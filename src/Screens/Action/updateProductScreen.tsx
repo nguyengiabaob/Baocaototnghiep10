@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, TextInput, View } from 'react-native';
 import { MediaType } from 'react-native-image-picker';
@@ -20,6 +20,7 @@ import { Overlay } from 'react-native-elements';
 import { Item } from 'react-native-paper/lib/typescript/components/List/List';
 import BellNofi from '../../asset/svg/bellnotification.svg';
 import { CustomNotification } from '../../Model/CustomNofication';
+import DataService from '../../services/dataservice';
 type Props={
     navigation: StackNavigationProp<ListproductNavigationPramaList,'UpdateProductScreen'>,
     route: RouteProp<ListproductNavigationPramaList,'UpdateProductScreen'>
@@ -44,25 +45,34 @@ const UpdateProductScreen: React.FC<Props> = ({navigation, route}: Props) =>{
     const [DataCate,setDataCate]= useState<any[]>([]);
     const [dataproduct,setdataproduct] = useState<Product[]>([]);
     const [dataProduct,setdataProduct]= useState<Product>();
-    useEffect(()=>{
-        let arrayproduct:any[] = [];
-        data.getdata('Products').then(res=>{
-            for (let key in res)
-            {
-                arrayproduct.push(
-                    {
-                        id: key,
-                        ...res[key],
-                    }
-                );
-            }
-            let i= arrayproduct.findIndex(Item => Item.id== id);
-            console.log('1',arrayproduct[i]);
-            setdataProduct(arrayproduct[i]);
+    const getProduct = useCallback(async()=>{
+        // let arrayproduct:any[] = [];
+        // data.getdata('Products').then(res=>{
+        //     for (let key in res)
+        //     {
+        //         arrayproduct.push(
+        //             {
+        //                 id: key,
+        //                 ...res[key],
+        //             }
+        //         );
+        //     }
+        //     let i= arrayproduct.findIndex(Item => Item.id== id);
+        //     console.log('1',arrayproduct[i]);
+        //     setdataProduct(arrayproduct[i]);
            
-            //setdataproduct(arrayproduct);
-        });
-    },[id]);
+        //     //setdataproduct(arrayproduct);
+        // });
+        let dta = await DataService.Getdata_dtService<any>('Products');
+        let i = dta.findIndex(Item => Item.id == id);
+        console.log('1',dta[i]);
+        setdataProduct(dta[i]);
+        //setdataproduct(arrayproduct);
+
+    },[id])
+    useEffect(()=>{
+        getProduct();
+    },[id,getProduct]);
     //let name ,price, quanity1,img1, CatergoryID;
 
    

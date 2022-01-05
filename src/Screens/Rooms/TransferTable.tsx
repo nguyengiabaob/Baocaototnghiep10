@@ -14,6 +14,7 @@ import { CustomNotification } from '../../Model/CustomNofication';
 import WarningIcon from '../../asset/svg/Warning.svg';
 import BellNofi from '../../asset/svg/bellnotification.svg';
 import { StackNavigationProp } from '@react-navigation/stack';
+import DataService from '../../services/dataservice';
 type props ={
     navigation: StackNavigationProp<RoomParamList,'SwapTable'>
     route: RouteProp<RoomParamList,'SwapTable'>
@@ -72,19 +73,20 @@ const checkExistBill =() =>{
   
   })
 }
-const checkBookTable =() =>{
-  data.getdata('BookTable').then(res=>{
-    var dataArray: any[]= [];
-    for (let key in res)
-    {
-      dataArray.push({
-        id: key,
-        ...res[key],
-      })
-    }
-    setBookTable(dataArray);
+const checkBookTable =async() =>{
+  let dataArray = await DataService.Getdata_dtService('BookTable') 
+  // data.getdata('BookTable').then(res=>{
+  //   var dataArray: any[]= [];
+  //   for (let key in res)
+  //   {
+  //     dataArray.push({
+  //       id: key,
+  //       ...res[key],
+  //     })
+  //   }
+  setBookTable(dataArray);
   
-  })
+  // })
 }
 useEffect(()=>{
   checkExistBill();

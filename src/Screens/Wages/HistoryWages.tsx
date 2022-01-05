@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import { useIsFocused } from "@react-navigation/native";
 import React, { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Pressable, StyleSheet, TouchableOpacity, View } from  'react-native';
 import { Text } from 'react-native-elements';
 import { Overlay } from "react-native-elements/dist/overlay/Overlay";
 import { ScrollView } from 'react-native-gesture-handler';
@@ -13,6 +13,7 @@ import data from '../../services/data';
 import { getheight, getwidth, reponsiveheight, reponsivewidth } from "../../theme/Metric";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Item } from "react-native-paper/lib/typescript/components/List/List";
+import DataService from "../../services/dataservice";
 type props = {
     visible: boolean
 }
@@ -29,39 +30,41 @@ export const WagesHistory:React.FC<props> = ({visible}) =>{
         var year = new Date(d).getFullYear();
        return date + '/' + month + '/' + year;
     };
-    const getallwages = ()=>{
-        let datarray :any[] = [];
-        data.getdata('Wages').then(res=> {for ( let key in res)
-        {
-            if (key !== '0')
-            {
-            datarray.push(
-                {
-                    id: key,
-                    ...res[key],
-                }
-            );
-            }
-        }
-       setDataWages(datarray);
-    });
+    const getallwages = async()=>{
+        let datarray = await DataService.Getdata_dtService<any>('Wages');
+
+    //     data.getdata('Wages').then(res=> {for ( let key in res)
+    //     {
+    //         if (key !== '0')
+    //         {
+    //         datarray.push(
+    //             {
+    //                 id: key,
+    //                 ...res[key],
+    //             }
+    //         );
+    //         }
+    //     }
+      setDataWages(datarray);
+    // });
     };
-    const getalluser = ()=>{
-        let datarray :any[] = [];
-        data.getdata('user').then(res=> {for ( let key in res)
-        {
-            if (key !== '0')
-            {
-            datarray.push(
-                {
-                    id: key,
-                    ...res[key],
-                }
-            );
-            }
-        }
-        setDatauser(datarray);
-    });
+    const getalluser = async()=>{
+        let datarray= await DataService.Getdata_dtService<any>('user');
+
+        // data.getdata('user').then(res=> {for ( let key in res)
+        // {
+        //     if (key !== '0')
+        //     {
+        //     datarray.push(
+        //         {
+        //             id: key,
+        //             ...res[key],
+        //         }
+        //     );
+        //     }
+        // }
+         setDatauser(datarray);
+    // });
 }
     useEffect(()=>{
     //     if (isFocused === true|| visible== true)

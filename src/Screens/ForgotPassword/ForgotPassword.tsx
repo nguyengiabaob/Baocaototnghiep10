@@ -1,9 +1,9 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState }  from "react";
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { CustomNotification } from "../../Model/CustomNofication";
-import { getheight, getwidth, reponsiveheight, reponsivewidth } from "../../theme/Metric";
+import { getheight, getwidth, reponsiveheight, reponsivewidth } from '../../theme/Metric';
 import BellNofi from '../../asset/svg/bellnotification.svg';
 import Logoimg from '../../asset/svg/logo.svg';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';

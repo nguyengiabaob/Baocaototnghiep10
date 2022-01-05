@@ -22,6 +22,8 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
+import DataService from '../../services/dataservice';
+import data from '../../services/data';
 type Props ={
     navigation:StackNavigationProp<DashboardNavigationParamList, 'DashboardScreen'>
     route:RouteProp<DashboardNavigationParamList,'DashboardScreen'>
@@ -35,7 +37,7 @@ const DashboardScreen: React.FC<Props> = ({navigation, route}:Props)=>{
         setusername(user);
 
     }
-    React.useEffect(()=>{
+    React.useEffect(()=>{   
         if (isLoggedGoogle === true)
         {
             setusername(auth().currentUser?.displayName);

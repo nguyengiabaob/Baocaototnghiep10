@@ -4,9 +4,9 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
 import { Text, TouchableOpacity, View,ScrollView } from 'react-native';
 import CustomHeader from '../../Model/CustomHeader';
-import { DashboardNavigationParamList, RoomParamList } from '../../navigation/types';
+import { RoomParamList } from '../../navigation/types';
 import { Input, Overlay, Tab, TabView} from 'react-native-elements';
-import Allrooms from './AllRooms';
+// import Allrooms from './AllRooms';
 import AllRooms from './AllRooms';
 import UsingRooms from './UsingRoom';
 import EmptyRooms from './EmptyRooms';
@@ -27,6 +27,7 @@ import { HistoryBookTable } from './HisotyBookTable';
 import { HistoryPaying } from './HistoryPaying';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Warning from '../../asset/svg/Warning.svg';
+import DataService from '../../services/dataservice';
 type props ={
     navigation: StackNavigationProp<RoomParamList,'RoomScreen'>
 }
@@ -53,64 +54,68 @@ type propsModal={
   Visible: boolean,
 }
 
-const DataArea1 = ()=>{
-    let datarray :any[] = [];
-    data.getdata('Area').then(res=> {for ( let key in res)
-    {
-        if (key !== '0')
-        {
-        datarray.push(
-            {
-                id: key,
-                ...res[key],
-            }
-        );
-        }
-    }
-    setdataArea1(datarray);
-});
+const DataArea1 =async ()=>{
+//     let datarray :any[] = [];
+//     data.getdata('Area').then(res=> {for ( let key in res)
+//     {
+//         if (key !== '0')
+//         {
+//         datarray.push(
+//             {
+//                 id: key,
+//                 ...res[key],
+//             }
+//         );
+//         }
+//     }
+//     setdataArea1(datarray);
+// });
+  let dta = await DataService.Getdata_dtService<any>('Area');
+  setdataArea1(dta);
 }
-const DataTable = ()=>{
-    let datarray :any[] = [];
-    data.getdata('Table').then(res=> {for ( let key in res)
-    {
-        if (key !== '0')
-        {
-        datarray.push(
-            {
-                id: key,
-                ...res[key],
-            }
-        );
-        }
-    }
-    let datarraytable :any[] = [];
-    data.getdata('BookTable').then(res=> {for ( let key in res)
-      {
-          if (key !== '0')
-          {
-          datarraytable.push(
-              {
-                  id: key,
-                  ...res[key],
-              }
-          );
-          }
-      }
+const DataTable =async()=>{
+    let datarray = await DataService.Getdata_dtService<any>('Table');
+    let datarraytable = await DataService.Getdata_dtService<any>('BookTable');
+    // let datarray :any[] = [];
+    // data.getdata('Table').then(res=> {for ( let key in res)
+    // {
+    //     if (key !== '0')
+    //     {
+    //     datarray.push(
+    //         {
+    //             id: key,
+    //             ...res[key],
+    //         }
+    //     );
+    //     }
+    // }
+    // let datarraytable :any[] = [];
+    // data.getdata('BookTable').then(res=> {for ( let key in res)
+    //   {
+    //       if (key !== '0')
+    //       {
+    //       datarraytable.push(
+    //           {
+    //               id: key,
+    //               ...res[key],
+    //           }
+    //       );
+    //       }
+    //   }
     datarray.forEach(item=>{
       datarraytable.forEach(i=>{
         if(i.TableID == item.id && new Date(i.BookDate) == new Date())
         {
           item.Status= 1;
           data.UpdateTable(item.Name,item.id,item.Type, item.Slots,item.Status).then(res=>{if(res=== true){
-            console.log("updaate");
+            console.log("update");
           }})
         }
       })
     })
     setdataTable(datarray);
-});
-})
+// });
+// })
 }
 // useEffect(()=>{
 //   let time =setTimeout(DataTable(),9000);
@@ -119,7 +124,6 @@ const DataTable = ()=>{
 useEffect(()=>{
     if (visible === false)
     {
-  
      DataArea1();
      DataTable();
     }
@@ -432,10 +436,10 @@ useEffect(()=>{
       </View>
       <View>
         <View style={{marginTop:15}}>
-           <Input placeholder="Tên bàn" containerStyle={{width:reponsivewidth(310)}} onChangeText={(text)=>{setnameTable(text)}}/>
+           <Input placeholder="Tên bàn" containerStyle={{ width: reponsivewidth(310) }} onChangeText={(text) => { setnameTable(text); } } autoCompleteType={undefined}/>
         </View>
         <View style={{marginTop:35}}>
-           <Input keyboardType={'number-pad'} placeholder="Số chỗ" containerStyle={{width:reponsivewidth(310)}} onChangeText={(text)=>{setTableSlots(Number(text))}}/>
+           <Input keyboardType={'number-pad'} placeholder="Số chỗ" containerStyle={{ width: reponsivewidth(310) }} onChangeText={(text) => { setTableSlots(Number(text)); } } autoCompleteType={undefined}/>
         </View>
         { AreaSelected !== undefined ?
           <View style={{flexDirection:'row',marginTop:20}}>
@@ -518,7 +522,7 @@ const ModalArea: React.FC = ()=>{
       </View>
       <View>
       <View style={{marginTop:15}}>
-           <Input placeholder="Tên Khu Vực" containerStyle={{width:reponsivewidth(310)}} onChangeText={(text)=>{setnameArea(text)}}/>
+           <Input placeholder="Tên Khu Vực" containerStyle={{ width: reponsivewidth(310) }} onChangeText={(text) => { setnameArea(text); } } autoCompleteType={undefined}/>
         </View>
       </View>
       <View style={{flexDirection:'row',marginTop:50,alignItems:'center',justifyContent:'center'}}>
@@ -563,7 +567,7 @@ const ModalEditArea:React.FC =()=>{
         {console.log('IDAREA', IDArea)}
       <View style={{marginLeft:15}} >
       <Text style={{fontSize:18, fontWeight:'700'}}>Tên Bàn :</Text>
-      <Input containerStyle={{width: reponsivewidth(300)}} onChange={(e)=>{setValueAreaName(e.nativeEvent.text)}}>
+      <Input containerStyle={{ width: reponsivewidth(300) }} onChange={(e) => { setValueAreaName(e.nativeEvent.text); } } autoCompleteType={undefined}>
           {IDArea?.Name}
       </Input>
       </View>

@@ -14,6 +14,17 @@ static async getdata( name: string) :Promise<any>
         console.log(error);
     });
 }
+static async getdata2( name: string) :Promise<any>
+{  return await
+   instance.get(`/${name}.json`,{timeout:2000})
+    .then(response=>{
+        // let data: any =[];
+        // data = response.data
+        return response;
+    }).catch(error=>{
+        console.log(error);
+    });
+}
 static async deletedData (nametable: string, id: string) : Promise<any>
  {
      return await

@@ -26,6 +26,7 @@ import Warning from '../../asset/svg/Warning.svg';
 import { CustomNotification } from '../../Model/CustomNofication';
 import { Item } from 'react-native-paper/lib/typescript/components/List/List';
 import AuthService from '../../services/authService';
+import DataService from '../../services/dataservice';
 
 type props= {
     navigation: StackNavigationProp<RoomParamList,'callingWater'>
@@ -46,8 +47,8 @@ const isFocused = useIsFocused();
 const [createrID, setCreaterID]=useState<string>();
 const [visibleSuccess,setvisibleSuccess]=useState<boolean>(false)
 const fetchId = async ()=>{
-    let a= await AuthService.getuserid();
-    if(a!= null)
+    let a = await AuthService.getuserid();
+    if (a!= null)
     { 
         setCreaterID(a);
     }
@@ -76,93 +77,94 @@ const fetchId = async ()=>{
 // })
 //     setcodeBill(code);
 // }
-const getTable = useCallback(()=>{
-
-    let datarray :any[] = [];
-    data.getdata('Table').then(res=> {for ( let key in res)
-    {
-        if (key !== '0')
-        {
-        datarray.push(
-            {
-                id: key,
-                ...res[key],
-            }
-        );
-        }
-    }
+const getTable = useCallback(async()=>{
+    let datarray= await DataService.Getdata_dtService<any>('Table');
+    // let datarray :any[] = [];
+    // data.getdata('Table').then(res=> {for ( let key in res)
+    // {
+    //     if (key !== '0')
+    //     {
+    //     datarray.push(
+    //         {
+    //             id: key,
+    //             ...res[key],
+    //         }
+    //     );
+    //     }
+    // }
     datarray.forEach(item=> {
       if (item.id === id)
       {
           setTable(item);
       }
     });
-});
+// });
 },[id]);
 useEffect(()=>{
     getTable();
 },[getTable]);
-const checktableBill=useCallback(()=>{
+const checktableBill= useCallback(async()=>{
     setflag(false);
-    let datarray :any[] = [];
-    data.getdata('Table').then(res=> {for ( let key in res)
-    {
-        if (key !== '0')
-        {
-        datarray.push(
-            {
-                id: key,
-                ...res[key],
-            }
-        );
-        }
-    }
-    let idtable=datarray.filter(item=>item.id=== id);
-    data.getdata('Bill').then(res=> {
-        var dataarrayBill: any []= [];
-        for (let key in res)
-        {
-            dataarrayBill.push({
-                id: key,
-                ...res[key],
-            });
-        }
-        
-        var billChooosen= dataarrayBill.filter(item=> item.TableID=== idtable[0].id && item.Status===0);
+     let datarray  = await DataService.Getdata_dtService<any>('Table');
+    // data.getdata('Table').then(res=> {for ( let key in res)
+    // {
+    //     if (key !== '0')
+    //     {
+    //     datarray.push(
+    //         {
+    //             id: key,
+    //             ...res[key],
+    //         }
+    //     );
+    //     }
+    // }
+    let idtable=datarray.filter(item=>item.id === id);
+    // data.getdata('Bill').then(res => {
+    //     var dataarrayBill: any [] = [];
+    //     for (let key in res)
+    //     {
+    //         dataarrayBill.push({
+    //             id: key,
+    //             ...res[key],
+    //         });
+    //     }
+        let  dataarrayBill = await DataService.Getdata_dtService<any>('Bill');
+        var billChooosen= dataarrayBill.filter(item=> item.TableID === idtable[0].id && item.Status ===0);
         console.log('billchoosen',billChooosen);
         if (billChooosen.length>0 )
             {
-                
                 setcodeBillfact('');
                 let billID: any;
                 billChooosen.forEach( item=> {
                     setcodeBill(item.id);
                     billID= item.id;
                 });
-                data.getdata('ListProduct').then(res=> {
-                    var arraylist: any[]=[];
-                    for (let key in res)
-                    {
-                            arraylist.push(
-                                {
-                                    id: key,
-                                    ...res[key]
-                                }
-                            );
-                    }
+                // data.getdata('ListProduct').then(res=> {
+                //     var arraylist: any[]=[];
+                //     for (let key in res)
+                //     {
+                //             arraylist.push(
+                //                 {
+                //                     id: key,
+                //                     ...res[key]
+                //                 }
+                //             );
+                //     }
+                let arraylist =await DataService.Getdata_dtService<any>('ListProduct') ;
                     var arrayb=(arraylist.filter(item=> item.billID=== billID));
                     console.log('arrayb',arrayb);
-                    data.getdata('Products').then(res=> {
-                        var a: any[] =[];
-                        for(  let key in res)
-                    {
-                        a.push(
-                            {
-                                id: key,
-                                ...res[key],
-                            }
-                        );
-                    }
+                    var a = await DataService.Getdata_dtService<any>('Products');
+                    // data.getdata('Products').then(res=> {
+                    //     var a: any[] =[];
+                    //     for(  let key in res)
+                    // {
+                    //     a.push(
+                    //         {
+                    //             id: key,
+                    //             ...res[key],
+                    //         }
+                    //     );
+                    // }
                     console.log('a',a);
                     var arrrayProductNews: any []= [] ;
                     a.forEach(item=>{
@@ -173,30 +175,26 @@ const checktableBill=useCallback(()=>{
                                 console.log(item);
                                // setupdateProducted(prev=>prev.concat(...item));
                                arrrayProductNews.push(item);
-                             
                             }
                         });
                     });
                     console.log('ttt',arrrayProductNews);
-                       setupdateProducted(arrrayProductNews);
-                    });
-                });
-                
+                    setupdateProducted(arrrayProductNews);
+                    // });
+                // });
             }
         else
         {  
             var code =(Math.floor(Math.random()* (999999-1000))+1000).toString();
-            var billChooosen= dataarrayBill.filter(item=> item.billID=== `HD ${code}`);
+            var billChooosen= dataarrayBill.filter(item=> item.billID === `HD ${code}`);
             if(billChooosen.length==0)
             {
                 setcodeBillfact(`HD ${code}`);
-            }
-        
-            
+            }   
         }
-    });  
+    // });  
    
-});
+// });
    
 },[id]);
  const [dataproduct,setdataproduct]= useState<Product[]>([]);
@@ -271,18 +269,19 @@ const DeleteProduct =(productid:string)=>{
             total+= item.Quanity* item.Price_product;
         });
        await data.PostBill(total,CodeBillfact,createrID ? createrID :'',0,new Date(),id)
-       .then(()=>{
-        data.getdata('Bill').then(res=> {
-            var arrayBill: any[]=[];
-            for (let key in res)
-            {
-                    arrayBill.push(
-                        {
-                            id: key,
-                            ...res[key]
-                        }
-                    );
-            }
+       .then(async()=>{
+        // data.getdata('Bill').then(res=> {
+        //     var arrayBill: any[]=[];
+        //     for (let key in res)
+        //     {
+        //             arrayBill.push(
+        //                 {
+        //                     id: key,
+        //                     ...res[key]
+        //                 }
+        //             );
+        //     }
+            let  arrayBill =await DataService.Getdata_dtService<any>('Bill');
             let a= arrayBill.filter(item=> item.TableID === id && item.Status==0);
             datatable.forEach(item=>{
                 if(item.id === id)
@@ -296,19 +295,20 @@ const DeleteProduct =(productid:string)=>{
                 })
                 .catch(()=>{check=true});
             });  
-            data.getdata("Products").then(res=>{
-                let datapro: any[] =[];
-                for (let key in res)
-                {
-                    if( key != "0")
-                    {
-                        datapro.push({
-                            id:key,
-                            ...res[key]
-                        });
-                    }
+            // data.getdata("Products").then(res=>{
+            //     let datapro: any[] =[];
+            //     for (let key in res)
+            //     {
+            //         if( key != "0")
+            //         {
+            //             datapro.push({
+            //                 id:key,
+            //                 ...res[key]
+            //             });
+            //         }
     
-                }
+            //     }
+            let datapro = await DataService.Getdata_dtService<any>('Products');
                 ProductArray.forEach(item=>{
                     datapro.forEach(i=>{
                         if(i.id== item.id)
@@ -322,9 +322,9 @@ const DeleteProduct =(productid:string)=>{
                     });
                    
                 });
-            });
+            // });
             
-        });
+        // });
             setupdateProducted([]);
              setflag(true);
         if(check==false)
@@ -345,17 +345,18 @@ const DeleteProduct =(productid:string)=>{
         if(CodeBill !== '')
         {
      console.log('456');    
-    data.getdata('ListProduct').then(res=> {
-        var arraylist: any[]=[];
-        for (let key in res)
-        {
-                arraylist.push(
-                    {
-                        id: key,
-                        ...res[key]
-                    }
-                );
-        }
+    // data.getdata('ListProduct').then(res=> {
+    //     var arraylist: any[]=[];
+    //     for (let key in res)
+    //     {
+    //             arraylist.push(
+    //                 {
+    //                     id: key,
+    //                     ...res[key]
+    //                 }
+    //             );
+    //     }
+    var arraylist = await DataService.Getdata_dtService<any>('ListProduct');
          arraylist.forEach(item=> {
             ProductArray.forEach( i=> {
                 if (i.id === item.productID && item.billID ==CodeBill)
@@ -375,24 +376,25 @@ const DeleteProduct =(productid:string)=>{
            
             
         });
-        data.getdata("Products").then(res=>{
-            let datapro: any[] =[];
-            for(let key in res)
-            {
-                if( key != "0")
-                {
-                    datapro.push({
-                        id:key,
-                        ...res[key]
-                    });
-                }
+        // data.getdata("Products").then(res=>{
+            // let datapro: any[] =[];
+            // for(let key in res)
+            // {
+            //     if( key != "0")
+            //     {
+            //         datapro.push({
+            //             id:key,
+            //             ...res[key]
+            //         });
+            //     }
 
-            }
+            // }
+            let datapro1= await DataService.Getdata_dtService<any>('Products')
             arraylist.forEach(item=>{
                 ProductArray.forEach(i=> {
                    if(i.id === item.productID && item.billID ==CodeBill)
                    {
-                    datapro.forEach(j=>{
+                    datapro1.forEach(j=>{
                         if(i.id== j.id)
                         {
                         let quanity = Number(j.Quanity)- (Number(i.Quanity)- Number(item.Number));
@@ -403,7 +405,7 @@ const DeleteProduct =(productid:string)=>{
                 });
             });
 
-        });
+        // });
        // let countadd= 0;
         ProductArray.forEach(item=>{
             if( arraylist.filter( i => i.productID === item.id && i.billID=== CodeBill ).length==0)
@@ -417,24 +419,26 @@ const DeleteProduct =(productid:string)=>{
                 });
                // countadd ++;
             }
-        });
-        data.getdata("Products").then(res=>{
-            let datapro: any[] =[];
-           for(let key in res)
-            {
-                if( key != "0")
-                {
-                    datapro.push({
-                        id:key,
-                        ...res[key]
-                    });
-                }
+        })
+        ;
+        // data.getdata("Products").then(res=>{
+        //     let datapro: any[] =[];
+        //    for(let key in res)
+        //     {
+        //         if( key != "0")
+        //         {
+        //             datapro.push({
+        //                 id:key,
+        //                 ...res[key]
+        //             });
+        //         }
 
-            }
+        //     }
+       
             ProductArray.forEach(item=>{
                 if( arraylist.filter( i => i.productID === item.id && i.billID=== CodeBill ).length==0)
                 {
-                datapro.forEach(i=>{
+                datapro1.forEach(i=>{
                     if(item.id == i.id)
                     {
                     let quanity = Number(i.Quanity)- Number(item.Quanity);
@@ -444,7 +448,7 @@ const DeleteProduct =(productid:string)=>{
             }
                
             });
-        });
+        // });
         
         let count= 0;
          arraylist.forEach( item=>{
@@ -464,19 +468,20 @@ const DeleteProduct =(productid:string)=>{
         //     })
         //    data.deletedData("Bill",CodeBill);
         //  }
-         data.getdata("Products").then(res=>{
-            let datapro: any[] =[];
-             for(let key in res)
-             {
-                 if( key != "0")
-                 {
-                     datapro.push({
-                         id:key,
-                         ...res[key]
-                     });
-                 }
+        //  data.getdata("Products").then(res=>{
+        //     let datapro: any[] =[];
+        //      for(let key in res)
+        //      {
+        //          if( key != "0")
+        //          {
+        //              datapro.push({
+        //                  id:key,
+        //                  ...res[key]
+        //              });
+        //          }
  
-             }
+        //      }
+        let datapro = await DataService.Getdata_dtService<any>('Products');
              arraylist.forEach(item=>{
                 if( item.billID== CodeBill && ProductArray.filter(i=> i.id === item.productID).length === 0 )
                  {
@@ -490,7 +495,7 @@ const DeleteProduct =(productid:string)=>{
              }
                 
              });
-         });
+        //  });
         
           setupdateProducted([]);
              setflag(true);
@@ -498,7 +503,7 @@ const DeleteProduct =(productid:string)=>{
         {
             setvisibleSuccess(true);
         }
-    });
+    // });
 }
 
 }
@@ -551,41 +556,43 @@ const ModalChoosenWater:React.FC<propsModalChoosenWater>= ({getdataproductSelect
     const [Catergory,setcatergory]= useState<any[]>();
     const [Productbefore,setProductbefore]= useState<any[]>();
     const isFocused= useIsFocused();
-    const getcatergory= ()=>{
-        let datarray :any[] = [];
-        data.getdata('Catergory').then(res=> {
-            
-        for ( let key in res)
-        {
-            if (key !== '0')
-            {
-            datarray.push(
-                {
-                    id: key,
-                    ...res[key],
-                }
-            );
-            }
-        }
+    const getcatergory= async()=>{
+        let datarray = await DataService.Getdata_dtService<any>('Catergory');
         setcatergory(datarray);
-        })
+        // data.getdata('Catergory').then(res=> {
+            
+        // for ( let key in res)
+        // {
+        //     if (key !== '0')
+        //     {
+        //     datarray.push(
+        //         {
+        //             id: key,
+        //             ...res[key],
+        //         }
+        //     );
+        //     }
+        // }
+        // setcatergory(datarray);
+        // })
     
     }
-    const getProduct=()=>{
-        let arrayproduct:any[] = [];
-        data.getdata('Products').then(res=>{
-            for (let key in res)
-            {
-                arrayproduct.push(
-                    {
-                        id: key,
-                        ...res[key],
-                    }
-                );
-            }
+    const getProduct=async()=>{
+        let arrayproduct= await DataService.Getdata_dtService<any>('Products');
+
+        // data.getdata('Products').then(res=>{
+        //     for (let key in res)
+        //     {
+        //         arrayproduct.push(
+        //             {
+        //                 id: key,
+        //                 ...res[key],
+        //             }
+        //         );
+        //     }
             setProduct(arrayproduct);
             setProductbefore(arrayproduct);
-        });
+        // });
     };
    const getbill=useCallback(()=>{
     data.getdata('Bill').then(res => {
@@ -935,34 +942,34 @@ const ShowPaying: React.FC<propspaying>= ({ListProduct, BillCode,getvisible})=>{
         getDataBill();
         fetchId();
     },[getDataBill]);
-    const CaculateMoney =()=>{
+    const CaculateMoney = async()=>{
         if ( CustomerMoney >= Number(total()) )
         {
       
             setchangeMoney(CustomerMoney- Number(total()));
             console.log('update Status');
             databill.Status =1;
-            let datatable: any[]= []
-            data.getdata('Table').then(res => {
-                console.log(res);
-                for ( let key in res)
-                {
+            let datatable= await DataService.Getdata_dtService<any>('Table');
+            // data.getdata('Table').then(res => {
+            //     console.log(res);
+            //     for ( let key in res)
+            //     {
                 
-                    if(key!="0")
-                    {
-                        datatable.push({
-                            id: key,
-                            ...res[key]
-                        })
-                    }
-                }
+            //         if(key!="0")
+            //         {
+            //             datatable.push({
+            //                 id: key,
+            //                 ...res[key]
+            //             })
+            //         }
+            //     }
                 datatable.forEach(item=>{
                     if(item.id == databill.TableID)
                     {
                         data.UpdateTable(item.Name,databill.TableID,item.Type,item.Slots,0);
                     }
                 })
-            });
+            // });
             data.UpdateBill(databill.id,Number(total()),databill.billID,createID,1,databill.TableID, databill.CreateDate).then(res=>{
                 if( res === true)
                 {
@@ -1017,10 +1024,11 @@ const ShowPaying: React.FC<propspaying>= ({ListProduct, BillCode,getvisible})=>{
     <View style={{flexDirection:'row', paddingBottom :25 , paddingTop:25,paddingLeft:10, paddingRight:10, borderBottomColor:'#d6d6d6', borderBottomWidth:1, }}>
         <Text style={{fontSize:18, marginLeft:10,width:reponsivewidth(240)}}>Tiền khách Đưa</Text>
         {FinishPaying === false ? <View style={{ alignSelf:'flex-end', justifyContent:'flex-end', width:reponsivewidth(130), height:reponsiveheight(30),marginTop:15, marginBottom:-15 }}>
-      <Input onChangeText={(text)=>{
-            let t='15,000,000';
-            console.log(Number(t.replace(/,/g,'')));
-            setCustomerMoney(Number(isNaN(Number(text))) ? Number(text.replace(/,/g,'')): Number(text));}} inputStyle={{textAlign:'center'}} keyboardType={'numeric'} style={{fontSize:18,alignSelf:'flex-end', justifyContent:'flex-end'}}>{CustomerMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</Input>
+      <Input onChangeText={(text) => {
+            let t = '15,000,000';
+            console.log(Number(t.replace(/,/g, '')));
+            setCustomerMoney(Number(isNaN(Number(text))) ? Number(text.replace(/,/g, '')) : Number(text));
+        } } inputStyle={{ textAlign: 'center' }} keyboardType={'numeric'} style={{ fontSize: 18, alignSelf: 'flex-end', justifyContent: 'flex-end' }} autoCompleteType={undefined}>{CustomerMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</Input>
 
     </View> :  
     <View style={{ alignSelf:'flex-end', justifyContent:'flex-end', width:reponsivewidth(120), height:reponsiveheight(30)}}>

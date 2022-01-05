@@ -16,6 +16,7 @@ import CustomBoxItem from '../../Model/CustomBoxItem';
 import { CustomNotification } from '../../Model/CustomNofication';
 import BellNofi from '../../asset/svg/bellnotification.svg';
 import { CustomNotificationDel } from '../../Model/CustomNoficationDel';
+import DataService from '../../services/dataservice';
 type props ={
     getvisible: (data: any)=>void
 }
@@ -67,19 +68,20 @@ const gettable =()=>{
     })
    
 }
-const getBookTable= ()=>{
-    data.getdata('BookTable').then(res=> {
-        var dataArray1: any[]= [];
-        for ( let key in res)
-        {
-            if (key !== '0')
-            {
-                dataArray1.push({
-                    id: key,
-                    ...res[key]
-                })
-            }
-        }
+const getBookTable= async ()=>{
+    var dataArray1= await DataService.Getdata_dtService('BookTable');
+    // data.getdata('BookTable').then(res=> {
+    //     var dataArray1: any[]= [];
+    //     for ( let key in res)
+    //     {
+    //         if (key !== '0')
+    //         {
+    //             dataArray1.push({
+    //                 id: key,
+    //                 ...res[key]
+    //             })
+    //         }
+    //     }
     // data.getdata('Table').then(res=>{
     //     var dataArray2: any[]= [];
     //     for ( let key in res)
@@ -102,7 +104,7 @@ const getBookTable= ()=>{
         // })
         setdataBookTable(dataArray1);
     // })
-    })
+    // })
 }
 useEffect(()=>{
     if (visibleModal === false)
@@ -199,10 +201,10 @@ useEffect(()=>{
     <Text style={{alignSelf:'center',fontSize:17, width:reponsivewidth(300), textAlign:'left', color:'#FFFF', fontWeight:'700'}}>Chỉnh sử thông tin</Text>
     </View>
     <View style={{justifyContent:'center', alignItems:'center',marginTop:35}}>
-        <TextInput disabled={true}  placeholder="Tên khách hàng"  mode="outlined" outlineColor="#02569E" style={{width:reponsivewidth(350)}}>{BookTableSelected.CustomerName}</TextInput>
+        <TextInput disabled={true} placeholder="Tên khách hàng" mode="outlined" outlineColor="#02569E" style={{ width: reponsivewidth(350) }} autoCompleteType={undefined}>{BookTableSelected.CustomerName}</TextInput>
     </View>
     <View style={{justifyContent:'center', alignItems:'center',marginTop:35}}>
-        <TextInput disabled={true}  editable={false}  mode="outlined" outlineColor="#02569E" style={{width:reponsivewidth(350)}} right={<TextInput.Icon name="calendar-today" />}>{tranferday(BookTableSelected.BookDate)}</TextInput>
+        <TextInput disabled={true} editable={false} mode="outlined" outlineColor="#02569E" style={{ width: reponsivewidth(350) }} right={<TextInput.Icon name="calendar-today" />} autoCompleteType={undefined}>{tranferday(BookTableSelected.BookDate)}</TextInput>
        </View>
        {console.log('tbs',TableSelected)}
        <TouchableOpacity onPress={()=>setVisibleTable(true)} style={[styles.Shadowbox,{marginTop:35, alignItems:'center', backgroundColor:'#ffffff', width:reponsivewidth(350),alignSelf:'center',padding:10, }]}>
@@ -210,7 +212,7 @@ useEffect(()=>{
         </TouchableOpacity>
        <View style={{justifyContent:'center', alignItems:'center',marginTop:35}}>
         {console.log(tranferday(BookTableSelected.BookTime))}
-        <TextInput editable={false}   mode="outlined" outlineColor="#02569E" style={{width:reponsivewidth(350)}} right={<TextInput.Icon onPress={()=>setshowtime(true)} name="clock"/>}>{tranferTime(time.toString())}</TextInput>
+        <TextInput editable={false} mode="outlined" outlineColor="#02569E" style={{ width: reponsivewidth(350) }} right={<TextInput.Icon onPress={() => setshowtime(true)} name="clock" />} autoCompleteType={undefined}>{tranferTime(time.toString())}</TextInput>
         {showtime &&  (  <DateTimePicker 
                 value={time}
                 display={"clock"}
@@ -221,7 +223,7 @@ useEffect(()=>{
         )}
     </View>
     <View style={{justifyContent:'center', alignItems:'center',marginTop:35}}>
-        <TextInput keyboardType={'numeric'} value={Slots.toString()} onChangeText={(text)=>setSlots(Number(text))} placeholder="Số người "  mode="outlined" outlineColor="#02569E" style={{width:reponsivewidth(350)}}/>
+        <TextInput keyboardType={'numeric'} value={Slots.toString()} onChangeText={(text) => setSlots(Number(text))} placeholder="Số người " mode="outlined" outlineColor="#02569E" style={{ width: reponsivewidth(350) }} autoCompleteType={undefined}/>
     </View>
     <View style={{justifyContent:'center', alignItems:'center',marginTop:35}}>
     <TouchableOpacity onPress={()=>{onSave()}}   style={{ backgroundColor:'#226cb3',padding:10, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4}}>

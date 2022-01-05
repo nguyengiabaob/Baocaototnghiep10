@@ -10,6 +10,7 @@ import CustomBoxItem from "../../Model/CustomBoxItem";
 import { Table } from "../../Model/Table";
 import { RoomParamList } from "../../navigation/types";
 import data from "../../services/data";
+import DataService from "../../services/dataservice";
 import { reponsiveheight, reponsivewidth } from "../../theme/Metric";
 type props ={
     route: RouteProp<RoomParamList,'RoomEdit'>
@@ -24,28 +25,28 @@ export const EditRooms: React.FC<props> = ({route}:props)=>{
     const [StatusSelected, setStatusSelected]= useState<Table>();
     const [Name, setName]= useState<string>('');
     const [Slots, setSlots]= useState<number>(0);
-    const DataArea1 = ()=>{
-        let datarray :any[] = [];
-        data.getdata('Area').then(res=> {for ( let key in res)
-        {
-            if (key !== '0')
-            {
-            datarray.push(
-                {
-                    id: key,
-                    ...res[key],
-                }
-            );
-            }
-        }
+    const DataArea1 =async ()=>{
+        let datarray = await DataService.Getdata_dtService<any>('Area');
+        // data.getdata('Area').then(res=> {for ( let key in res)
+        // {
+        //     if (key !== '0')
+        //     {
+        //     datarray.push(
+        //         {
+        //             id: key,
+        //             ...res[key],
+        //         }
+        //     );
+        //     }
+        // }
       
         setdataArea(datarray);
  
-    });
+    // });
     }
-    const DataTable = ()=>{
+    const DataTable =()=>{
         let datarray :Table ;
-        data.getdata('Table/').then(res=> {for ( let key in res)
+        data.getdata('Table/').then(async(res)=> {for ( let key in res)
         {
             if (key !== '0' && key === id)
             {
@@ -53,19 +54,19 @@ export const EditRooms: React.FC<props> = ({route}:props)=>{
                 datarray.id = key;
             }
         }
-        let datarrayArea :any[] = [];
-        data.getdata('Area').then(Res=> {for ( let key in Res)
-        {
-            if (key !== '0')
-            {
-            datarrayArea.push(
-                {
-                    id: key,
-                    ...Res[key],
-                }
-            );
-            }
-        }
+        let datarrayArea= await DataService.Getdata_dtService<any>('Area');
+        // data.getdata('Area').then(Res=> {for ( let key in Res)
+        // {
+        //     if (key !== '0')
+        //     {
+        //     datarrayArea.push(
+        //         {
+        //             id: key,
+        //             ...Res[key],
+        //         }
+        //     );
+        //     }
+        // }
         setStatusSelected(datarray);
         datarrayArea.forEach( item=>{
             if ( item.id === datarray.Type)
@@ -77,7 +78,7 @@ export const EditRooms: React.FC<props> = ({route}:props)=>{
         })
         console.log('dataarray', datarray);
         settablesel(datarray);
-    });
+    // });
     });
     }
 useEffect(()=>{

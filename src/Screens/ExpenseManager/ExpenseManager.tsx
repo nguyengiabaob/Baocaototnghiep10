@@ -19,6 +19,7 @@ import MonthSelector from "react-native-month-selector";
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Checkbox } from "react-native-paper";
+import DataService from "../../services/dataservice";
 type props ={
     navigation : StackNavigationProp<ExpenseParamList,'ExpenseMainScreen'>
 }
@@ -72,21 +73,24 @@ export const ExpenseManagerScreen: React.FC<props>=(
     //     weekdaysShort:  ['CN','T2','T3','T4','T5','T6','T7'],
     // });
     const isFocused = useIsFocused();
-    const getDataExpense=()=>{
-        data.getdata('Expense').then(res => {
-            let datarray: any [] = [];
-            for ( let key in res)
-            {
-                 if (key !== '0')
-                 {
-                     datarray.push({
-                         id: key,
-                         ...res[key],
-                     })
-                 }
-            }
-            setArrayExpense(datarray);
-        });
+    const getDataExpense= async ()=>{
+        // data.getdata('Expense').then(res => {
+        //     let datarray: any [] = [];
+        //     for ( let key in res)
+        //     {
+        //          if (key !== '0')
+        //          {
+        //              datarray.push({
+        //                  id: key,
+        //                  ...res[key],
+        //              })
+        //          }
+        //     }
+        //     setArrayExpense(datarray);
+        // });
+        // let dta : any =[];
+        let dta = await DataService.Getdata_dtService<any>('Expense');
+        setArrayExpense(dta);
     }
     const oncheck =  (id:string,check:boolean)=>{
         if (check)
@@ -105,7 +109,6 @@ export const ExpenseManagerScreen: React.FC<props>=(
             DelArray.forEach(item=>{
                 data.deletedData("Expense",item)
                 })
-            
             setflag(true);
         }
 

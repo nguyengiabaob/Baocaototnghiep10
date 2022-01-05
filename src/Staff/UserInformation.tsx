@@ -24,7 +24,6 @@ export const UserInformation :React.FC<props> = ({navigation,route}:props)=>{
         {
             if (key === ID)
             {
-             
               datarray = res[key];
               datarray.id = key;
             }

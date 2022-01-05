@@ -9,6 +9,7 @@ import { getheight, getwidth, reponsiveheight, reponsivewidth } from '../../them
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { CustomNotificationDel } from '../../Model/CustomNoficationDel';
 import BellNofi from '../../asset/svg/bellnotification.svg';
+import DataService from '../../services/dataservice';
 type props ={
     getvisible: (data: any)=>void
 }
@@ -23,31 +24,33 @@ export const HistoryPaying: React.FC<props>= ({getvisible})=> {
         var year = new Date(d).getFullYear();
        return date + '/' + month + '/' + year;
     };
-    const getPaying= useCallback(()=>{
-        data.getdata('Bill').then(res=> {
-            var dataArray1: any[]= [];
-            for ( let key in res)
-            {
-                if (key !== '0')
-                {
-                    dataArray1.push({
-                        id: key,
-                        ...res[key]
-                    })
-                }
-            }
-        data.getdata('Table').then(res=>{
-            var dataArray2: any[]= [];
-            for ( let key in res)
-            {
-                if (key !== '0')
-                {
-                    dataArray2.push({
-                        id: key,
-                        ...res[key]
-                    })
-                }
-            }
+    const getPaying= useCallback(async()=>{
+        var dataArray1= await DataService.Getdata_dtService<any>('Bill');
+        // data.getdata('Bill').then(res=> {
+        //     var dataArray1: any[]= [];
+        //     for ( let key in res)
+        //     {
+        //         if (key !== '0')
+        //         {
+        //             dataArray1.push({
+        //                 id: key,
+        //                 ...res[key]
+        //             })
+        //         }
+        //     }
+        var dataArray2= await DataService .Getdata_dtService<any>('Table');
+        // data.getdata('Table').then(res=>{
+            // var dataArray2: any[]= [];
+            // for ( let key in res)
+            // {
+            //     if (key !== '0')
+            //     {
+            //         dataArray2.push({
+            //             id: key,
+            //             ...res[key]
+            //         })
+            //     }
+            // }
             dataArray1.forEach(item=>{
                 dataArray2.forEach(i=>{
                     if (item.TableID === i.id)
@@ -56,16 +59,16 @@ export const HistoryPaying: React.FC<props>= ({getvisible})=> {
                     }
                 })
             })
-           
-            data.getdata('user').then(res=>{
-                var dataArray3: any[]= [];
-                for (let key in res)
-                {
-                    dataArray3.push({
-                        id: key,
-                        ...res[key]
-                    })
-                }
+            var dataArray3 =await DataService.Getdata_dtService<any>('user');
+            // data.getdata('user').then(res=>{
+            //     var dataArray3: any[]= [];
+            //     for (let key in res)
+            //     {
+            //         dataArray3.push({
+            //             id: key,
+            //             ...res[key]
+            //         })
+            //     }
             
                 dataArray1.forEach(item=>{
                     dataArray3.forEach(i=>{
@@ -76,32 +79,33 @@ export const HistoryPaying: React.FC<props>= ({getvisible})=> {
                     })
                 })
             setdatapaying(dataArray1);
-            })
-        })
-        })
+            // })
+        // })
+        // })
     },[]) 
 useEffect(()=>{
     getPaying()
 },[getPaying]);
-const onDelPaying=()=>{
+const onDelPaying= async()=>{
     data.deletedData('Bill',itemSelected.id);
-    data.getdata('ListProduct').then(res=>{
-        let dataArray: any[]= [];
-        for( let key in res)
-        {
-            if( key !='0')
-            {
-                dataArray.push({
-                    id: key,
-                    ...res[key]
-                })
-            }
-        }
+    let dataArray = await DataService.Getdata_dtService<any>('ListProduct') ;
+    // data.getdata('ListProduct').then(res=>{
+    //     let dataArray: any[]= [];
+    //     for( let key in res)
+    //     {
+    //         if( key !='0')
+    //         {
+    //             dataArray.push({
+    //                 id: key,
+    //                 ...res[key]
+    //             })
+    //         }
+    //     }
         var listitem= dataArray.filter(item=> item.billID === itemSelected.billID);
         listitem.forEach(item=>{
             data.deletedData('ListProduct',item.id);
         })
-    })
+    // })
 }
     return (
             <View style={{width:getwidth(), height:getheight(),flex:1, marginTop:-9.5}}>

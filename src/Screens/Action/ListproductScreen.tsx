@@ -27,6 +27,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { CustomNotificationDel } from '../../Model/CustomNoficationDel';
 import { ModelDelete } from '../../Model/ModelDelete';
 import { useIsFocused } from '@react-navigation/native';
+import DataService from '../../services/dataservice';
 type Props ={
     navigation:StackNavigationProp<ListproductNavigationPramaList, 'ListProductScreen'>
 }
@@ -50,22 +51,28 @@ const [ListCheckProduct,setListCheckProduct]= useState<string[]>([]);
 const [ModalDelete,setModalDelete]= useState<boolean>(false);
 const [CheckAll,setCheckAll]= useState<boolean>(false);
 const isFocused= useIsFocused();
+const getDataProduct = async ()=>{
+
+    let dta  = await DataService.Getdata_dtService<Product>('Products');
+    setdataproduct( dta);
+}
 useEffect(()=>{
     if(isFocused === true && ModalDelete==false)
     {
-    let arrayproduct:any[] = [];
-    data.getdata('Products').then(res=>{
-        for (let key in res)
-        {
-            arrayproduct.push(
-                {
-                    id: key,
-                    ...res[key],
-                }
-            );
-        }
-        setdataproduct(arrayproduct);
-    });
+    // let arrayproduct:any[] = [];
+    // data.getdata('Products').then(res=>{
+    //     for (let key in res)
+    //     {
+    //         arrayproduct.push(
+    //             {
+    //                 id: key,
+    //                 ...res[key],
+    //             }
+    //         );
+    //     }
+    //     setdataproduct(arrayproduct);
+    // });
+    getDataProduct();
 }
 },[isFocused,ModalDelete]);
 useEffect(()=>{

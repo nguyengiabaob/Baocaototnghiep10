@@ -14,7 +14,7 @@ type props= {
         >
          {Listitem.map((item,index)=>{
              return (
-             <ListItem key={index} containerStyle={item.containerStyle} onPress={item.onPress} >
+             <ListItem  key={index} containerStyle={item.containerStyle} onPress={item.onPress} hasTVPreferredFocus={undefined} tvParallaxProperties={undefined} >
                    <ListItem.Content>
                         <ListItem.Title>{item.title}</ListItem.Title>
                 </ListItem.Content>

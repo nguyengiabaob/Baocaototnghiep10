@@ -17,6 +17,7 @@ import { UserData } from 'react-native-fbsdk-next/types/FBAppEventsLogger';
 import { Userdata } from '../Model/User';
 import { reponsiveheight, reponsivewidth } from '../theme/Metric';
 import { useIsFocused } from '@react-navigation/native';
+import DataService from '../services/dataservice';
 type props= {
     navigation: StackNavigationProp<EmployeeInformationParamList,'ListStaffScreen'>
 
@@ -30,22 +31,22 @@ const [datadel, setdatadel] = useState<string[]>([]);
 const [staffArray, setstaffArray] = useState<Userdata[]>([]);
 const [staffArraysearch, setstaffArraysearch] = useState<Userdata[]>([]);
 var isFocused = useIsFocused();
-const getuser = ()=>{
-    var datarray :any[] = [];
-    data.getdata('user').then(res=> {for ( let key in res)
-    {
-        if (key !== '0')
-        {
-        datarray.push(
-            {
-                id: key,
-                ...res[key],
-            }
-        );
-        }
-    }
+const getuser = async()=>{
+    var datarray = await DataService.Getdata_dtService<Userdata>('user');
+    // data.getdata('user').then(res=> {for ( let key in res)
+    // {
+    //     if (key !== '0')
+    //     {
+    //     datarray.push(
+    //         {
+    //             id: key,
+    //             ...res[key],
+    //         }
+    //     );
+    //     }
+    // }
     setstaffArray(datarray);
-});
+// });
 };
 useEffect(()=>{
     if (isFocused)
@@ -130,24 +131,25 @@ console.log(staffArray);
 
 // ];
 console.log(staffArray);
-const ondel =()=>{
-    if(datadel.length>0)
+const ondel =async()=>{
+    if (datadel.length > 0)
     {
         datadel.forEach(item=>{
             data.deletedData("user",item);
         })
-        data.getdata("Assignment").then(res=>{
-            let dataarray: any[]= [];
-            for( let key in res)
-            {
-                if( key !== "0")
-                {
-                    dataarray.push({
-                        id: key,
-                        ...res[key],
-                    })
-                }
-            }
+        let dataarray =await DataService.Getdata_dtService<any>('Assignment')
+        // data.getdata("Assignment").then(res=>{
+        //     let dataarray: any[]= [];
+        //     for ( let key in res)
+        //     {
+        //         if ( key !== "0")
+        //         {
+        //             dataarray.push({
+        //                 id: key,
+        //                 ...res[key],
+        //             })
+        //         }
+        //     }
             datadel.forEach(item=>{
                 dataarray.forEach(i=>{
                     if( i.EmployeeID==item )
@@ -157,7 +159,7 @@ const ondel =()=>{
                 })
             })
           
-        })
+        // })
         setdatadel([]);
         setcheckbox(false);
         setflag(true);

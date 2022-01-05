@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, Text, TextInputChangeEventData, View } from 'react-native';
 import { Input, SearchBar } from 'react-native-elements';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
@@ -17,6 +17,7 @@ import { Userdata } from "../../Model/User";
 import BellNofi from '../../asset/svg/bellnotification.svg';
 import Warning from '../../asset/svg/Warning.svg';
 import { CustomNotification } from "../../Model/CustomNofication";
+import DataService from '../../services/dataservice';
 export const Wages :React.FC = ()=>{
  const [DataAssignment, setDataAssignment] = useState<Userdata[]>([]);
  const [EmployeeIDselected, setEmployeeIDselected] = useState<string[]>([]);
@@ -202,22 +203,22 @@ export const Wages :React.FC = ()=>{
         var year = new Date(d).getFullYear();
        return   date + '/' + month + '/' + year;
     };
-    const getalluser = ()=>{
-        let datarray :any[] = [];
-        data.getdata('user').then(res=> {for ( let key in res)
-        {
-            if (key !== '0')
-            {
-            datarray.push(
-                {
-                    id: key,
-                    ...res[key],
-                }
-            );
-            }
-        }
+    const getalluser = async()=>{
+        let datarray = await DataService.Getdata_dtService<Userdata>('user');
+    //     data.getdata('user').then(res=> {for ( let key in res)
+    //     {
+    //         if (key !== '0')
+    //         {
+    //         datarray.push(
+    //             {
+    //                 id: key,
+    //                 ...res[key],
+    //             }
+    //         );
+    //         }
+    //     }
        setDatauser(datarray);
-    });
+    // });
     };
     useEffect(()=>{
         getalluser();
@@ -228,7 +229,7 @@ export const Wages :React.FC = ()=>{
         let dataArray:any[]= [];
         if (EmployeeIDselected.length>0)
         {
-           EmployeeIDselected.forEach( item=>{
+           EmployeeIDselected.forEach( item =>{
                let employee = Datauser.filter(i=> i.id === item);
                dataArray.push(...employee);
            })
@@ -300,28 +301,22 @@ export const Wages :React.FC = ()=>{
         </View>
         }
             <View style={{alignItems:'center', marginTop:50,height:reponsiveheight(50)}}>
-            <Input containerStyle={{width:reponsivewidth(350) }}
-                    onChangeText={(text)=>{setHours(text)}}
-                    placeholder="Nhập số giờ"
-                    keyboardType={"number-pad"}
-                    leftIcon={
-                        <ClockIcon
-                            width={reponsivewidth(32)}
-                        />
-            } />
+            <Input containerStyle={{ width: reponsivewidth(350) }}
+                onChangeText={(text) => { setHours(text); } }
+                placeholder="Nhập số giờ"
+                keyboardType={"number-pad"}
+                leftIcon={<ClockIcon
+                    width={reponsivewidth(32)} />} autoCompleteType={undefined} />
             </View>
             <View style={{height:reponsiveheight(50), marginTop:25, alignItems:'center'}}>
             <TextInput />
-            <Input containerStyle={{width:reponsivewidth(350) }}
-                    onChange={(e)=>{setMoneyHours(Number(isNaN(Number(e.nativeEvent.text))) ? Number(e.nativeEvent.text.replace(/,/g,'')): Number(e.nativeEvent.text))}}
-                    placeholder="Nhập số tiền/giờ"
-                    value={MoneyHour.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                    keyboardType={"decimal-pad"}
-                    leftIcon={
-                        <MoneyHourIcon
-                            width={reponsivewidth(32)}
-                        />
-                            }/>
+            <Input containerStyle={{ width: reponsivewidth(350) }}
+                onChange={(e) => { setMoneyHours(Number(isNaN(Number(e.nativeEvent.text))) ? Number(e.nativeEvent.text.replace(/,/g, '')) : Number(e.nativeEvent.text)); } }
+                placeholder="Nhập số tiền/giờ"
+                value={MoneyHour.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                keyboardType={"decimal-pad"}
+                leftIcon={<MoneyHourIcon
+                    width={reponsivewidth(32)} />} autoCompleteType={undefined}/>
             </View>
             <View style={ [styles.shadowWages, {height: reponsiveheight(50), marginTop:80,justifyContent:'center',flexDirection:'row', alignItems:'center', backgroundColor:'#e7e7e7', width:reponsivewidth(250), alignSelf:'center', zIndex:-99999999}]} >
             <View style={{marginRight:5 }}>

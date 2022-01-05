@@ -535,7 +535,7 @@ type props={
                   <Text style={{fontSize:18, fontWeight:'700',textAlign:'center', padding:8}}>{title}</Text>
               </View>
               <View style={{justifyContent:'center', alignItems:'center', marginTop:8}}>
-                  <SearchBar  containerStyle={{borderBottomColor:'#838282', borderWidth:0.8    , width:reponsivewidth(380), height:reponsiveheight(50),alignItems:'center', justifyContent:'center',borderRadius:4}} onChange={(e)=>setvaluesea(e.nativeEvent.text)}  value={valuesea} placeholder={placeHolder} platform="android" />
+                  <SearchBar  containerStyle={{ borderBottomColor: '#838282', borderWidth: 0.8, width: reponsivewidth(380), height: reponsiveheight(50), alignItems: 'center', justifyContent: 'center', borderRadius: 4 }} onChange={(e) => setvaluesea(e.nativeEvent.text)} value={valuesea} placeholder={placeHolder} platform="android" round={true} />
               </View>
               <View>
                  <ScrollView>

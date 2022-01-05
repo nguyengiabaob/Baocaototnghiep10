@@ -50,135 +50,135 @@ const [AreaFilter, setAreaFilter] = useState<Area>(AreaALL);
 //         type: 'Ngoài nhà',
 //     },
 // ];
-const Rooms = [
-    {
-        id: '1',
-        name:'Bàn 1',
-        Type: '1',
-        slots:'5',
-        status: 0,
+// const Rooms = [
+//     {
+//         id: '1',
+//         name:'Bàn 1',
+//         Type: '1',
+//         slots:'5',
+//         status: 0,
 
-    },
-    {
-        id: '2',
-        name:'Bàn 2',
-        Type: '1',
-        slots:'5',
-        status: 1,
+//     },
+//     {
+//         id: '2',
+//         name:'Bàn 2',
+//         Type: '1',
+//         slots:'5',
+//         status: 1,
 
-    },
-    {
-        id: '3',
-        name:'Bàn 3',
-        Type: '1',
-        slots:'6',
-        status: 1,
-    },
-    {
-        id: '4',
-        name:'Bàn 4',
-        Type: '2',
-        slots:'6',
-        status: 0,
+//     },
+//     {
+//         id: '3',
+//         name:'Bàn 3',
+//         Type: '1',
+//         slots:'6',
+//         status: 1,
+//     },
+//     {
+//         id: '4',
+//         name:'Bàn 4',
+//         Type: '2',
+//         slots:'6',
+//         status: 0,
 
-    },
-    {
-        id: '5',
-        name:'Bàn 5',
-        Type: '1',
-        slots:'6',
-        status: 0,
+//     },
+//     {
+//         id: '5',
+//         name:'Bàn 5',
+//         Type: '1',
+//         slots:'6',
+//         status: 0,
 
-    },
-    {
-        id: '6',
-        name:'Bàn 6',
-        Type: '2',
-        slots:'6', 
-        status: 0,
+//     },
+//     {
+//         id: '6',
+//         name:'Bàn 6',
+//         Type: '2',
+//         slots:'6', 
+//         status: 0,
 
-    },
-    {
-        id: '7',
-        name:'Bàn 7',
-        Type: '2',
-        slots:'6',
-        status: 1,
+//     },
+//     {
+//         id: '7',
+//         name:'Bàn 7',
+//         Type: '2',
+//         slots:'6',
+//         status: 1,
 
-    },
-    {
-        id: '8',
-        name:'Bàn 8',
-        Type: '2',
-        slots:'6',
-        status: 1,
+//     },
+//     {
+//         id: '8',
+//         name:'Bàn 8',
+//         Type: '2',
+//         slots:'6',
+//         status: 1,
 
-    },
-    {
-        id: '9',
-        name:'Bàn 9',
-        Type: '2',
-        slots:'6',
-        status: 1,
+//     },
+//     {
+//         id: '9',
+//         name:'Bàn 9',
+//         Type: '2',
+//         slots:'6',
+//         status: 1,
 
-    },
-    {
-        id: '10',
-        name:'Bàn 10',
-        Type: '2',
-        slots:'6',
-        status: 0,
+//     },
+//     {
+//         id: '10',
+//         name:'Bàn 10',
+//         Type: '2',
+//         slots:'6',
+//         status: 0,
 
-    },
-    {
-        id: '11',
-        name:'Bàn 11',
-        Type: '2',
-        slots:'6',
-        status: 0,
+//     },
+//     {
+//         id: '11',
+//         name:'Bàn 11',
+//         Type: '2',
+//         slots:'6',
+//         status: 0,
 
-    },
-    {
-        id: '12',
-        name:'Bàn 12',
-        Type: '2',
-        slots:'6',
-        status: 0,
+//     },
+//     {
+//         id: '12',
+//         name:'Bàn 12',
+//         Type: '2',
+//         slots:'6',
+//         status: 0,
 
-    },
-    {
-        id: '13',
-        name:'Bàn 13',
-        Type: '2',
-        slots:'6',
-        status: 0,
+//     },
+//     {
+//         id: '13',
+//         name:'Bàn 13',
+//         Type: '2',
+//         slots:'6',
+//         status: 0,
 
-    },
-    {
-        id: '13',
-        name:'Bàn 13',
-        Type: '2',
-        slots:'6',
-        status: 0,
+//     },
+//     {
+//         id: '13',
+//         name:'Bàn 13',
+//         Type: '2',
+//         slots:'6',
+//         status: 0,
 
-    },
-    {
-        id: '13',
-        name:'Bàn 13',
-        Type: '2',
-        slots:'6',
-        status: 1,
+//     },
+//     {
+//         id: '13',
+//         name:'Bàn 13',
+//         Type: '2',
+//         slots:'6',
+//         status: 1,
 
-    },
-    {
-        id: '13',
-        name:'Bàn 13',
-        Type: '2',
-        slots:'6',
-        status: 1,
+//     },
+//     {
+//         id: '13',
+//         name:'Bàn 13',
+//         Type: '2',
+//         slots:'6',
+//         status: 1,
 
-    },
-]
+//     },
+// ]
 
 type propsedit= {
     visible: boolean,
