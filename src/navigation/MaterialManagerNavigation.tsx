@@ -1,22 +1,23 @@
 import {createStackNavigator} from '@react-navigation/stack';
 import React from 'react';
-import {AddExpenseManager} from '../Screens/ExpenseManager/AddExpenseManager';
-import {ExpenseManagerScreen} from '../Screens/ExpenseManager/ExpenseManager';
-import {UpdateExpenseManager} from '../Screens/ExpenseManager/UpdateExpenseManager';
+import AddMaterial from '../Screens/Material/AddMaterial';
+import ListMaterial from '../Screens/Material/ListMaterial';
+import UpdateMaterial from '../Screens/Material/UpdateMaterial';
 import {reponsiveheight} from '../theme/Metric';
-import {ExpenseParamList} from './types';
+import {MaterialParamList} from './types';
+
 // import Dashboard from '../Dashboard/DashboardScreen';
-const ExpenseManagerStack = createStackNavigator<ExpenseParamList>();
-const ExpesneManagerNavigator: React.FC = () => {
-  const {Navigator, Screen} = ExpenseManagerStack;
+const MaterialManagerStack = createStackNavigator<MaterialParamList>();
+const MaterialManagerNavigator: React.FC = () => {
+  const {Navigator, Screen} = MaterialManagerStack;
   return (
     <Navigator
       screenOptions={{headerShown: false}}
       mode={'modal'}
       headerMode={'screen'}>
       <Screen
-        name="ExpenseMainScreen"
-        component={ExpenseManagerScreen}
+        name="ListMaterialScreen"
+        component={ListMaterial}
         options={{
           headerShown: true,
           headerStyle: {
@@ -25,13 +26,13 @@ const ExpesneManagerNavigator: React.FC = () => {
             borderBottomRightRadius: 5,
             height: reponsiveheight(60),
           },
-          headerTitle: 'Quản lý nguồn chi',
+          headerTitle: 'Quản lý kho',
           headerTitleStyle: {color: '#FFF'},
           headerTintColor: '#FFF',
         }}
       />
       <Screen
-        name="AddExpenseScreen"
+        name="AddMaterialScreen"
         options={{
           headerShown: true,
           headerStyle: {
@@ -40,14 +41,14 @@ const ExpesneManagerNavigator: React.FC = () => {
             borderBottomRightRadius: 5,
             height: reponsiveheight(60),
           },
-          headerTitle: 'Thêm nguồn chi',
+          headerTitle: 'Thêm kho',
           headerTitleStyle: {color: '#FFF'},
           headerTintColor: '#FFF',
         }}
-        component={AddExpenseManager}
+        component={AddMaterial}
       />
       <Screen
-        name="UpdateExpenseScreen"
+        name="UpdateMaterialScreen"
         options={{
           headerShown: true,
           headerStyle: {
@@ -56,13 +57,13 @@ const ExpesneManagerNavigator: React.FC = () => {
             borderBottomRightRadius: 5,
             height: reponsiveheight(60),
           },
-          headerTitle: 'Cập nhật nguồn chi',
+          headerTitle: 'Cập nhật kho',
           headerTitleStyle: {color: '#FFF'},
           headerTintColor: '#FFF',
         }}
-        component={UpdateExpenseManager}
+        component={UpdateMaterial}
       />
     </Navigator>
   );
 };
-export default ExpesneManagerNavigator;
+export default MaterialManagerNavigator;

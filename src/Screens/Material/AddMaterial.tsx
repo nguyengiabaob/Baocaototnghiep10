@@ -1,42 +1,33 @@
-/* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
-import {StackNavigationProp} from '@react-navigation/stack';
-import React, {useEffect} from 'react';
-import {Image, TouchableOpacity} from 'react-native';
-import {Text, TextInput, View} from 'react-native';
-// import Addproduct from '../asset/svg/box.svg';
-import CustomHeader from '../../Model/CustomHeader';
-// import Customitem from '../Model/CustomItem';
+import React, {useEffect, useState} from 'react';
 import {
-  ListproductNavigationPramaList,
-  // ProductNavigationPramaList,
-} from '../../navigation/types';
-import {reponsiveheight, reponsivewidth} from '../../theme/Metric';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import {StyleSheet} from 'react-native';
-import {useState} from 'react';
-// import Gallery from '../../asset/svg/image-gallery.svg';
-import data from '../../services/data';
-// import {Button, Dialog, Paragraph, Portal, Provider} from 'react-native-paper';
-import * as ImagePicker from 'react-native-image-picker';
-import {MediaType} from 'react-native-image-picker';
+  Image,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {Overlay, Text} from 'react-native-elements';
 import storage from '@react-native-firebase/storage';
+import data from '../../services/data';
+import {MediaType} from 'react-native-image-picker';
+import * as ImagePicker from 'react-native-image-picker';
+import DataService from '../../services/dataservice';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import {reponsiveheight, reponsivewidth} from '../../theme/Metric';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
-import {Overlay} from 'react-native-elements';
-import {ScrollView} from 'react-native-gesture-handler';
+import {MaterialParamList} from '../../navigation/types';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {CustomNotification} from '../../Model/CustomNofication';
 import BellNofi from '../../asset/svg/bellnotification.svg';
 import Warning from '../../asset/svg/Warning.svg';
-import {CustomNotification} from '../../Model/CustomNofication';
-import DataService from '../../services/dataservice';
-import ChooseMaterial from './ChooseMaterial';
-
+import {Material} from '../../Model/Material';
+import {Units} from '../../Model/Unit';
 type Props = {
-  navigation: StackNavigationProp<
-    ListproductNavigationPramaList,
-    'AddproductScreen'
-  >;
+  navigation: StackNavigationProp<MaterialParamList, 'AddMaterialScreen'>;
 };
-const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
+const AddMaterial: React.FC<Props> = ({navigation}: Props) => {
   const [nameproduct, setnameproduct] = useState<string>('');
   const [priceproduct, setpriceproduct] = useState<number>(0);
   const [quantity, setquantity] = useState<number>(1);
@@ -47,10 +38,15 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
   const showDialog = () => setVisible(true);
   const hideDialog = () => setVisible(false);
   const [showChooseCate, setShowChooseCate] = useState<boolean>(false);
+  const [showChooseUnit, setShowChooseUnit] = useState<boolean>(false);
   const [ChooseCate, setChooseCate] = useState<any>();
+  const [ChooseUnit, setChooseunit] = useState<any>();
   const [DataCate, setDataCate] = useState<any[]>([]);
+  const [DataUnit, setDataUnit] = useState<Units[]>([]);
   const [showError, setshowError] = useState<boolean>(false);
-  const [showMaterial,setShowMaterial] = useState<boolean>(false);
+  const [NameUnit, setNameUnit] = useState<string>('');
+  const [showAddUnit, setAddUnit] = useState<boolean>(false);
+  // const [showMaterial, setShowMaterial] = useState<boolean>(false);
   const addproduct = async () => {
     if (
       nameproduct === '' ||
@@ -65,20 +61,19 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
       const pathToFile = pathimg;
       await reference.putFile(pathToFile);
       let urlimg = await reference.getDownloadURL();
-      data
-        .postdataproduct(
-          'Products',
-          nameproduct,
-          priceproduct,
-          quantity,
-          urlimg,
-          ChooseCate.id,
-        )
-        .then(result => {
-          if (result === true) {
-            showDialog();
-          }
-        });
+      let initaldata: Material = {
+        id: '',
+        Name: nameproduct,
+        Number: quantity,
+        MaterialGroup: ChooseCate.id,
+        Image: urlimg,
+        unit: ChooseCate.id,
+      };
+      data.AddMaterial(initaldata).then(result => {
+        if (result === true) {
+          showDialog();
+        }
+      });
     }
   };
   const type: MediaType = 'photo';
@@ -108,20 +103,50 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
     //   }
     //   setDataCate(dataArray);
     // });
-    let dta = await DataService.Getdata_dtService<any>('Catergory');
+    let dta = await DataService.Getdata_dtService<any>('MaterialCatergory');
     setDataCate(dta);
   };
+  const getUnits = async () => {
+    // data.getdata('Catergory').then(res => {
+    //   var dataArray: any[] = [];
+    //   for (let key in res) {
+    //     if (key !== '0') {
+    //       dataArray.push({
+    //         id: key,
+    //         ...res[key],
+    //       });
+    //     }
+    //   }
+    //   setDataCate(dataArray);
+    // });
+    let dta = await DataService.Getdata_dtService<any>('Units');
+    setDataUnit(dta);
+  };
+  const SaveUnits = (name: string) => {
+    if (name) {
+      let intialUnit: Units = {
+        id: '',
+        Name: name,
+      };
+      data.AddUnit(intialUnit).then(res => {
+        if (res === true) {
+          setAddUnit(false);
+          setVisible(true);
+        }
+      });
+    }
+  };
+  useEffect(() => {
+    if (showAddUnit === false) {
+      getUnits();
+    }
+  }, [showAddUnit]);
   useEffect(() => {
     getCatergory();
+    getUnits();
   }, []);
   return (
     <View>
-      <CustomHeader
-        title="Thêm sản phẩm"
-        onpress={() => {
-          navigation.goBack();
-        }}
-      />
       <View style={style.containerfiled}>
         <View
           style={{
@@ -161,13 +186,13 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
             backgroundColor: '#FFFF',
             height: 70,
           }}>
-          <Text style={style.titlefiled}>Tên sản phẩm </Text>
+          <Text style={style.titlefiled}>Tên nguyên liệu </Text>
           <TextInput
             onChangeText={text => {
               setnameproduct(text);
             }}
             style={[style.textinput, {width: reponsivewidth(280)}]}
-            placeholder="Tên sản phẩm"
+            placeholder="Tên nguyên liệu"
           />
         </View>
         <View
@@ -182,7 +207,7 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
             backgroundColor: '#FFFF',
             height: 70,
           }}>
-          <Text style={style.titlefiled}>Nhóm sản phẩm </Text>
+          <Text style={style.titlefiled}>Nhóm nguyên liệu</Text>
           <TouchableOpacity
             onPress={() => {
               setChooseCate(undefined);
@@ -196,7 +221,7 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
             <TextInput
               editable={false}
               style={[style.textinput, {width: reponsivewidth(170)}]}
-              placeholder="Nhóm sản phẩm">
+              placeholder="Nhóm nguyên liệu">
               {ChooseCate ? ChooseCate.Name : ''}
             </TextInput>
             <EvilIcons name="chevron-right" size={32} color={'#777777'} />
@@ -214,7 +239,7 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
             backgroundColor: '#FFFF',
             height: 70,
           }}>
-          <Text style={style.titlefiled}>Giá bán </Text>
+          <Text style={style.titlefiled}>Giá mua </Text>
           <TextInput
             keyboardType="numeric"
             defaultValue="0"
@@ -240,15 +265,25 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
             backgroundColor: '#FFFF',
             height: 70,
           }}>
-          <Text style={style.titlefiled}>Số Lượng </Text>
-          <TextInput
-            onChangeText={text => {
-              setquantity(Number.parseInt(text, 10));
+          <Text style={style.titlefiled}>Đơn vị tính</Text>
+          <TouchableOpacity
+            onPress={() => {
+              setChooseunit(undefined);
+              setShowChooseUnit(true);
             }}
-            defaultValue="1"
-            keyboardType="numeric"
-            style={[style.textinput, {width: reponsivewidth(280)}]}
-          />
+            style={{
+              width: reponsivewidth(280),
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <TextInput
+              editable={false}
+              style={[style.textinput, {width: reponsivewidth(170)}]}
+              placeholder="Chọn đơn vị tính">
+              {ChooseUnit ? ChooseUnit.Name : ''}
+            </TextInput>
+            <EvilIcons name="chevron-right" size={32} color={'#777777'} />
+          </TouchableOpacity>
         </View>
         <View
           style={{
@@ -262,24 +297,15 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
             backgroundColor: '#FFFF',
             height: 70,
           }}>
-          <Text style={style.titlefiled}>Nguyễn liệu </Text>
-          <TouchableOpacity
-            onPress={()=>{
-              setShowMaterial(true);
+          <Text style={style.titlefiled}>Số Lượng </Text>
+          <TextInput
+            onChangeText={text => {
+              setquantity(Number.parseInt(text, 10));
             }}
-            style={{
-              width: reponsivewidth(280),
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}>
-            <TextInput
-              editable={false}
-              style={[style.textinput, {width: reponsivewidth(170)}]}
-              placeholder="Chọn nguyên liệu">
-              {ChooseCate ? ChooseCate.Name : ''}
-            </TextInput>
-            <EvilIcons name="chevron-right" size={32} color={'#777777'} />
-          </TouchableOpacity>
+            defaultValue="1"
+            keyboardType="numeric"
+            style={[style.textinput, {width: reponsivewidth(280)}]}
+          />
         </View>
       </View>
       <View style={style.containerbutton}>
@@ -292,19 +318,19 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
         </TouchableOpacity>
       </View>
       {/* <Provider>
-            <Portal >
-                           <Dialog  visible={visible} onDismiss={hideDialog} style={{borderRadius:25, marginBottom:30}}>
-                           { (nameproduct !== '' && priceproduct  &&  quantity && image) ?
-                          <Dialog.Title style={style.titledialog} >Chúc mừng</Dialog.Title> :  <Dialog.Title style={style.titledialog} >Thông báo</Dialog.Title>}
-                           <Dialog.Content style={style.contentdialog}>
-                              { (nameproduct !== '' && priceproduct  &&  quantity && image) ? <Paragraph style={{fontSize:15}}>Bạn đã thêm một sản phẩm</Paragraph> : <Paragraph style={{fontSize:15}}>Vui lòng nhập đủ thông tin !</Paragraph> }
-                          </Dialog.Content>
-                          <Dialog.Actions style={style.actiondialog}>
-                          <Button onPress={hideDialog}><Text style={{color:'#3399FF'}}>Thoát</Text></Button>
-                          </Dialog.Actions>
-                          </Dialog>
-                          </Portal>
-            </Provider> */}
+              <Portal >
+                             <Dialog  visible={visible} onDismiss={hideDialog} style={{borderRadius:25, marginBottom:30}}>
+                             { (nameproduct !== '' && priceproduct  &&  quantity && image) ?
+                            <Dialog.Title style={style.titledialog} >Chúc mừng</Dialog.Title> :  <Dialog.Title style={style.titledialog} >Thông báo</Dialog.Title>}
+                             <Dialog.Content style={style.contentdialog}>
+                                { (nameproduct !== '' && priceproduct  &&  quantity && image) ? <Paragraph style={{fontSize:15}}>Bạn đã thêm một sản phẩm</Paragraph> : <Paragraph style={{fontSize:15}}>Vui lòng nhập đủ thông tin !</Paragraph> }
+                            </Dialog.Content>
+                            <Dialog.Actions style={style.actiondialog}>
+                            <Button onPress={hideDialog}><Text style={{color:'#3399FF'}}>Thoát</Text></Button>
+                            </Dialog.Actions>
+                            </Dialog>
+                            </Portal>
+              </Provider> */}
       <Overlay isVisible={showChooseCate}>
         <View
           style={{width: reponsivewidth(300), height: reponsiveheight(350)}}>
@@ -317,7 +343,7 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
                 paddingBottom: 2,
                 fontWeight: '700',
               }}>
-              Chọn nhóm sản phẩm
+              Chọn nhóm nguyên liệu
             </Text>
           </View>
           <View style={style.TitleOverlAdd_content}>
@@ -344,7 +370,113 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
           <Text style={{color: '#FFFF'}}>Thoát</Text>
         </TouchableOpacity>
       </Overlay>
-      <ChooseMaterial visible={showMaterial} cancel={setShowMaterial}/>
+      <Overlay isVisible={showChooseUnit}>
+        <View
+          style={{width: reponsivewidth(300), height: reponsiveheight(350)}}>
+          <View style={style.TitleOverlAdd}>
+            <Text
+              style={{
+                fontSize: 18,
+                textAlign: 'center',
+                color: '#000000',
+                paddingBottom: 2,
+                fontWeight: '700',
+              }}>
+              Chọn đơn vị tính
+            </Text>
+          </View>
+          <View style={style.TitleOverlAdd_content}>
+            <ScrollView style={{height: reponsiveheight(300)}}>
+              {DataUnit.length > 0 &&
+                DataUnit.map(item => {
+                  return (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setChooseunit(item);
+                        setShowChooseUnit(false);
+                      }}
+                      style={[style.btnChoosenAdd, {padding: 15}]}>
+                      <Text>{item.Name}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              <View style={{marginTop: 5}}>
+                <TouchableOpacity style={{alignItems: 'center'}}>
+                  <MaterialIcon
+                    onPress={() => {
+                      setAddUnit(true);
+                    }}
+                    name="add-box"
+                    size={32}
+                    color={'#02569E'}
+                  />
+                  <Text>Thêm đơn vị</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+        <TouchableOpacity
+          style={[style.btnExit, {alignItems: 'center', alignSelf: 'center'}]}
+          onPress={() => setShowChooseUnit(false)}>
+          <Text style={{color: '#FFFF'}}>Thoát</Text>
+        </TouchableOpacity>
+        <Overlay isVisible={showAddUnit}>
+          <View
+            style={{width: reponsivewidth(300), height: reponsiveheight(250)}}>
+            <View style={style.TitleOverlAdd}>
+              <Text
+                style={{
+                  fontSize: 18,
+                  textAlign: 'center',
+                  color: '#000000',
+                  paddingBottom: 2,
+                  fontWeight: '700',
+                }}>
+                Thêm đơn vị
+              </Text>
+            </View>
+            <View
+              style={[style.styletxtInput, {marginTop: 28, borderRadius: 4}]}>
+              <TextInput
+                onChangeText={text => {
+                  setNameUnit(text);
+                }}
+                style={{padding: 18}}
+                placeholder="Tên đơn vị"
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignSelf: 'center',
+                marginTop: 35,
+              }}>
+              <TouchableOpacity
+                style={[
+                  style.btnExit,
+                  {alignItems: 'center', alignSelf: 'center', marginRight: 25},
+                ]}
+                onPress={() => {
+                  SaveUnits(NameUnit);
+                  setAddUnit(false);
+                }}>
+                <Text style={{color: '#FFFF'}}>Lưu</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  style.btnExit,
+                  {alignItems: 'center', alignSelf: 'center'},
+                ]}
+                onPress={() => {
+                  setAddUnit(false);
+                }}>
+                <Text style={{color: '#FFFF'}}>Thoát</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Overlay>
+      </Overlay>
       <CustomNotification
         visible={visible}
         iconTitle={
@@ -372,6 +504,10 @@ const style = StyleSheet.create({
     borderWidth: 3,
     borderRadius: 10,
     height: reponsiveheight(600),
+  },
+  styletxtInput: {
+    borderColor: '#afaeae',
+    borderWidth: 0.5,
   },
   titlefiled: {
     color: 'black',
@@ -468,4 +604,4 @@ const style = StyleSheet.create({
     borderRadius: 4,
   },
 });
-export default Addproductscreen;
+export default AddMaterial;

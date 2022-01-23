@@ -163,7 +163,6 @@ const searchProduct = useCallback((value: string)=>{
 useEffect (()=>{
     searchProduct(valueSearch);
 },[valueSearch,searchProduct]);
-
 const ModalAddCatergory:React.FC =()=>{
     const [InputValue, setInputValue]= useState<string>('');
     const saveCatergory =(value: string)=>{
@@ -418,7 +417,7 @@ const ModalUpdateCatergory: React.FC =()=>{
                    </TouchableOpacity>
                    </View>
                    </View>
-}
+                }
            <View style={style.containerScrollview}>
            <View style={{flexDirection:'row', alignItems:'center', marginLeft:16, marginTop:10}}>
            <Checkbox color="#02569E"  onPress={()=>{oncheckAll(CheckAll)}} status={CheckAll ? 'checked': 'unchecked'} />
@@ -474,6 +473,7 @@ const ModalUpdateCatergory: React.FC =()=>{
                         setvisibleOverplayUpdateCater(true);} }
                         style={[style.btnChoosenAdd,{padding:15}]}><Text>Cập nhật nhóm sản phẩm mới</Text></TouchableOpacity>
                 </View>
+               
                </View>
                <TouchableOpacity style={[ style.btnExit,{alignItems:'center', alignSelf:'center'}]} onPress={()=>setvisibleOverplayAdd(false)}><Text style={{color:'#FFFF'}}>Thoát</Text></TouchableOpacity>
                 </>

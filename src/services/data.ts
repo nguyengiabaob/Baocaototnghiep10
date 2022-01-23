@@ -3,6 +3,9 @@ import instance from './instance';
 import database from '@react-native-firebase/database';
 import { produceWithPatches } from 'immer';
 import { identifier } from '@babel/types';
+import { MaterialCategory } from '../Model/MaterialCategory';
+import { Material } from '../Model/Material';
+import { Units } from '../Model/Unit';
 // import axios, {AxiosResponse} from 'axios';
 class data{
 static async getdata( name: string) :Promise<any>
@@ -36,7 +39,7 @@ static async deletedData (nametable: string, id: string) : Promise<any>
 // Service User
 static async getuser(name:string , id: string) :Promise<any>
 {
-    return await 
+    return await
         instance.get(`/${name}/${id}.json`,{timeout:2000})
         .then(response=>{
             return response.data;
@@ -60,8 +63,8 @@ static async getuser(name:string , id: string) :Promise<any>
        dateofbirth: dateofbirth,
     }).then(response=>{
         console.log(response.data);
-        return true
-    }).catch((e)=>{console.log(e)});
+        return true;
+    }).catch((e)=>{console.log(e);});
 }
 
 
@@ -81,8 +84,8 @@ static async updateuser (nametable : string, username: string, password: string,
        dateofbirth: dateofbirth,
     }).then(response=>{
         console.log(response.data);
-        return true
-    }).catch((e)=>{console.log(e)});
+        return true;
+    }).catch((e)=>{console.log(e);});
 }
 
 
@@ -97,7 +100,7 @@ static async postdataproduct(nametable : string, name:string , price: number, qu
         Price_product: price,
         Quanity: quanity,
         Image: img,
-        CatergoryID:catergoryid
+        CatergoryID:catergoryid,
     }).then(reponse=>{
         console.log(reponse);
         return true;
@@ -150,7 +153,7 @@ static async updatedataproduct (nametable: string , id: string,  name:string , p
         Price_product: price,
         Quanity: quanity,
         Image: img,
-        CatergoryID:catergoryid
+        CatergoryID:catergoryid,
     }).then(reponse=>{
         console.log(reponse);
         return true;
@@ -170,7 +173,7 @@ static async updatedataproduct (nametable: string , id: string,  name:string , p
     }).then(response=>{
         console.log(response.data);
         return true;
-    }).catch((e)=>{console.log(e)});
+    }).catch((e)=>{console.log(e);});
  }
 
 
@@ -184,18 +187,18 @@ static async PostTimeWork (nametable: string , NameTimeWork: string, day: string
     }).then(response=>{
         console.log(response.data);
         return true;
-    }).catch((e)=>{console.log(e)});
+    }).catch((e)=>{console.log(e);});
  }
  static async UpdateTimeWork (nametable: string , NameTimeWork: string ,day:any, id: string)
  {
     return await
     instance.put(`/${nametable}/${id}.json`,{
         Name: NameTimeWork,
-        Day: day
+        Day: day,
     }).then(response=>{
         console.log(response.data);
         return true;
-    }).catch((e)=>{console.log(e)});
+    }).catch((e)=>{console.log(e);});
  }
 
 
@@ -212,7 +215,7 @@ static async PostTimeWork (nametable: string , NameTimeWork: string, day: string
  // Service Wages
  static async PostWages (EmployeeID: string , BasicSalary: number, TotalSalary: number, Time:number , Day: string  )
  {
-    return await 
+    return await
     instance.post('/Wages.json',{
         EmployeeID: EmployeeID,
         Day: Day,
@@ -222,7 +225,7 @@ static async PostTimeWork (nametable: string , NameTimeWork: string, day: string
     }).then(response=>{
         console.log(response.data);
         return true;
-    }).catch((e)=>{console.log(e)});
+    }).catch((e)=>{console.log(e);});
  }
 
 
@@ -231,23 +234,23 @@ static async PostTimeWork (nametable: string , NameTimeWork: string, day: string
  // Service Area
  static async postArea (nameArea: string)
  {
-    return await 
+    return await
     instance.post('/Area.json',{
         Name: nameArea,
     }).then(response=>{
         console.log(response.data);
         return true;
-    }).catch((e)=>{console.log(e)});
+    }).catch((e)=>{console.log(e);});
  }
  static async UpdateArea (name: string, id: string )
  {
-    return await 
+    return await
     instance.put(`/Area/${id}.json`,{
         Name: name,
     }).then(response=>{
         console.log(response.data);
         return true;
-    }).catch((e)=>{console.log(e)});
+    }).catch((e)=>{console.log(e);});
  }
  static async DeleteArea (id :string )
  {
@@ -261,7 +264,7 @@ static async PostTimeWork (nametable: string , NameTimeWork: string, day: string
  // Servicew Table
  static async postTable (name: string, type: string, slots: number, status: number)
  {
-    return await 
+    return await
     instance.post('/Table.json',{
         Name: name,
         Type: type,
@@ -270,11 +273,11 @@ static async PostTimeWork (nametable: string , NameTimeWork: string, day: string
     }).then(response=>{
         console.log(response.data);
         return true;
-    }).catch((e)=>{console.log(e)});
+    }).catch((e)=>{console.log(e);});
  }
  static async UpdateTable (name: string, id: string ,type: string, slots: number, status: number)
  {
-    return await 
+    return await
     instance.put(`/Table/${id}.json`,{
         Name: name,
         Type: type,
@@ -283,7 +286,7 @@ static async PostTimeWork (nametable: string , NameTimeWork: string, day: string
     }).then(response=>{
         console.log(response.data);
         return true;
-    }).catch((e)=>{console.log(e)});
+    }).catch((e)=>{console.log(e);});
  }
 
 
@@ -291,7 +294,7 @@ static async PostTimeWork (nametable: string , NameTimeWork: string, day: string
 
  // Service ListProduct
  static async UpdateListProduct (id: string, ProductId: string , BillId:string, Number: number, createdate:any){
-    return await 
+    return await
     instance.put(`/ListProduct/${id}.json`,{
        productID: ProductId,
        billID:BillId,
@@ -300,7 +303,7 @@ static async PostTimeWork (nametable: string , NameTimeWork: string, day: string
     }).then(response=>{
         console.log(response.data);
         return true;
-    }).catch((e)=>{console.log(e)});
+    }).catch((e)=>{console.log(e);});
 
  }
  static async PostListProduct (ProductId: string , BillId:string, Number: number,createdate:any){
@@ -313,7 +316,7 @@ static async PostTimeWork (nametable: string , NameTimeWork: string, day: string
     }).then(response=>{
         console.log(response.data);
         return true;
-    }).catch((e)=>{console.log(e)});
+    }).catch((e)=>{console.log(e);});
 
  }
  static async DeleteListProduct (id :string )
@@ -326,37 +329,37 @@ static async PostTimeWork (nametable: string , NameTimeWork: string, day: string
 
  // Service Bill
  static async PostBill (Total: number , BillId:string, CreaterID: string, status: number,createDate :any,tableID: string){
-    return await 
+    return await
     instance.post('/Bill.json',{
-         billID:BillId, 
+         billID:BillId,
          Total: Total ,
-         createrID: CreaterID, 
+         createrID: CreaterID,
          Status: status,
          CreateDate: createDate,
          TableID : tableID,
     }).then(response=>{
         console.log(response.data);
         return true;
-    }).catch((e)=>{console.log(e)});
+    }).catch((e)=>{console.log(e);});
 
  }
  static async UpdateBill (id:string , Total: number , BillId:string, CreaterID: string, status: number,TableID: string,createDate :any){
-    return await 
+    return await
     instance.put(`/Bill/${id}.json`,{
-         billID:BillId, 
+         billID:BillId,
          Total: Total ,
-         createrID: CreaterID, 
+         createrID: CreaterID,
          Status: status,
          TableID: TableID,
-         CreateDate: createDate
+         CreateDate: createDate,
     }).then(response=>{
         console.log(response.data);
         return true;
-    }).catch((e)=>{console.log(e)});
+    }).catch((e)=>{console.log(e);});
 
  }
 //  static async UpdateStatusBill (id:string,  status: number){
-//     return await 
+//     return await
 //     instance.put(`/Bill/${id}.json`,{
 //          Status: status,
 //     }).then(response=>{
@@ -369,22 +372,22 @@ static async PostTimeWork (nametable: string , NameTimeWork: string, day: string
 
  // Service BookTable
  static async PostBookTable (customerName: string , bookDate: any, bookTime:any, slots:number,tableID:string,status:number) {
-    return await 
+    return await
     instance.post('/BookTable.json',{
         CustomerName: customerName,
         BookDate: bookDate,
         BookTime: bookTime,
         Slots: slots,
         TableID: tableID,
-        Status: status
+        Status: status,
     }).then(response=>{
         console.log(response.data);
         return true;
-    }).catch((e)=>{console.log(e)});
+    }).catch((e)=>{console.log(e);});
 
  }
  static async UpdateBookTable (id: string ,customerName: string , bookDate: any, bookTime:any, slots:number, tableID:string, status:number) {
-    return await 
+    return await
     instance.put(`/BookTable/${id}.json`,{
         CustomerName: customerName,
         BookDate: bookDate,
@@ -395,29 +398,29 @@ static async PostTimeWork (nametable: string , NameTimeWork: string, day: string
     }).then(response=>{
         console.log(response.data);
         return true;
-    }).catch((e)=>{console.log(e)});
+    }).catch((e)=>{console.log(e);});
 
  }
 
  // Service Catergory
  static async PostCatergory (nameCatergory: string) {
-    return await 
+    return await
     instance.post('/Catergory.json',{
         Name: nameCatergory,
     }).then(response=>{
         console.log(response.data);
         return true;
-    }).catch((e)=>{console.log(e)});
+    }).catch((e)=>{console.log(e);});
 
  }
  static async UpdateCatergory (id: string , nameCatergory: string) {
-    return await 
+    return await
     instance.put(`/Catergory/${id}.json`,{
         Name: nameCatergory,
     }).then(response=>{
         console.log(response.data);
         return true;
-    }).catch((e)=>{console.log(e)});
+    }).catch((e)=>{console.log(e);});
 
  }
 
@@ -425,7 +428,7 @@ static async PostTimeWork (nametable: string , NameTimeWork: string, day: string
  //Service Expense
 
  static async PostExpense (name: string , content: string ,total: number, createDate: any){
-    return await 
+    return await
     instance.post('/Expense.json',{
         Name: name,
         Content: content,
@@ -434,10 +437,10 @@ static async PostTimeWork (nametable: string , NameTimeWork: string, day: string
     }).then(response=>{
         console.log(response.data);
         return true;
-    }).catch((e)=>{console.log(e)});
+    }).catch((e)=>{console.log(e);});
  }
  static async UpdateExpense (id: string ,name: string , content: string ,total: number, createDate: any){
-    return await 
+    return await
     instance.put(`/Expense/${id}.json`,{
         Name: name,
         Content: content,
@@ -446,7 +449,104 @@ static async PostTimeWork (nametable: string , NameTimeWork: string, day: string
     }).then(response=>{
         console.log(response.data);
         return true;
-    }).catch((e)=>{console.log(e)});
+    }).catch((e)=>{console.log(e);});
  }
+ //Service MaterialCatergory
+static async PostMaterialCatergory (dataValue:MaterialCategory )
+    {
+        return await
+        instance.post('/MaterialCatergory.json',{
+            Name: dataValue.name,
+        })
+        .then(response=>{
+            if (response.data)
+            {
+                console.log(response.data);
+                return true;
+            }
+        })
+        .catch(e=> console.log(e));
+    }
+static async updateMaterialCatergory (dataValue:MaterialCategory )
+    {
+        return await
+        instance.put(`/MaterialCatergory/${dataValue.id}.json`,{
+            Name: dataValue.name,
+        })
+        .then(response=>{
+            if (response.data)
+            {
+                console.log(response.data);
+                return true;
+            }
+        })
+        .catch(e=> console.log(e));
+    }
+static async AddMaterial (value: Material){
+    return await
+        instance.post('Material.json',{
+            Name: value.Name,
+            MaterialGroup:value.MaterialGroup,
+            Unit:value.unit,
+            Number: value.Number,
+            Img: value.unit,
+        })
+        .then(response=>{
+            if (response.data)
+            {
+                console.log(response.data);
+                return true;
+            }
+        })
+        .catch(e=>{console.log(e);});
+    }
+static async UpdateMaterial (value: Material){
+        return await
+            instance.post('Material.json',{
+                Name: value.Name,
+                MaterialGroup:value.MaterialGroup,
+                Unit:value.unit,
+                Number: value.Number,
+                Img: value.unit,
+            })
+            .then(response=>{
+                if (response.data)
+                {
+                    console.log(response.data);
+                    return true;
+                }
+            })
+            .catch(e=>{console.log(e);});
+    }
+
+    static async AddUnit (value: Units){
+        return await
+            instance.post('Units.json',{
+                Name: value.Name,
+            })
+            .then(response=>{
+                if (response.data)
+                {
+                    console.log(response.data);
+                    return true;
+                }
+            })
+            .catch(e=>{console.log(e);});
+        }
+        static async  updateUnit (value: Units){
+            return await
+                instance.put(`Units/${value.id}.json`,{
+                    Name: value.Name,
+                })
+                .then(response=>{
+                    if (response.data)
+                    {
+                        console.log(response.data);
+                        return true;
+                    }
+                })
+                .catch(e=>{console.log(e);});
+            }
 }
+
 export default data;

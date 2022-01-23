@@ -20,6 +20,7 @@ export type DashboardNavigationParamList={
     ManageStaff:undefined
     ExpenseManager: undefined
     ChartNavigation : undefined
+    MaterialManager: undefined
 }
 export type TabNavigationParamList={
     DashboardNavigation: {displayname : string| undefined}
@@ -64,5 +65,10 @@ export type ExpenseParamList={
     ExpenseMainScreen: undefined
     AddExpenseScreen:undefined
     UpdateExpenseScreen: {id: string}
+}
+export type MaterialParamList={
+    ListMaterialScreen: undefined
+    AddMaterialScreen:undefined
+    UpdateMaterialScreen: {id: string}
 }
 
