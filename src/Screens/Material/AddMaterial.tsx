@@ -48,26 +48,27 @@ const AddMaterial: React.FC<Props> = ({navigation}: Props) => {
   const [showAddUnit, setAddUnit] = useState<boolean>(false);
   // const [showMaterial, setShowMaterial] = useState<boolean>(false);
   const addproduct = async () => {
-    if (
-      nameproduct === '' ||
-      priceproduct <= 0 ||
-      quantity < 1 ||
-      image === null
-    ) {
+    if (nameproduct === '' || priceproduct <= 0 || quantity < 1) {
       setshowError(true);
     } else {
-      const reference = storage().ref(image);
-      console.log(reference);
-      const pathToFile = pathimg;
-      await reference.putFile(pathToFile);
-      let urlimg = await reference.getDownloadURL();
+      let urlimg;
+      if (image === null) {
+        urlimg = 'none';
+      } else {
+        const reference = storage().ref(image);
+        console.log(reference);
+        const pathToFile = pathimg;
+        await reference.putFile(pathToFile);
+        urlimg = await reference.getDownloadURL();
+      }
       let initaldata: Material = {
         id: '',
         Name: nameproduct,
         Number: quantity,
         MaterialGroup: ChooseCate.id,
-        Image: urlimg,
-        unit: ChooseCate.id,
+        Img: urlimg,
+        Unit: ChooseUnit.id,
+        BuyingPrice: priceproduct,
       };
       data.AddMaterial(initaldata).then(result => {
         if (result === true) {
@@ -242,7 +243,6 @@ const AddMaterial: React.FC<Props> = ({navigation}: Props) => {
           <Text style={style.titlefiled}>Giá mua </Text>
           <TextInput
             keyboardType="numeric"
-            defaultValue="0"
             onChangeText={text => {
               setpriceproduct(
                 Number(isNaN(Number(text)))
@@ -250,8 +250,11 @@ const AddMaterial: React.FC<Props> = ({navigation}: Props) => {
                   : Number(text),
               );
             }}
-            style={[style.textinput, {width: reponsivewidth(280)}]}
-          />
+            style={[style.textinput, {width: reponsivewidth(280)}]}>
+            {priceproduct
+              ? priceproduct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+              : 0}
+          </TextInput>
         </View>
         <View
           style={{
@@ -268,7 +271,7 @@ const AddMaterial: React.FC<Props> = ({navigation}: Props) => {
           <Text style={style.titlefiled}>Đơn vị tính</Text>
           <TouchableOpacity
             onPress={() => {
-              setChooseunit(undefined);
+              // setChooseunit(undefined);
               setShowChooseUnit(true);
             }}
             style={{
@@ -302,7 +305,6 @@ const AddMaterial: React.FC<Props> = ({navigation}: Props) => {
             onChangeText={text => {
               setquantity(Number.parseInt(text, 10));
             }}
-            defaultValue="1"
             keyboardType="numeric"
             style={[style.textinput, {width: reponsivewidth(280)}]}
           />

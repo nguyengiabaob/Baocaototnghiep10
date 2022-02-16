@@ -217,7 +217,6 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
           <Text style={style.titlefiled}>Giá bán </Text>
           <TextInput
             keyboardType="numeric"
-            defaultValue="0"
             onChangeText={text => {
               setpriceproduct(
                 Number(isNaN(Number(text)))
@@ -226,7 +225,11 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
               );
             }}
             style={[style.textinput, {width: reponsivewidth(280)}]}
-          />
+          >
+            {priceproduct
+              ? priceproduct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+              : 0}
+          </TextInput>
         </View>
         <View
           style={{

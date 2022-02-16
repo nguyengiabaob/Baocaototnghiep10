@@ -24,7 +24,7 @@ const AddMaterialCategory: React.FC<props> = ({visible, cancel}: props) => {
 
   const PostMaterialCategory = async (valueName: string) => {
     let initalData: MaterialCategory = {
-      name: valueName,
+      Name: valueName,
       id: '',
     };
     let res = await data.PostMaterialCatergory(initalData);

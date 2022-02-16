@@ -456,7 +456,7 @@ static async PostMaterialCatergory (dataValue:MaterialCategory )
     {
         return await
         instance.post('/MaterialCatergory.json',{
-            Name: dataValue.name,
+            Name: dataValue.Name,
         })
         .then(response=>{
             if (response.data)
@@ -471,7 +471,7 @@ static async updateMaterialCatergory (dataValue:MaterialCategory )
     {
         return await
         instance.put(`/MaterialCatergory/${dataValue.id}.json`,{
-            Name: dataValue.name,
+            Name: dataValue.Name,
         })
         .then(response=>{
             if (response.data)
@@ -487,9 +487,10 @@ static async AddMaterial (value: Material){
         instance.post('Material.json',{
             Name: value.Name,
             MaterialGroup:value.MaterialGroup,
-            Unit:value.unit,
+            Unit:value.Unit,
             Number: value.Number,
-            Img: value.unit,
+            Img: value.Img,
+            BuyingPrice: value.BuyingPrice,
         })
         .then(response=>{
             if (response.data)
@@ -500,14 +501,15 @@ static async AddMaterial (value: Material){
         })
         .catch(e=>{console.log(e);});
     }
-static async UpdateMaterial (value: Material){
+static async UpdateMaterial (value: Material, id : string){
         return await
-            instance.post('Material.json',{
+            instance.put(`Material/${id}.json`,{
                 Name: value.Name,
                 MaterialGroup:value.MaterialGroup,
-                Unit:value.unit,
+                Unit:value.Unit,
                 Number: value.Number,
-                Img: value.unit,
+                Img: value.Img,
+                BuyingPrice: value.BuyingPrice,
             })
             .then(response=>{
                 if (response.data)

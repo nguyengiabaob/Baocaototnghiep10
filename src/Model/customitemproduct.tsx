@@ -1,11 +1,13 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { StyleProp, StyleSheet, TextStyle, View, ViewStyle, TouchableOpacity, Text } from 'react-native';
 import { reponsiveheight, reponsivewidth } from '../theme/Metric';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Anticon from 'react-native-vector-icons/AntDesign';
 import { Checkbox } from 'react-native-paper';
+import DataService from '../services/dataservice';
+import { Units } from './Unit';
 type Props={
     textStyle?: StyleProp<TextStyle>,
     viewstyle?: StyleProp<ViewStyle>,
@@ -17,8 +19,9 @@ type Props={
     price: number,
     quanity: number,
     checked: boolean,
-    oncheck: (id:string , check: boolean)=> void
+    oncheck?: (id:string , check: boolean)=> void
     setmodelDel: (value: any)=>void
+    unitId?: string
 
 }
 const Customitemproduct: React.FC<Props> = ({
@@ -34,22 +37,38 @@ const Customitemproduct: React.FC<Props> = ({
     price,
     quanity,
     checked,
+    unitId
 }:Props) =>{
+    const [nameunit, setNameUnit]= useState<string>();
+    console.log('56456456',unitId)
+    const getNameUnit=useCallback( async()=>{
+        if (unitId)
+        {
+          
+           let a =  await DataService.Getdata_dtServiceById<Units>('Units',unitId);
+           setNameUnit(a.Name);
+        }
+
+    },[unitId])
+    useEffect(()=>{
+        getNameUnit();
+    },[getNameUnit]);
+    
     return (
         <View style={style.container}>
             <View style={[style.button, viewstyle]}>
                 <View style={{flexDirection: 'row', alignItems: 'center', justifyContent:'center'}}>
                     <View style={{marginRight:4, marginLeft:15}}>
-                        <Checkbox onPress={()=>{setmodelDel(true); oncheck(item.id,checked)}} color="#02569E" status={checked === true ? 'checked' : 'unchecked' }/>
+                        <Checkbox onPress={()=>{setmodelDel(true); oncheck && oncheck(item.id,checked)}} color="#02569E" status={checked === true ? 'checked' : 'unchecked' }/>
                     </View>
-                   <View style={{marginHorizontal:1, flex:0.2}}>
+                   <View style={{marginHorizontal:0.3, flex:0.2}}>
                        {icon}
                    </View>
                    <View style={{flexDirection: 'column',  alignItems: 'center', justifyContent:'center',flex:0.7}}>
                    <Text style={[style.title, textStyle,{fontWeight:'bold',fontSize:16, width:reponsivewidth(210),textAlign:'center'}]}>{title}</Text>
                    <View style={{marginTop:15}}>
                    <Text style={[style.title2, textStyle, {fontStyle:'italic'}]}>Giá  : {Number(price).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
-                    <Text style={[style.title2, textStyle,{fontStyle:'italic'}]}>Số lượng: {quanity}</Text>
+                    <Text style={[style.title2, textStyle,{fontStyle:'italic'}]}>KL / SL: {quanity} {unitId && nameunit}</Text>
                    </View>
                     </View>
                     <View style={{flex:0.2, flexDirection: 'column',marginRight:10 }}>

@@ -11,6 +11,7 @@ import {
 import {Overlay} from 'react-native-elements';
 import {reponsiveheight, reponsivewidth} from '../../../theme/Metric';
 type optionData = {
+  key: number;
   title: string;
   mission: () => void;
   viewStyle: ViewStyle;
@@ -50,6 +51,7 @@ const OpitonOverplay: React.FC<props> = ({
             return (
               <>
                 <TouchableOpacity
+                  key={item.key}
                   onPress={item.mission}
                   style={[
                     style.btnChoosenAdd,

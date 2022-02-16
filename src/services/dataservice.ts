@@ -19,5 +19,25 @@ class DataService  {
       
         return resultArray;
     }
+    static async  Getdata_dtServiceById<T>(name: string,id: string) : Promise<T> {
+        let item;
+        let temp :any =[];
+        temp = await data.getdata(name);
+        for ( let key in  temp)
+        {
+            if ( key !== "0" && key === id)
+            {
+                item = {
+                    id: key,
+                    ...temp[key]
+                }
+                console.log(item);
+                break;
+            }
+           // console.log('789',resultArray);
+        }
+       return item;
+    }
+    
 }
 export default DataService;

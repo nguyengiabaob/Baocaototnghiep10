@@ -2,7 +2,8 @@ export interface Material {
   id: string;
   Name: string;
   MaterialGroup: string;
-  Image: string;
+  Img: string;
   Number: number;
-  unit: string;
+  Unit: string;
+  BuyingPrice: number;
 }

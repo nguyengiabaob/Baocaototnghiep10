@@ -1,4 +1,4 @@
 export interface MaterialCategory {
   id: string;
-  name: string;
+  Name: string;
 }
