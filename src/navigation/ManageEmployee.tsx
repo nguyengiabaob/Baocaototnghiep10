@@ -3,6 +3,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import React from 'react';
 import {AssignmentScreen} from '../Screens/Assignment/AssignmentScreen';
 import {TimeKeeping} from '../Screens/Wages/DoWages';
+import Attendance from '../Staff/AtendanceScreen';
 // import ListStaffScreen from '../Staff/ListStaffScreen';
 import ManageStaffScreen from '../Staff/ManageStaffScreen';
 import {reponsiveheight} from '../theme/Metric';
@@ -56,6 +57,21 @@ const ManageEmployeeNavigator: React.FC = () => {
         }}
         component={TimeKeeping}
       />
+      <Screen name="AttendanceScreen"
+        options={{
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: '#67bff3',
+            borderBottomLeftRadius: 15,
+            borderBottomRightRadius: 15,
+            height: reponsiveheight(55),
+          },
+          headerTitle: 'Điểm danh',
+          headerTitleStyle: {color: '#FFF'},
+          headerTintColor: '#FFF',
+          headerTitleAlign: 'center',
+        }}
+        component={Attendance}/>
     </Navigator>
   );
 };

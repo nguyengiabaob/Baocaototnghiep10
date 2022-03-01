@@ -1,57 +1,58 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   Image,
-  ScrollView,
   StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import {Overlay, Text} from 'react-native-elements';
 import storage from '@react-native-firebase/storage';
-import data from '../../services/data';
 import {MediaType} from 'react-native-image-picker';
 import * as ImagePicker from 'react-native-image-picker';
-import DataService from '../../services/dataservice';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import {reponsiveheight, reponsivewidth} from '../../theme/Metric';
-import EvilIcons from 'react-native-vector-icons/EvilIcons';
-import {MaterialParamList} from '../../navigation/types';
-import {StackNavigationProp} from '@react-navigation/stack';
+import {
+  getheight,
+  getwidth,
+  reponsiveheight,
+  reponsivewidth,
+} from '../../theme/Metric';
 import {CustomNotification} from '../../Model/CustomNofication';
 import BellNofi from '../../asset/svg/bellnotification.svg';
 import Warning from '../../asset/svg/Warning.svg';
 import {Material} from '../../Model/Material';
-import {Units} from '../../Model/Unit';
 type Props = {
-  navigation: StackNavigationProp<MaterialParamList, 'AddMaterialScreen'>;
+  oncancel: (value: any) => void;
+  onItemArray: (value: any) => void;
+  // navigation: StackNavigationProp<MaterialParamList, 'AddMaterialScreen'>;
 };
-const AddMaterial: React.FC<Props> = ({navigation}: Props) => {
+const AddMaterial: React.FC<Props> = ({oncancel, onItemArray}: Props) => {
+  // const [imgdata, setImageData] = useState<any>();
   const [nameproduct, setnameproduct] = useState<string>('');
-  const [priceproduct, setpriceproduct] = useState<number>(0);
+  // const [priceproduct, setpriceproduct] = useState<number>(0);
   const [quantity, setquantity] = useState<number>(1);
   const [image, setimage] = useState<any>(null);
   const [pathimg, setpathimg] = useState<any>(null);
   const [imgopick, setimgpick] = useState<any>(null);
   const [visible, setVisible] = useState<boolean>(false);
-  const showDialog = () => setVisible(true);
+  // const showDialog = () => setVisible(true);
   const hideDialog = () => setVisible(false);
-  const [showChooseCate, setShowChooseCate] = useState<boolean>(false);
-  const [showChooseUnit, setShowChooseUnit] = useState<boolean>(false);
-  const [ChooseCate, setChooseCate] = useState<any>();
-  const [ChooseUnit, setChooseunit] = useState<any>();
-  const [DataCate, setDataCate] = useState<any[]>([]);
-  const [DataUnit, setDataUnit] = useState<Units[]>([]);
+  // const [showChooseCate, setShowChooseCate] = useState<boolean>(false);
+  // const [showChooseUnit, setShowChooseUnit] = useState<boolean>(false);
+  // const [ChooseCate, setChooseCate] = useState<any>();
+  const [ChooseUnit, setChooseunit] = useState<any>('');
+  // const [DataCate, setDataCate] = useState<any[]>([]);
+  // const [DataUnit, setDataUnit] = useState<Units[]>([]);
   const [showError, setshowError] = useState<boolean>(false);
-  const [NameUnit, setNameUnit] = useState<string>('');
-  const [showAddUnit, setAddUnit] = useState<boolean>(false);
+  // const [NameUnit, setNameUnit] = useState<string>('');
+  // const [showAddUnit, setAddUnit] = useState<boolean>(false);
   // const [showMaterial, setShowMaterial] = useState<boolean>(false);
   const addproduct = async () => {
-    if (nameproduct === '' || priceproduct <= 0 || quantity < 1) {
+    if (nameproduct === '' || quantity < 1) {
       setshowError(true);
     } else {
-      let urlimg;
+      let urlimg: string;
       if (image === null) {
         urlimg = 'none';
       } else {
@@ -62,19 +63,27 @@ const AddMaterial: React.FC<Props> = ({navigation}: Props) => {
         urlimg = await reference.getDownloadURL();
       }
       let initaldata: Material = {
-        id: '',
         Name: nameproduct,
         Number: quantity,
-        MaterialGroup: ChooseCate.id,
+        Total: quantity,
         Img: urlimg,
-        Unit: ChooseUnit.id,
-        BuyingPrice: priceproduct,
+        Unit: ChooseUnit,
       };
-      data.AddMaterial(initaldata).then(result => {
-        if (result === true) {
-          showDialog();
-        }
-      });
+      onItemArray((prev: any) => [...prev, initaldata]);
+      // data.AddMaterial(initaldata).then(result => {
+      //   let item: Material = {
+      //     id: result.name,
+      //     Name: nameproduct,
+      //     Number: quantity,
+      //     MaterialGroup: ChooseCate.id,
+      //     Img: urlimg,
+      //     Unit: ChooseUnit.id,
+      //     BuyingPrice: priceproduct,
+      //   };
+      //   onItemArray((prev: any) => [...prev, item]);
+      //   console.log('123', result.name);
+      //   // onItemArray(result.name);
+      // });
     }
   };
   const type: MediaType = 'photo';
@@ -91,63 +100,91 @@ const AddMaterial: React.FC<Props> = ({navigation}: Props) => {
       }
     });
   };
-  const getCatergory = async () => {
-    // data.getdata('Catergory').then(res => {
-    //   var dataArray: any[] = [];
-    //   for (let key in res) {
-    //     if (key !== '0') {
-    //       dataArray.push({
-    //         id: key,
-    //         ...res[key],
-    //       });
-    //     }
-    //   }
-    //   setDataCate(dataArray);
-    // });
-    let dta = await DataService.Getdata_dtService<any>('MaterialCatergory');
-    setDataCate(dta);
-  };
-  const getUnits = async () => {
-    // data.getdata('Catergory').then(res => {
-    //   var dataArray: any[] = [];
-    //   for (let key in res) {
-    //     if (key !== '0') {
-    //       dataArray.push({
-    //         id: key,
-    //         ...res[key],
-    //       });
-    //     }
-    //   }
-    //   setDataCate(dataArray);
-    // });
-    let dta = await DataService.Getdata_dtService<any>('Units');
-    setDataUnit(dta);
-  };
-  const SaveUnits = (name: string) => {
-    if (name) {
-      let intialUnit: Units = {
-        id: '',
-        Name: name,
-      };
-      data.AddUnit(intialUnit).then(res => {
-        if (res === true) {
-          setAddUnit(false);
-          setVisible(true);
-        }
-      });
-    }
-  };
-  useEffect(() => {
-    if (showAddUnit === false) {
-      getUnits();
-    }
-  }, [showAddUnit]);
-  useEffect(() => {
-    getCatergory();
-    getUnits();
-  }, []);
+  // const getCatergory = async () => {
+  // data.getdata('Catergory').then(res => {
+  //   var dataArray: any[] = [];
+  //   for (let key in res) {
+  //     if (key !== '0') {
+  //       dataArray.push({
+  //         id: key,
+  //         ...res[key],
+  //       });
+  //     }
+  //   }
+  //   setDataCate(dataArray);
+  // });
+  // let dta = await DataService.Getdata_dtService<any>('MaterialCatergory');
+  // setDataCate(dta);
+  // };
+  // const getUnits = async () => {
+  // data.getdata('Catergory').then(res => {
+  //   var dataArray: any[] = [];
+  //   for (let key in res) {
+  //     if (key !== '0') {
+  //       dataArray.push({
+  //         id: key,
+  //         ...res[key],
+  //       });
+  //     }
+  //   }
+  //   setDataCate(dataArray);
+  // });
+  // let dta = await DataService.Getdata_dtService<any>('Units');
+  // setDataUnit(dta);
+  // };
+  // const SaveUnits = (name: string) => {
+  //   if (name) {
+  //     let intialUnit: Units = {
+  //       id: '',
+  //       Name: name,
+  //     };
+  //     data.AddUnit(intialUnit).then(res => {
+  //       if (res === true) {
+  //         setAddUnit(false);
+  //         setVisible(true);
+  //       }
+  //     });
+  //   }
+  // };
+  // useEffect(() => {
+  //   if (showAddUnit === false) {
+  //     getUnits();
+  //   }
+  // }, [showAddUnit]);;
   return (
-    <View>
+    <View style={{width: getwidth(), height: getheight(), flex: 1}}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          paddingTop: 18,
+          paddingBottom: 18,
+          backgroundColor: '#67bff3',
+          marginTop: -10,
+        }}>
+        <View
+          style={{
+            alignSelf: 'flex-start',
+            justifyContent: 'flex-start',
+            marginLeft: -80,
+            width: reponsivewidth(40),
+          }}>
+          <TouchableOpacity onPress={() => oncancel(false)}>
+            <MaterialIcon name="arrow-back" size={28} color="#efefef" />
+          </TouchableOpacity>
+        </View>
+        <Text
+          style={{
+            alignSelf: 'center',
+            justifyContent: 'flex-start',
+            fontSize: 17,
+            width: reponsivewidth(250),
+            color: '#FFFF',
+          }}>
+          {' '}
+          Thông tin nguyên liệu
+        </Text>
+      </View>
       <View style={style.containerfiled}>
         <View
           style={{
@@ -185,7 +222,7 @@ const AddMaterial: React.FC<Props> = ({navigation}: Props) => {
             borderTopWidth: 0.5,
             flexDirection: 'row',
             backgroundColor: '#FFFF',
-            height: 70,
+            height: 100,
           }}>
           <Text style={style.titlefiled}>Tên nguyên liệu </Text>
           <TextInput
@@ -196,7 +233,7 @@ const AddMaterial: React.FC<Props> = ({navigation}: Props) => {
             placeholder="Tên nguyên liệu"
           />
         </View>
-        <View
+        {/* <View
           style={{
             justifyContent: 'center',
             alignItems: 'center',
@@ -227,8 +264,8 @@ const AddMaterial: React.FC<Props> = ({navigation}: Props) => {
             </TextInput>
             <EvilIcons name="chevron-right" size={32} color={'#777777'} />
           </TouchableOpacity>
-        </View>
-        <View
+        </View> */}
+        {/* <View
           style={{
             justifyContent: 'center',
             alignItems: 'center',
@@ -255,7 +292,7 @@ const AddMaterial: React.FC<Props> = ({navigation}: Props) => {
               ? priceproduct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
               : 0}
           </TextInput>
-        </View>
+        </View> */}
         <View
           style={{
             justifyContent: 'center',
@@ -266,27 +303,16 @@ const AddMaterial: React.FC<Props> = ({navigation}: Props) => {
             borderTopWidth: 0.5,
             flexDirection: 'row',
             backgroundColor: '#FFFF',
-            height: 70,
+            height: 100,
           }}>
           <Text style={style.titlefiled}>Đơn vị tính</Text>
-          <TouchableOpacity
-            onPress={() => {
-              // setChooseunit(undefined);
-              setShowChooseUnit(true);
+          <TextInput
+            onChangeText={text => {
+              setChooseunit(text);
             }}
-            style={{
-              width: reponsivewidth(280),
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}>
-            <TextInput
-              editable={false}
-              style={[style.textinput, {width: reponsivewidth(170)}]}
-              placeholder="Chọn đơn vị tính">
-              {ChooseUnit ? ChooseUnit.Name : ''}
-            </TextInput>
-            <EvilIcons name="chevron-right" size={32} color={'#777777'} />
-          </TouchableOpacity>
+            style={[style.textinput, {width: reponsivewidth(280)}]}
+            placeholder="Nhập đơn vị tính"
+          />
         </View>
         <View
           style={{
@@ -298,10 +324,11 @@ const AddMaterial: React.FC<Props> = ({navigation}: Props) => {
             borderTopWidth: 0.5,
             flexDirection: 'row',
             backgroundColor: '#FFFF',
-            height: 70,
+            height: 100,
           }}>
           <Text style={style.titlefiled}>Số Lượng </Text>
           <TextInput
+            placeholder="Nhập số lượng"
             onChangeText={text => {
               setquantity(Number.parseInt(text, 10));
             }}
@@ -310,11 +337,12 @@ const AddMaterial: React.FC<Props> = ({navigation}: Props) => {
           />
         </View>
       </View>
-      <View style={style.containerbutton}>
+      <View style={[style.containerbutton, {marginTop: 10}]}>
         <TouchableOpacity
           style={style.btn_add}
-          onPress={() => {
-            addproduct();
+          onPress={async () => {
+            await addproduct();
+            oncancel(false);
           }}>
           <Text style={style.titleadd}>Lưu</Text>
         </TouchableOpacity>
@@ -333,7 +361,7 @@ const AddMaterial: React.FC<Props> = ({navigation}: Props) => {
                             </Dialog>
                             </Portal>
               </Provider> */}
-      <Overlay isVisible={showChooseCate}>
+      {/* <Overlay isVisible={showChooseCate}>
         <View
           style={{width: reponsivewidth(300), height: reponsiveheight(350)}}>
           <View style={style.TitleOverlAdd}>
@@ -462,6 +490,7 @@ const AddMaterial: React.FC<Props> = ({navigation}: Props) => {
                 onPress={() => {
                   SaveUnits(NameUnit);
                   setAddUnit(false);
+                  oncancel(false);
                 }}>
                 <Text style={{color: '#FFFF'}}>Lưu</Text>
               </TouchableOpacity>
@@ -472,13 +501,14 @@ const AddMaterial: React.FC<Props> = ({navigation}: Props) => {
                 ]}
                 onPress={() => {
                   setAddUnit(false);
+                  oncancel(false);
                 }}>
                 <Text style={{color: '#FFFF'}}>Thoát</Text>
               </TouchableOpacity>
             </View>
           </View>
         </Overlay>
-      </Overlay>
+      </Overlay> */}
       <CustomNotification
         visible={visible}
         iconTitle={
@@ -501,11 +531,15 @@ const AddMaterial: React.FC<Props> = ({navigation}: Props) => {
   );
 };
 const style = StyleSheet.create({
+  TitleOverlAdd: {
+    borderBottomColor: '#02569E',
+    borderBottomWidth: 2,
+  },
   containerfiled: {
     borderColor: '#D3D3D3',
     borderWidth: 3,
     borderRadius: 10,
-    height: reponsiveheight(600),
+    // height: reponsiveheight(600),
   },
   styletxtInput: {
     borderColor: '#afaeae',
@@ -585,10 +619,6 @@ const style = StyleSheet.create({
   actiondialog: {
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  TitleOverlAdd: {
-    borderBottomColor: '#02569E',
-    borderBottomWidth: 2,
   },
   btnChoosenAdd: {
     alignItems: 'center',

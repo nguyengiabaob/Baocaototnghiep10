@@ -2,6 +2,5 @@
 import axios from 'axios';
 const instance = axios.create({
     baseURL: 'https://drinkshopmanager-default-rtdb.firebaseio.com/',
-    timeout: 1000,
 });
 export default instance;

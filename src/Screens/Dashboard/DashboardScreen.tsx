@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
 import {RouteProp} from '@react-navigation/native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Pressable, ScrollView, StyleSheet, Text} from 'react-native';
 import {View} from 'react-native';
 import Logoimg from '../../asset/svg/logo.svg';
@@ -22,8 +22,11 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import DataService from '../../services/dataservice';
-import data from '../../services/data';
+// import {Product} from '../../Model/product';
+// import DataService from '../../services/dataservice';
+// import data from '../../services/data';
+// import DataService from '../../services/dataservice';
+// import data from '../../services/data';
 type Props = {
   navigation: StackNavigationProp<
     DashboardNavigationParamList,
@@ -33,7 +36,7 @@ type Props = {
 };
 const DashboardScreen: React.FC<Props> = ({navigation, route}: Props) => {
   const [username, setusername] = useState<string | null | undefined>('');
-  const {isLoggedGoogle, isLoggedIn} = useAppSelector(selectAuth);
+  const {isLoggedGoogle, isLoggedIn, typeUser} = useAppSelector(selectAuth);
   async function fetchUsename() {
     const user = await AuthService.getusername();
     setusername(user);
@@ -100,30 +103,47 @@ const DashboardScreen: React.FC<Props> = ({navigation, route}: Props) => {
               title="Quản lý sản phẩm "
               icon={<Feather name="box" size={65} color={'#02569E'} />}
             />
-            <CustomButton
-              textStyle={{color: '#02569E'}}
-              onpress={() => {
-                navigation.navigate('ChartNavigation');
-              }}
-              viewstyle={[style.shadowsContainer, {backgroundColor: '#ffff'}]}
-              title="Thống kê doanh thu"
-              icon={
-                <FontAwesome name="pie-chart" size={65} color={'#02569E'} />
-              }
-            />
+            {typeUser == 0 ? (
+              <CustomButton
+                textStyle={{color: '#02569E'}}
+                onpress={() => {
+                  navigation.navigate('ChartNavigation');
+                }}
+                viewstyle={[style.shadowsContainer, {backgroundColor: '#ffff'}]}
+                title="Thống kê doanh thu"
+                icon={
+                  <FontAwesome name="pie-chart" size={65} color={'#02569E'} />
+                }
+              />
+            ) : (
+              <CustomButton
+                textStyle={{color: '#02569E'}}
+                onpress={() => {
+                  navigation.navigate('ExpenseManager');
+                }}
+                viewstyle={[style.shadowsContainer, {backgroundColor: '#ffff'}]}
+                title="Quản lý Nguồn chi "
+                icon={
+                  <FontAwesome5 name="box-open" size={65} color={'#02569E'} />
+                }
+              />
+            )}
           </View>
           <View style={style.ContainerButton}>
-            <CustomButton
-              textStyle={{color: '#02569E'}}
-              onpress={() => {
-                navigation.navigate('ExpenseManager');
-              }}
-              viewstyle={[style.shadowsContainer, {backgroundColor: '#ffff'}]}
-              title="Quản lý Nguồn chi "
-              icon={
-                <FontAwesome5 name="box-open" size={65} color={'#02569E'} />
-              }
-            />
+            {typeUser == 0 && (
+              <CustomButton
+                textStyle={{color: '#02569E'}}
+                onpress={() => {
+                  navigation.navigate('ExpenseManager');
+                }}
+                viewstyle={[style.shadowsContainer, {backgroundColor: '#ffff'}]}
+                title="Quản lý Nguồn chi "
+                icon={
+                  <FontAwesome5 name="box-open" size={65} color={'#02569E'} />
+                }
+              />
+            )}
+
             <CustomButton
               textStyle={{color: '#02569E'}}
               onpress={() => {

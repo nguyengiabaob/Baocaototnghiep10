@@ -15,24 +15,27 @@ import data from '../../services/data';
 import { reponsiveheight, reponsivewidth } from '../../theme/Metric';
 import * as ImagePicker from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
-import EvilIcons from 'react-native-vector-icons/EvilIcons'
+import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import { Overlay } from 'react-native-elements';
 import { Item } from 'react-native-paper/lib/typescript/components/List/List';
 import BellNofi from '../../asset/svg/bellnotification.svg';
 import { CustomNotification } from '../../Model/CustomNofication';
 import DataService from '../../services/dataservice';
+import ChooseMaterial from './ChooseMaterial';
 type Props={
     navigation: StackNavigationProp<ListproductNavigationPramaList,'UpdateProductScreen'>,
     route: RouteProp<ListproductNavigationPramaList,'UpdateProductScreen'>
 }
 const UpdateProductScreen: React.FC<Props> = ({navigation, route}: Props) =>{
     const {id} = route.params;
+    const [stringMaterial, setstringMaterial] = useState<string>('');
     const [nameproduct, setnameproduct] = useState<string>('');
     const [priceproduct, setpriceproduct] = useState<number>(-1);
     const [quanity,setquanity] = useState<number>(-1);
     const [image, setimage] = useState<any>(null);
     const [pathimg, setpathimg] = useState<any>(null);
     // const [postimg,setpostimg] = useState<any>(null);
+    const [showMaterial,setShowMaterial] = useState<boolean>(false);
     const [imgopick,setimgpick] = useState<any>(null);
     const [visible, setVisible] = useState<boolean>(false);
     const showDialog = () => setVisible(true);
@@ -40,11 +43,21 @@ const UpdateProductScreen: React.FC<Props> = ({navigation, route}: Props) =>{
         setVisible(false);
         navigation.navigate('ListProductScreen');
     };
-    const [showChooseCate,setShowChooseCate]= useState<boolean>(false);
-    const [ChooseCate,setChooseCate]= useState<any>();
-    const [DataCate,setDataCate]= useState<any[]>([]);
-    const [dataproduct,setdataproduct] = useState<Product[]>([]);
-    const [dataProduct,setdataProduct]= useState<Product>();
+    const [showChooseCate,setShowChooseCate] = useState<boolean>(false);
+    const [ChooseCate,setChooseCate] = useState<any>();
+    const [DataCate,setDataCate] = useState<any[]>([]);
+    const [dataproduct,setdataproduct] = useState<any[]>([]);
+    const [dataProduct,setdataProduct] = useState<Product>();
+    const getstringMaterialUpdate =  useCallback(()=>{
+        let a = '';
+        if (dataproduct && showMaterial == false)
+        {
+            dataproduct.forEach(item=>{
+               a += item.Name + ',';
+            });
+            setstringMaterial(a);
+        }
+    },[dataproduct, showMaterial]);
     const getProduct = useCallback(async()=>{
         // let arrayproduct:any[] = [];
         // data.getdata('Products').then(res=>{
@@ -60,51 +73,60 @@ const UpdateProductScreen: React.FC<Props> = ({navigation, route}: Props) =>{
         //     let i= arrayproduct.findIndex(Item => Item.id== id);
         //     console.log('1',arrayproduct[i]);
         //     setdataProduct(arrayproduct[i]);
-           
+
         //     //setdataproduct(arrayproduct);
         // });
         let dta = await DataService.Getdata_dtService<any>('Products');
         let i = dta.findIndex(Item => Item.id == id);
         console.log('1',dta[i]);
+        // let a = "";
+        // dta[i].ListMaterial?.forEach((it:any) => {
+        //     console.log(it.Name);
+        //   a += it.Name + ',' ;
+        // })
+        // setstringMaterial(a);
         setdataProduct(dta[i]);
-        //setdataproduct(arrayproduct);
+        setdataproduct(dta[i].ListMaterial);
 
-    },[id])
+    },[id]);
     useEffect(()=>{
         getProduct();
     },[id,getProduct]);
     //let name ,price, quanity1,img1, CatergoryID;
 
-   
 
-const getNameCate= (id: string|undefined)=>{
+
+const getNameCate = (id: string|undefined)=>{
     let name;
-   let array=  DataCate?.filter(item=> item.id == id);
+   let array =  DataCate?.filter(item=> item.id == id);
    console.log('a', array);
     array.forEach(item => {
-       name= item.Name;
+       name = item.Name;
     });
     return name;
-}
-    const getCatergory =()=>{
-        data.getdata('Catergory'). then(res=> 
-            {   var dataArray: any[]= [];
+};
+    const getCatergory = ()=>{
+        data.getdata('Catergory'). then(res=>
+            {   var dataArray: any[] = [];
                 for (let key in res)
                 {
-                    if (key!='0')
+                    if (key != '0')
                     {
                         dataArray.push({
                             id:key,
-                            ...res[key]
+                            ...res[key],
                         });
                     }
                 }
                 setDataCate(dataArray);
             });
     };
+useEffect(()=>{
+    getstringMaterialUpdate(); 
+},[ getstringMaterialUpdate])
  useEffect(()=>{
     getCatergory();
- },[])
+ },[]);
     async function update()
 
     {
@@ -117,10 +139,14 @@ const getNameCate= (id: string|undefined)=>{
         // }
        // {
         // //  uploadImg(image,pathimg);
-        let catergory= DataCate.filter(item=>item.id == dataProduct?.CatergoryID);
+       
+        
+
+        
+        let catergory = DataCate.filter(item=>item.id == dataProduct?.CatergoryID);
         console.log('0',catergory[0]);
         let urlimg;
-        if(image !== null)
+        if (image !== null)
         {
         const reference = storage().ref(image);
         console.log(reference);
@@ -130,10 +156,16 @@ const getNameCate= (id: string|undefined)=>{
         }
         if (dataProduct)
         {
-           
-         await data.updatedataproduct('Products',id,nameproduct == '' ? dataProduct?.name_product : nameproduct , priceproduct > 0 ? priceproduct : Number(dataProduct.Price_product)  , quanity > 0 ? quanity : Number(dataProduct.Quanity), urlimg ? urlimg : dataProduct.Image, ChooseCate ? ChooseCate.id : catergory[0].id);
+            if(dataproduct.length>0)
+            {
+                dataproduct.forEach(i=>{
+                    i.Total= i.Number * dataProduct?.Quanity;
+                })
+            }
+         await data.updatedataproduct('Products',id,nameproduct == '' ? dataProduct?.name_product : nameproduct , priceproduct > 0 ? priceproduct : Number(dataProduct.Price_product)  , quanity > 0 ? quanity : Number(dataProduct.Quanity), urlimg ? urlimg : dataProduct.Image, ChooseCate ? ChooseCate.id : catergory[0].id, dataproduct.length > 0 ? dataproduct : [] );
         }
          showDialog();
+    
 
        // }
     }
@@ -208,14 +240,14 @@ const getNameCate= (id: string|undefined)=>{
                 <Text  style={style.titlefiled}>Nhóm sản phẩm </Text>
                 <TouchableOpacity onPress={()=>{
                     setChooseCate(undefined);
-                    setShowChooseCate(true)}} style={{width:reponsivewidth(280), flexDirection:'row', alignItems:'center'}}>
-                <TextInput   editable={false} style={[style.textinput,{width:reponsivewidth(170)},]} placeholder="Nhóm sản phẩm">{ChooseCate ? ChooseCate.Name : getNameCate(dataProduct?.CatergoryID)}</TextInput>
-                <EvilIcons name='chevron-right' size={32} color={'#777777'}/>
+                    setShowChooseCate(true);}} style={{width:reponsivewidth(280), flexDirection:'row', alignItems:'center'}}>
+                <TextInput   editable={false} style={[style.textinput,{width:reponsivewidth(170)}]} placeholder="Nhóm sản phẩm">{ChooseCate ? ChooseCate.Name : getNameCate(dataProduct?.CatergoryID)}</TextInput>
+                <EvilIcons name="chevron-right" size={32} color={'#777777'}/>
                 </TouchableOpacity>
         </View>
            <View style={{ justifyContent:'center', alignItems:'center', borderBottomWidth:0.5,borderBottomColor:'#c3c3c3',borderTopColor:'#c3c3c3',borderTopWidth:0.5, flexDirection:'row', backgroundColor:'#FFFF',height:70}} >
           <Text  style={style.titlefiled}>Giá bán </Text>
-                <TextInput keyboardType="numeric"  onChangeText={(text)=>{setpriceproduct(Number(isNaN(Number(text))) ? Number(text.replace(/,/g,'')): Number(text));}} style={[style.textinput, {width:reponsivewidth(280)}]}>{priceproduct>=0 ? priceproduct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") :Number(dataProduct?.Price_product).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</TextInput>
+                <TextInput keyboardType="numeric"  onChangeText={(text)=>{setpriceproduct(Number(isNaN(Number(text))) ? Number(text.replace(/,/g,'')) : Number(text));}} style={[style.textinput, {width:reponsivewidth(280)}]}>{priceproduct >= 0 ? priceproduct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : Number(dataProduct?.Price_product).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</TextInput>
           </View>
           {/* <View  style={{marginTop:30}}>
                 <Text style={{fontSize:15, fontWeight:'bold',fontStyle:'italic'}}>Số Lượng </Text>
@@ -233,6 +265,38 @@ const getNameCate= (id: string|undefined)=>{
                 <Text style={style.titlefiled}>Số Lượng </Text>
                 <TextInput onChangeText={(text)=>{setquanity(Number(text));}}  keyboardType="numeric"  style={[style.textinput, {width:reponsivewidth(280)}]}>{dataProduct?.Quanity}</TextInput>
           </View>
+          <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderBottomWidth: 0.5,
+            borderBottomColor: '#c3c3c3',
+            borderTopColor: '#c3c3c3',
+            borderTopWidth: 0.5,
+            flexDirection: 'row',
+            backgroundColor: '#FFFF',
+            height: 70,
+          }}>
+
+          <Text style={style.titlefiled}>Nguyễn liệu </Text>
+          <TouchableOpacity
+            onPress={()=>{
+              setShowMaterial(true);
+            }}
+            style={{
+              width: reponsivewidth(280),
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <TextInput
+              editable={false}
+              style={[style.textinput, {width: reponsivewidth(170)}]}
+              placeholder="Chọn nguyên liệu">
+                   {stringMaterial ? stringMaterial : ''}
+            </TextInput>
+            <EvilIcons name="chevron-right" size={32} color={'#777777'} />
+          </TouchableOpacity>
+        </View>
           {/* <View style={{marginTop:30, flexDirection:'row'}}>
          { imgopick ? <Image style={[style.img,{ width:reponsivewidth(150), height: reponsiveheight(150) }]} source={imgopick} /> : <Image style={[style.img,{ width:reponsivewidth(150), height: reponsiveheight(150) }]} source={{uri: img1}} />}
               <TouchableOpacity  style={{ height:50,justifyContent:'center', marginLeft:100,alignItems:'center',alignSelf:'center' }}onPress={()=>{Handlechoosephoto();}}>
@@ -274,28 +338,29 @@ const getNameCate= (id: string|undefined)=>{
                           </Dialog>
                           </Portal>
                           </Provider> */}
+                     <ChooseMaterial visible={showMaterial} cancel={setShowMaterial} getArrayItem={setdataproduct} dataMaterial={dataProduct && dataProduct?.ListMaterial}/>
                     <Overlay isVisible={showChooseCate}>
                         <View style={{width:reponsivewidth(300), height: reponsiveheight(350)}}>
                     <View style={style.TitleOverlAdd}>
                         <Text style={{fontSize:18, textAlign: 'center', color:'#000000',paddingBottom:2, fontWeight:'700'}}>Chọn nhóm sản phẩm</Text>
                     </View>
                 <View style={style.TitleOverlAdd_content}>
-                <ScrollView style={{height:reponsiveheight(300)}}> 
+                <ScrollView style={{height:reponsiveheight(300)}}>
                     { DataCate.length > 0 && DataCate.map(item=>{
                         return (
-                            <TouchableOpacity 
-                                onPress={()=>{  
+                            <TouchableOpacity
+                                onPress={()=>{
                                 setChooseCate(item);
-                                setShowChooseCate(false)
+                                setShowChooseCate(false);
                             } }
                                 style={[style.btnChoosenAdd,{padding:15}]}><Text>{item.Name}</Text>
                              </TouchableOpacity>
-                        )
+                        );
                     })
- 
-                    
-                    }       
-                </ScrollView>  
+
+
+                    }
+                </ScrollView>
                 </View>
 
                </View>
@@ -308,19 +373,19 @@ const getNameCate= (id: string|undefined)=>{
 export default UpdateProductScreen;
 const style = StyleSheet.create({
     img:{
-       
-        
+
+
         marginLeft:10,
         borderRadius:35,
-        width:reponsivewidth(105), 
+        width:reponsivewidth(105),
         height: reponsiveheight(125),
-        
+
     },
     Addphoto:
     {
         backgroundColor:'#848D99',
         borderRadius:15,
-        width:reponsivewidth(105), 
+        width:reponsivewidth(105),
         height: reponsiveheight(125),
         justifyContent:'center',
         marginLeft:35,
@@ -329,9 +394,9 @@ const style = StyleSheet.create({
     },
     Addphoto2:
     {
-       
+
         borderRadius:15,
-        width:reponsivewidth(105), 
+        width:reponsivewidth(105),
         height: reponsiveheight(125),
         justifyContent:'center',
         marginLeft:35,
@@ -339,7 +404,7 @@ const style = StyleSheet.create({
         alignSelf:'center',
     },
     titlefiled:{
-       
+
         color:'black',
         fontSize:16,
         fontWeight:'bold',
@@ -350,7 +415,7 @@ const style = StyleSheet.create({
     },
     textinput:
     {
-       
+
         fontSize:16,
         // marginTop:5,
         // borderRadius:10,
@@ -358,7 +423,7 @@ const style = StyleSheet.create({
         // borderColor:'#D3D3D3',
         // borderWidth:3,
         backgroundColor:'#FFF',
-        color:'black'
+        color:'black',
     },
     TitleOverlAdd_content:
     {
@@ -367,24 +432,24 @@ const style = StyleSheet.create({
     btnChoosenAdd:
     {
         alignItems:'center',
-        borderBottomColor: '#afaeae', 
+        borderBottomColor: '#afaeae',
         borderBottomWidth:0.5,
         borderTopColor:'#afaeae',
         borderTopWidth:0.5,
-    
+
     },
     btnExit:
     {
         backgroundColor:'#226cb3',
-        padding:10, 
-        width:reponsivewidth(100), 
-        justifyContent:'center', 
+        padding:10,
+        width:reponsivewidth(100),
+        justifyContent:'center',
         alignItems:'center',
-        borderRadius:4
+        borderRadius:4,
     },
-    TitleOverlAdd: 
+    TitleOverlAdd:
     {
-        borderBottomColor: "#02569E",
+        borderBottomColor: '#02569E',
         borderBottomWidth:2,
 
 

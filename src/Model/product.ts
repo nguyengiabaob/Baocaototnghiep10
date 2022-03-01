@@ -7,5 +7,6 @@ export interface Product
     Price_product: number,
     Image: any,
     CatergoryID:string,
+    ListMaterial: any [];
 
 }

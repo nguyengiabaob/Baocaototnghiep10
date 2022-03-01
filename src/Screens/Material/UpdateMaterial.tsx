@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {reponsiveheight, reponsivewidth} from '../../theme/Metric';
+import {getwidth, reponsiveheight, reponsivewidth} from '../../theme/Metric';
 import * as ImagePicker from 'react-native-image-picker';
 import {MediaType} from 'react-native-image-picker';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
@@ -28,10 +28,19 @@ import {RouteProp} from '@react-navigation/native';
 import DataService from '../../services/dataservice';
 import {MaterialCategory} from '../../Model/MaterialCategory';
 type props = {
-  navigation: StackNavigationProp<MaterialParamList, 'UpdateMaterialScreen'>;
-  route: RouteProp<MaterialParamList, 'UpdateMaterialScreen'>;
+  index: number;
+  arrayData: any[];
+  onArrayData: (value: any) => void;
+  onCancel: (value: any) => void;
+  // navigation: StackNavigationProp<MaterialParamList, 'UpdateMaterialScreen'>;
+  // route: RouteProp<MaterialParamList, 'UpdateMaterialScreen'>;
 };
-const UpdateMaterial: React.FC<props> = ({navigation, route}) => {
+const UpdateMaterial: React.FC<props> = ({
+  index,
+  arrayData,
+  onArrayData,
+  onCancel,
+}) => {
   // const [nameMaterialCatergory, setnameMaterialCatergory] =
   //   useState<string>('');
   // const [nameUnit, setnameUnit] = useState<string>('');
@@ -54,31 +63,37 @@ const UpdateMaterial: React.FC<props> = ({navigation, route}) => {
   const [showError, setshowError] = useState<boolean>(false);
   const [NameUnit, setNameUnit] = useState<string>('');
   const [showAddUnit, setAddUnit] = useState<boolean>(false);
-  const {id} = route.params;
-  const getMaterialById = useCallback(async () => {
-    let item: Material = await DataService.Getdata_dtServiceById<Material>(
-      'Material',
-      id,
-    );
-    let MaterialGroup: MaterialCategory =
-      await DataService.Getdata_dtServiceById<MaterialCategory>(
-        'MaterialCatergory',
-        item.MaterialGroup,
-      );
-    let unit: Units = await DataService.Getdata_dtServiceById<Units>(
-      'Units',
-      item.Unit,
-    );
-    setChooseCate(MaterialGroup);
-    setnameproduct(item.Name);
-    setpriceproduct(item.BuyingPrice);
-    setquantity(item.Number);
-    setChooseunit(unit);
-    setItemEdit(item);
-  }, [id]);
-  useEffect(() => {
-    getMaterialById();
-  }, [getMaterialById]);
+  const id = index;
+  const GetData = useCallback(() => {
+    setItemEdit(arrayData[id]);
+    setnameproduct(arrayData[id].Name);
+    setquantity(arrayData[id].Number);
+    setChooseunit(arrayData[id].Unit);
+  }, [arrayData, id]);
+  // const getMaterialById = useCallback(async () => {
+  //   let item: Material = await DataService.Getdata_dtServiceById<Material>(
+  //     'Material',
+  //     id,
+  //   );
+  //   let MaterialGroup: MaterialCategory =
+  //     await DataService.Getdata_dtServiceById<MaterialCategory>(
+  //       'MaterialCatergory',
+  //       item.MaterialGroup,
+  //     );
+  //   let unit: Units = await DataService.Getdata_dtServiceById<Units>(
+  //     'Units',
+  //     item.Unit,
+  //   );
+  //   setChooseCate(MaterialGroup);
+  //   setnameproduct(item.Name);
+  //   setpriceproduct(item.BuyingPrice);
+  //   setquantity(item.Number);
+  //   setChooseunit(unit);
+  //   setItemEdit(item);
+  // }, [id]);
+  // useEffect(() => {
+  //   getMaterialById();
+  // }, [getMaterialById]);
   const getCatergory = async () => {
     // data.getdata('Catergory').then(res => {
     //   var dataArray: any[] = [];
@@ -92,8 +107,8 @@ const UpdateMaterial: React.FC<props> = ({navigation, route}) => {
     //   }
     //   setDataCate(dataArray);
     // });
-    let dta = await DataService.Getdata_dtService<any>('MaterialCatergory');
-    setDataCate(dta);
+    // let dta = await DataService.Getdata_dtService<any>('MaterialCatergory');
+    // setDataCate(dta);
   };
   const getUnits = async () => {
     // data.getdata('Catergory').then(res => {
@@ -108,41 +123,52 @@ const UpdateMaterial: React.FC<props> = ({navigation, route}) => {
     //   }
     //   setDataCate(dataArray);
     // });
-    let dta = await DataService.Getdata_dtService<any>('Units');
-    setDataUnit(dta);
+    // let dta = await DataService.Getdata_dtService<any>('Units');
+    // setDataUnit(dta);
   };
   useEffect(() => {
-    getCatergory();
-    getUnits();
-  }, []);
+    GetData();
+    // getCatergory();
+    // getUnits();
+  }, [GetData]);
   const updateProduct = async () => {
-    if (nameproduct === '' || priceproduct <= 0 || quantity < 1) {
+    if (nameproduct === '' || quantity < 1) {
       setshowError(true);
     } else {
-      let urlimg;
-      if (image === null) {
-        urlimg = 'none';
-      } else {
-        const reference = storage().ref(image);
-        console.log(reference);
-        const pathToFile = pathimg;
-        await reference.putFile(pathToFile);
-        urlimg = await reference.getDownloadURL();
-      }
       if (ItemEdit) {
+        let urlimg;
+        if (ItemEdit?.Img === 'none' && image === null) {
+          urlimg = 'none';
+        } else {
+          if (ItemEdit?.Img === 'none' && image !== null) {
+            const reference = storage().ref(image);
+            console.log(reference);
+            const pathToFile = pathimg;
+            await reference.putFile(pathToFile);
+            urlimg = await reference.getDownloadURL();
+          } else {
+            if (ItemEdit?.Img !== 'none') {
+              urlimg = ItemEdit?.Img;
+            }
+          }
+        }
+
         let initaldata = ItemEdit;
 
-        (initaldata.Name = nameproduct),
-          (initaldata.Number = quantity),
-          (initaldata.MaterialGroup = ChooseCate.id),
-          (initaldata.Img = urlimg),
-          (initaldata.Unit = ChooseUnit.id),
-          (initaldata.BuyingPrice = priceproduct),
-          data.UpdateMaterial(initaldata, ItemEdit?.id).then(result => {
-            if (result === true) {
-              showDialog();
-            }
-          });
+        initaldata.Name = nameproduct;
+        initaldata.Number = quantity;
+        // initaldata.MaterialGroup = ChooseCate.id;
+        initaldata.Img = urlimg ? urlimg : 'none';
+        initaldata.Unit = ChooseUnit;
+        // initaldata.BuyingPrice = priceproduct;
+        // data.UpdateMaterial(initaldata, ItemEdit?.id).then(result => {
+        //   if (result === true) {
+        //     showDialog();
+        //   }
+        // });
+        arrayData[id] = initaldata;
+        onArrayData(arrayData);
+        onCancel(false);
       }
     }
   };
@@ -175,8 +201,20 @@ const UpdateMaterial: React.FC<props> = ({navigation, route}) => {
     });
   };
   return (
-    <View>
-      <View style={style.containerfiled}>
+    <View style={{width: reponsivewidth(330), height: reponsiveheight(600)}}>
+      <View>
+        <View style={style.TitleOverlAdd}>
+          <Text
+            style={{
+              fontSize: 18,
+              textAlign: 'center',
+              color: '#000000',
+              paddingBottom: 2,
+              fontWeight: '700',
+            }}>
+            Cập nhật thông tin
+          </Text>
+        </View>
         <View
           style={{
             marginTop: 10,
@@ -184,21 +222,27 @@ const UpdateMaterial: React.FC<props> = ({navigation, route}) => {
             alignItems: 'flex-start',
             justifyContent: 'flex-start',
           }}>
-          {console.log('789456', ItemEdit?.Img)}
+          {console.log('789456', arrayData[id]?.Img)}
           <TouchableOpacity
             onPress={() => {
               Handlechoosephoto();
             }}
-            style={ItemEdit?.Img === 'none' ? style.Addphoto : undefined}>
-            {ItemEdit?.Img !== 'none' ? (
+            style={arrayData[id]?.Img === 'none' ? style.Addphoto : undefined}>
+            {imgopick ? (
               <Image
                 style={[
                   style.img,
                   {width: reponsivewidth(150), height: reponsiveheight(150)},
                 ]}
-                source={{
-                  uri: imgopick ? imgopick : ItemEdit?.Img,
-                }}
+                source={imgopick}
+              />
+            ) : arrayData[id]?.Img !== 'none' ? (
+              <Image
+                style={[
+                  style.img,
+                  {width: reponsivewidth(150), height: reponsiveheight(150)},
+                ]}
+                source={{uri: arrayData[id]?.Img}}
               />
             ) : (
               <MaterialIcon name="add-a-photo" size={50} color="#FFFF" />
@@ -208,14 +252,12 @@ const UpdateMaterial: React.FC<props> = ({navigation, route}) => {
         <View
           style={{
             marginTop: 15,
-            justifyContent: 'center',
             alignItems: 'center',
             borderBottomWidth: 0.5,
             borderBottomColor: '#c3c3c3',
             borderTopColor: '#c3c3c3',
             borderTopWidth: 0.5,
             flexDirection: 'row',
-            backgroundColor: '#FFFF',
             height: 70,
           }}>
           <Text style={style.titlefiled}>Tên nguyên liệu </Text>
@@ -223,12 +265,12 @@ const UpdateMaterial: React.FC<props> = ({navigation, route}) => {
             onChangeText={text => {
               setnameproduct(text);
             }}
-            style={[style.textinput, {width: reponsivewidth(280)}]}
+            style={[style.textinput, {width: reponsivewidth(180)}]}
             placeholder="Tên nguyên liệu">
-            {ItemEdit?.Name}
+            {arrayData[id]?.Name}
           </TextInput>
         </View>
-        <View
+        {/* <View
           style={{
             justifyContent: 'center',
             alignItems: 'center',
@@ -258,8 +300,8 @@ const UpdateMaterial: React.FC<props> = ({navigation, route}) => {
             </TextInput>
             <EvilIcons name="chevron-right" size={32} color={'#777777'} />
           </TouchableOpacity>
-        </View>
-        <View
+        </View> */}
+        {/* <View
           style={{
             justifyContent: 'center',
             alignItems: 'center',
@@ -289,10 +331,9 @@ const UpdateMaterial: React.FC<props> = ({navigation, route}) => {
                   ',',
                 )}
           </TextInput>
-        </View>
+        </View> */}
         <View
           style={{
-            justifyContent: 'center',
             alignItems: 'center',
             borderBottomWidth: 0.5,
             borderBottomColor: '#c3c3c3',
@@ -301,30 +342,20 @@ const UpdateMaterial: React.FC<props> = ({navigation, route}) => {
             flexDirection: 'row',
             backgroundColor: '#FFFF',
             height: 70,
+            width: '100%',
           }}>
           <Text style={style.titlefiled}>Đơn vị tính</Text>
-          <TouchableOpacity
-            onPress={() => {
-              // setChooseunit(undefined);
-              setShowChooseUnit(true);
+          <TextInput
+            onChangeText={text => {
+              setChooseunit(text);
             }}
-            style={{
-              width: reponsivewidth(280),
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}>
-            <TextInput
-              editable={false}
-              style={[style.textinput, {width: reponsivewidth(170)}]}
-              placeholder="Chọn đơn vị tính">
-              {ChooseUnit && ChooseUnit.Name}
-            </TextInput>
-            <EvilIcons name="chevron-right" size={32} color={'#777777'} />
-          </TouchableOpacity>
+            style={[style.textinput, {width: reponsivewidth(180)}]}
+            placeholder="Chọn đơn vị tính">
+            {ChooseUnit && ChooseUnit}
+          </TextInput>
         </View>
         <View
           style={{
-            justifyContent: 'center',
             alignItems: 'center',
             borderBottomWidth: 0.5,
             borderBottomColor: '#c3c3c3',
@@ -340,18 +371,25 @@ const UpdateMaterial: React.FC<props> = ({navigation, route}) => {
               setquantity(Number.parseInt(text, 10));
             }}
             keyboardType="numeric"
-            style={[style.textinput, {width: reponsivewidth(280)}]}>
+            style={[style.textinput, {width: reponsivewidth(180)}]}>
             {ItemEdit?.Number}
           </TextInput>
         </View>
       </View>
-      <View style={style.containerbutton}>
+      <View style={[style.containerbutton, {marginTop: 40}]}>
         <TouchableOpacity
-          style={style.btn_add}
+          style={[style.btn_add, {marginBottom: 15}]}
           onPress={() => {
             updateProduct();
           }}>
           <Text style={style.titleadd}>Lưu</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            onCancel(false);
+          }}
+          style={style.btn_add}>
+          <Text style={style.titleadd}>Thoát</Text>
         </TouchableOpacity>
       </View>
       {/* <Provider>
@@ -576,8 +614,9 @@ const style = StyleSheet.create({
     fontWeight: 'bold',
     fontStyle: 'italic',
     width: reponsivewidth(150),
-    marginLeft: 50,
     alignItems: 'center',
+    backgroundColor: '#FFFF',
+    textAlign: 'center',
   },
   TitleOverlAdd_content: {
     marginTop: 8,
@@ -601,8 +640,6 @@ const style = StyleSheet.create({
   containerbutton: {
     alignItems: 'center',
     marginTop: 5,
-    borderColor: '#D3D3D3',
-    borderWidth: 3,
     height: reponsiveheight(70),
     justifyContent: 'center',
     backgroundColor: '#FFF',

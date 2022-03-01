@@ -78,6 +78,7 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
   const isFocused = useIsFocused();
   const getDataProduct = async () => {
     let dta = await DataService.Getdata_dtService<Product>('Products');
+    console.log('123456789',dta);
     setdataproduct(dta);
   };
   useEffect(() => {
@@ -152,7 +153,6 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
   const searchProduct = useCallback(
     (value: string) => {
       if (dataproduct.length > 0) {
-        console.log();
         if (
           dataproduct.filter(item =>
             item.name_product.toLowerCase().search(value.toLowerCase()),
@@ -178,6 +178,7 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
         var dataArray: any[] = [];
         for (let key in res) {
           if (key !== '0') {
+            console.log('123456',res[key]);
             dataArray.push({
               id: key,
               ...res[key],

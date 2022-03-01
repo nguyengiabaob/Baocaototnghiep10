@@ -2,9 +2,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { createSlice, PayloadAction} from '@reduxjs/toolkit';
-import React from 'react';
+// import React from 'react';
 import { Userdata } from '../../Model/User';
 import data from '../../services/data';
+import DataService from '../../services/dataservice';
 import { AppDispatch, AppThunk, Rootstate } from '../store';
 export interface AuthState
 {
@@ -14,7 +15,8 @@ export interface AuthState
   userToken?: string| null;
   userName?: string;
   isLoggedGoogle?:boolean
-  isLoggedFacebook?:boolean
+  isLoggedFacebook?:boolean;
+  typeUser? : number|undefined
 
 }
 const initialState : AuthState = {
@@ -25,7 +27,7 @@ const initialState : AuthState = {
     userName: undefined,
     isLoggedGoogle:false,
     isLoggedFacebook:false,
-
+    typeUser: undefined
 
 };
 export const authSlice = createSlice({
@@ -40,6 +42,7 @@ export const authSlice = createSlice({
             state.userName = action.payload.userName;
             state.isLoggedFacebook = action.payload.isLoggedFacebook;
             state.isLoggedGoogle = action.payload.isLoggedGoogle;
+            state.typeUser = action.payload.typeUser;
         },
         checkStatus: (state, action: PayloadAction<AuthState>)=>{
             state.isLoggedIn  = action.payload.isLoggedIn;
@@ -62,11 +65,11 @@ export const SigIn = (username: string , password: string): AppThunk => async (d
     if (datauser !== undefined)
     {
        dispatch(
-           updateStatus({isLoggedIn: true, isLogging:false, userToken:datauser.id })
+           updateStatus({isLoggedIn: true, isLogging:false, userToken:datauser.id, typeUser: datauser.type, userName:datauser.Name  })
        );
        try {
            await AsyncStorage.setItem('userToken',datauser.id);
-           await AsyncStorage.setItem('username',datauser.username);
+           await AsyncStorage.setItem('username',datauser.Name);
        }
        catch (e) {
          console.log(e);
@@ -86,15 +89,16 @@ export const requestLogout = ():AppThunk =>async(dispatch,selector)=>{
     await AsyncStorage.removeItem('username');
     }
     dispatch(
-        updateStatus({isLoggedIn: false, isLogging:false, userToken:null ,userName:undefined,isLoggedGoogle: false , isLoggedFacebook: false})
+        updateStatus({isLoggedIn: false, isLogging:false, userToken:null ,userName:undefined,isLoggedGoogle: false , isLoggedFacebook: false, typeUser:undefined})
     );
 };
 export const checklogin =  ():AppThunk => async dispatch =>{
     var  usertoken = await AsyncStorage.getItem('userToken');
     if (usertoken != null)
     {
+        let user= await DataService.Getdata_dtServiceById<Userdata>('user',usertoken);
         dispatch(
-            updateStatus({isLoggedIn:true, isLogging:false,userToken: usertoken})
+            updateStatus({isLoggedIn:true, isLogging:false,userToken: usertoken, typeUser:user.type, userName: user.Name})
         );
      }
      else

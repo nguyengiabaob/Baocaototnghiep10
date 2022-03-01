@@ -1,17 +1,20 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
 import instance from './instance';
-import database from '@react-native-firebase/database';
-import { produceWithPatches } from 'immer';
-import { identifier } from '@babel/types';
 import { MaterialCategory } from '../Model/MaterialCategory';
 import { Material } from '../Model/Material';
 import { Units } from '../Model/Unit';
+import { AttendanceMode } from '../Model/AttendanceModel';
 // import axios, {AxiosResponse} from 'axios';
 class data{
 static async getdata( name: string) :Promise<any>
-{  return await
-   instance.get(`/${name}.json`,{timeout:2000})
+{
+
+    console.log('getdata');
+    return await
+   instance.get(`/${name}.json`)
     .then(response=>{
+
         return response.data;
     }).catch(error=>{
         console.log(error);
@@ -92,7 +95,7 @@ static async updateuser (nametable : string, username: string, password: string,
 
 
 // Service Product
-static async postdataproduct(nametable : string, name:string , price: number, quanity: number, img: any,catergoryid: string): Promise<any>
+static async postdataproduct(nametable : string, name:string , price: number, quanity: number, img: any,catergoryid: string, ListMaterial: any[]): Promise<any>
 {
     return await
     instance.post(`/${nametable}.json`,{
@@ -101,6 +104,7 @@ static async postdataproduct(nametable : string, name:string , price: number, qu
         Quanity: quanity,
         Image: img,
         CatergoryID:catergoryid,
+        ListMaterial: ListMaterial,
     }).then(reponse=>{
         console.log(reponse);
         return true;
@@ -116,7 +120,7 @@ static async deletedataproduct (nametable: string, id: string) : Promise<any>
 }
 
 
-static async updatedataproduct (nametable: string , id: string,  name:string , price: number, quanity: number, img:any, catergoryid:string) : Promise<any>
+static async updatedataproduct (nametable: string , id: string,  name:string , price: number, quanity: number, img:any, catergoryid:string, ListMaterial: any[]) : Promise<any>
 {
     // if (name !== '')
     // {
@@ -154,6 +158,7 @@ static async updatedataproduct (nametable: string , id: string,  name:string , p
         Quanity: quanity,
         Image: img,
         CatergoryID:catergoryid,
+        ListMaterial: ListMaterial,
     }).then(reponse=>{
         console.log(reponse);
         return true;
@@ -486,17 +491,14 @@ static async AddMaterial (value: Material){
     return await
         instance.post('Material.json',{
             Name: value.Name,
-            MaterialGroup:value.MaterialGroup,
             Unit:value.Unit,
             Number: value.Number,
             Img: value.Img,
-            BuyingPrice: value.BuyingPrice,
         })
         .then(response=>{
             if (response.data)
             {
-                console.log(response.data);
-                return true;
+                return response.data;
             }
         })
         .catch(e=>{console.log(e);});
@@ -505,11 +507,9 @@ static async UpdateMaterial (value: Material, id : string){
         return await
             instance.put(`Material/${id}.json`,{
                 Name: value.Name,
-                MaterialGroup:value.MaterialGroup,
                 Unit:value.Unit,
                 Number: value.Number,
                 Img: value.Img,
-                BuyingPrice: value.BuyingPrice,
             })
             .then(response=>{
                 if (response.data)
@@ -549,6 +549,41 @@ static async UpdateMaterial (value: Material, id : string){
                 })
                 .catch(e=>{console.log(e);});
             }
+    static async postLogAttendance (value :AttendanceMode){
+        return await
+        instance.post('LogAttendance.json',{
+           userId: value.userId,
+           time: value.Time,
+           date: value.date,
+           type: value.type,
+        })
+        .then(response=>{
+            if (response.data)
+            {
+                console.log(response.data);
+                return true;
+            }
+        })
+        .catch(e=>{console.log(e);});
+    }
+    static async putLogAttendance (value :AttendanceMode, id: string){
+        return await
+        instance.put(`LogAttendance/${id}.json`,{
+           userId: value.userId,
+           time: value.Time,
+           date: value.date,
+           type: value.type,
+        })
+        .then(response=>{
+            if (response.data)
+            {
+                console.log(response.data);
+                return true;
+            }
+        })
+        .catch(e=>{console.log(e);});
+    }
 }
+
 
 export default data;

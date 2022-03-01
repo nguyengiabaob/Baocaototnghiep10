@@ -45,11 +45,13 @@ export type ManageEmployeePramaList ={
     EmployeeInformationParamList: undefined,
     Assignment: undefined,
     Wages:undefined,
+    AttendanceScreen: undefined
 }
 export type EmployeeInformationParamList= {
     ListStaffScreen: undefined,
     UserInformation:{id: string},
     AddstaffScreen:undefined,
+    AttendanceScreen: undefined
 }
 export type ChartParamList={
     ChartScreen: undefined

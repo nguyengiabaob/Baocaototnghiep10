@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
 import {StackNavigationProp} from '@react-navigation/stack';
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {Image, TouchableOpacity} from 'react-native';
 import {Text, TextInput, View} from 'react-native';
 // import Addproduct from '../asset/svg/box.svg';
@@ -51,6 +51,19 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
   const [DataCate, setDataCate] = useState<any[]>([]);
   const [showError, setshowError] = useState<boolean>(false);
   const [showMaterial,setShowMaterial] = useState<boolean>(false);
+  const [ListMaterial, setListMaterial]= useState<any[]>([]);
+  const [stringMaterial,setStringMaterial]= useState<string>('');
+  const getStringMaterial=useCallback(()=>{
+      let a ='';
+      if (ListMaterial.length > 0)
+      {
+        const textMaterial = ListMaterial.reduce((previous,current)=> previous + current.Name + ', '
+        ,a);
+        console.log('78465',textMaterial);
+        console.log('78465789',ListMaterial);
+        setStringMaterial(textMaterial);
+      }
+  },[ListMaterial])
   const addproduct = async () => {
     if (
       nameproduct === '' ||
@@ -65,6 +78,12 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
       const pathToFile = pathimg;
       await reference.putFile(pathToFile);
       let urlimg = await reference.getDownloadURL();
+      if(ListMaterial.length> 0)
+      {
+        ListMaterial.forEach(item=>{
+          item.Number=  item.Number *  quantity;
+        })
+      }
       data
         .postdataproduct(
           'Products',
@@ -73,6 +92,7 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
           quantity,
           urlimg,
           ChooseCate.id,
+          ListMaterial.length > 0 ? ListMaterial : []
         )
         .then(result => {
           if (result === true) {
@@ -114,6 +134,9 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
   useEffect(() => {
     getCatergory();
   }, []);
+  useEffect(()=>{
+    getStringMaterial();
+  },[getStringMaterial])
   return (
     <View>
       <CustomHeader
@@ -279,7 +302,7 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
               editable={false}
               style={[style.textinput, {width: reponsivewidth(170)}]}
               placeholder="Chọn nguyên liệu">
-              {ChooseCate ? ChooseCate.Name : ''}
+              { stringMaterial ? stringMaterial : ''}
             </TextInput>
             <EvilIcons name="chevron-right" size={32} color={'#777777'} />
           </TouchableOpacity>
@@ -347,7 +370,7 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
           <Text style={{color: '#FFFF'}}>Thoát</Text>
         </TouchableOpacity>
       </Overlay>
-      <ChooseMaterial visible={showMaterial} cancel={setShowMaterial}/>
+      <ChooseMaterial visible={showMaterial} cancel={setShowMaterial} dataMaterial={ListMaterial} getArrayItem={setListMaterial}/>
       <CustomNotification
         visible={visible}
         iconTitle={

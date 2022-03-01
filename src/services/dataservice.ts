@@ -2,12 +2,13 @@
 import data from './data';
 class DataService  {
     static async  Getdata_dtService<T>(name: string) : Promise<T []> {
-        var resultArray: any []=[];
-        let temp :any =[];
+        var resultArray: any [] = [];
+        let temp :any = [];
         temp = await data.getdata(name);
+         console.log('789456temp',temp);
         for ( let key in  temp)
         {
-            if ( key !== "0")
+            if ( key !== '0')
             {
                 resultArray.push({
                     id: key ,
@@ -38,6 +39,9 @@ class DataService  {
         }
        return item;
     }
-    
+    // static async Updatedata_dtService<T>(name: string, data: T, id: string): Promise<boolean>
+    // {
+
+    // }
 }
 export default DataService;
