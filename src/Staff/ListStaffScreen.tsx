@@ -25,6 +25,7 @@ import {useIsFocused} from '@react-navigation/native';
 import DataService from '../services/dataservice';
 import {useAppSelector} from '../redux/hook';
 import {selectAuth} from '../redux/reducer/authslice';
+import database from '@react-native-firebase/database';
 type props = {
   navigation: StackNavigationProp<
     EmployeeInformationParamList,
@@ -39,6 +40,7 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
   const [datadel, setdatadel] = useState<string[]>([]);
   const [staffArray, setstaffArray] = useState<Userdata[]>([]);
   const [staffArraysearch, setstaffArraysearch] = useState<Userdata[]>([]);
+  const [Reload, setReload] = useState<boolean>(false);
   const {typeUser} = useAppSelector(selectAuth);
   var isFocused = useIsFocused();
   const getuser = async () => {
@@ -58,14 +60,19 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
     setstaffArray(datarray);
     // });
   };
+   useEffect(()=>{
+    database().ref('/user').on('value', snapshot=>{
+      setReload(prev=> !prev);
+    })
+   },[])
   useEffect(() => {
-    if (isFocused) {
+    if (isFocused === true || Reload === false || Reload === true ) {
       getuser();
     }
     if (flag == true) {
       getuser();
     }
-  }, [isFocused, flag]);
+  }, [isFocused, flag, Reload]);
   const getsearch = useCallback(
     (value: string) => {
       if (search != '') {
@@ -73,7 +80,7 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
         let res = staffArray.filter(item =>
           item.Name.toLowerCase().includes(val),
         );
-        console.log('abc', res);
+        // console.log('abc', res);
         setstaffArraysearch(res);
       } else {
         setstaffArraysearch([]);
@@ -139,7 +146,6 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
   //     },
 
   // ];
-  console.log('456', staffArray);
   const ondel = async () => {
     if (datadel.length > 0) {
       datadel.forEach(item => {
@@ -225,7 +231,7 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
             <Text style={{marginLeft: 5}}>Thêm</Text>
           </TouchableOpacity>
         )}
-        <ScrollView style={{height: reponsiveheight(590)}}>
+        <ScrollView  style={{height: reponsiveheight(590)}}>
           {staffArraysearch.length > 0
             ? staffArraysearch.map(item => {
                 const checked = datadel.includes(item.id);

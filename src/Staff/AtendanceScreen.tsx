@@ -23,6 +23,7 @@ import DataService from '../services/dataservice';
 import {Userdata} from '../Model/User';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {ManageEmployeePramaList} from '../navigation/types';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 type props = {
   navigation: StackNavigationProp<ManageEmployeePramaList, 'AttendanceScreen'>;
 };
@@ -123,7 +124,7 @@ const Attendance: React.FC<props> = ({navigation}) => {
     ).start();
   }, []);
   return (
-    <View style={{flex: 1}}>
+    <View style={{flex: 1, backgroundColor:'#2596be1c'}}>
       <View style={{flexDirection: 'row', marginTop: 25}}>
         <EvilIcons name="calendar" style={{fontSize: 30}} />
         <Text
@@ -150,15 +151,20 @@ const Attendance: React.FC<props> = ({navigation}) => {
             />
           )}
         </View>
-        <View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: 15,
+          }}>
+          <FontAwesome name="user" style={{fontSize: 28, marginRight: 15}} />
           <Text
             style={{
               fontSize: 25,
               fontWeight: '700',
-              marginTop: 15,
-              alignSelf: 'center',
             }}>
-            {userName}
+             {userName}
           </Text>
         </View>
       </View>

@@ -47,6 +47,7 @@ import {CustomNotificationDel} from '../../Model/CustomNoficationDel';
 import {ModelDelete} from '../../Model/ModelDelete';
 import {useIsFocused} from '@react-navigation/native';
 import DataService from '../../services/dataservice';
+import database from '@react-native-firebase/database';
 type Props = {
   navigation: StackNavigationProp<
     ListproductNavigationPramaList,
@@ -76,13 +77,19 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
   const [ModalDelete, setModalDelete] = useState<boolean>(false);
   const [CheckAll, setCheckAll] = useState<boolean>(false);
   const isFocused = useIsFocused();
+  const [Reload, setReload]= useState<boolean>(false);
   const getDataProduct = async () => {
     let dta = await DataService.Getdata_dtService<Product>('Products');
     console.log('123456789',dta);
     setdataproduct(dta);
   };
+  useEffect(()=>{
+    database().ref().on('child_changed', snapshot=>{
+      setReload(prev => !prev)
+    })
+  },[])
   useEffect(() => {
-    if (isFocused === true && ModalDelete == false) {
+    if (isFocused === true && ModalDelete == false || Reload=== false || Reload === true) {
       // let arrayproduct:any[] = [];
       // data.getdata('Products').then(res=>{
       //     for (let key in res)
@@ -98,7 +105,7 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
       // });
       getDataProduct();
     }
-  }, [isFocused, ModalDelete]);
+  }, [isFocused, ModalDelete, Reload]);
   useEffect(() => {
     if (ListCheckProduct.length === 0) {
       setModelDel(false);

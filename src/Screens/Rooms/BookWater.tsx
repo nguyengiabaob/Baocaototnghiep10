@@ -41,13 +41,17 @@ import {Item} from 'react-native-paper/lib/typescript/components/List/List';
 import AuthService from '../../services/authService';
 import DataService from '../../services/dataservice';
 import ListMaterialView from '../Action/SupportComponent/ListMaterialView';
+import database from '@react-native-firebase/database';
 
 type props = {
   navigation: StackNavigationProp<RoomParamList, 'callingWater'>;
   route: RouteProp<RoomParamList, 'callingWater'>;
 };
 export const BookWater: React.FC<props> = ({route, navigation}: props) => {
-  const [Table, setTable] = useState<Table>();
+  const [table, setTable] = useState<Table>();
+  // const [bill, setBill] = useState<any[]>([]);
+  const [productArr, setproductArr] = useState<Product[]>([]);
+  const [listproductArr, setlistproductArr] = useState<any[]>([]);
   const [flag, setflag] = useState<boolean>(false);
   const [visible, setvisible] = useState<boolean>(false);
   const [UpdateProductSelected, setupdateProducted] = useState<Product[]>([]);
@@ -62,6 +66,8 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
   const [visibleSuccess, setvisibleSuccess] = useState<boolean>(false);
   const [visibleTurial, setVisibleTurial] = useState<boolean>(false);
   const [clickItem, setclickItem] = useState<any>();
+  const [itemsaved, setitemsaved] = useState<any[]>([]);
+  const [Reload, setReload]= useState<boolean>(false);
   const fetchId = async () => {
     let a = await AuthService.getuserid();
     if (a != null) {
@@ -114,9 +120,32 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
     });
     // });
   }, [id]);
+  // const getBillRealTime=async() =>{
+  //   let dataarrayBill = await DataService.Getdata_dtService<any>('Bill');
+  //   setBill( dataarrayBill);
+  // }
+  const getProductRealTime=async() =>{
+    let dataarrayBill = await DataService.Getdata_dtService<any>('Products');
+    setproductArr( dataarrayBill);
+  }
+  const getListProductRealTime=async() =>{
+    let dataarrayBill = await DataService.Getdata_dtService<any>('ListProduct');
+    setlistproductArr( dataarrayBill);
+  }
+  useEffect(()=>{
+    database().ref("/ListProduct").on('value', snapshot=>{
+      setReload(prev=> !prev);
+    })
+  },[])
   useEffect(() => {
-    getTable();
-  }, [getTable]);
+    if (Reload === true || Reload === false)
+      {
+        getTable();
+        // getBillRealTime();
+        getProductRealTime();
+        getListProductRealTime();
+      }
+  }, [getTable,Reload]);
   const checktableBill = useCallback(async () => {
     setflag(false);
     let datarray = await DataService.Getdata_dtService<any>('Table');
@@ -167,6 +196,7 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
       //     }
       let arraylist = await DataService.Getdata_dtService<any>('ListProduct');
       var arrayb = arraylist.filter(item => item.billID === billID);
+      setitemsaved(arrayb);
       console.log('arrayb', arrayb);
       var a = await DataService.Getdata_dtService<any>('Products');
       // data.getdata('Products').then(res=> {
@@ -228,29 +258,22 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
       setdataproduct(dataarray);
     });
   };
-  const getdatatable = () => {
-    var dataarray: any[] = [];
-    data.getdata('Table').then(res => {
-      for (let key in res) {
-        if (key != '0') {
-          dataarray.push({
-            id: key,
-            ...res[key],
-          });
-        }
-      }
-      setdatatable(dataarray);
-    });
+  const getdatatable = async() => {
+    let b= await DataService.Getdata_dtService<Table>('Table');
+    setdatatable(b);
   };
   useEffect(() => {
-    getdataproduct();
-    getdatatable();
-  }, []);
+    if (Reload == true || Reload == false)
+        {
+          getdataproduct();
+          getdatatable();
+        }
+  }, [Reload]);
   useEffect(() => {
-    if (isFocused === true) {
+    if (isFocused === true || Reload== false || Reload == true) {
       checktableBill();
     }
-  }, [isFocused, checktableBill]);
+  }, [isFocused, checktableBill, Reload]);
   useEffect(() => {
     if (flag === true) {
       checktableBill();
@@ -328,9 +351,9 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
             //         }
 
             //     }
-            let datapro = await DataService.Getdata_dtService<any>('Products');
+            // let datapro = await DataService.Getdata_dtService<any>('Products');
             ProductArray.forEach(item => {
-              datapro.forEach(i => {
+              productArr.forEach(i => {
                 if (i.id == item.id) {
                   let quanity = Number(i.Quanity) - Number(item.Quanity);
                   console.log('array', [
@@ -386,10 +409,10 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
           //                 }
           //             );
           //     }
-          var arraylist = await DataService.Getdata_dtService<any>(
-            'ListProduct',
-          );
-          arraylist.forEach(item => {
+          // var arraylist = await DataService.Getdata_dtService<any>(
+          //   'ListProduct',
+          // );
+          listproductArr.forEach(item => {
             ProductArray.forEach(i => {
               if (i.id === item.productID && item.billID == CodeBill) {
                 data
@@ -421,11 +444,11 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
           //     }
 
           // }
-          let datapro1 = await DataService.Getdata_dtService<any>('Products');
-          arraylist.forEach(item => {
+          // let datapro1 = await DataService.Getdata_dtService<any>('Products');
+          listproductArr.forEach(item => {
             ProductArray.forEach(i => {
               if (i.id === item.productID && item.billID == CodeBill) {
-                datapro1.forEach(j => {
+                productArr.forEach(j => {
                   if (i.id == j.id) {
                     let quanity =
                       Number(j.Quanity) -
@@ -450,7 +473,7 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
           // let countadd= 0;
           ProductArray.forEach(item => {
             if (
-              arraylist.filter(
+              listproductArr.filter(
                 i => i.productID === item.id && i.billID === CodeBill,
               ).length == 0
             ) {
@@ -480,11 +503,11 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
 
           ProductArray.forEach(item => {
             if (
-              arraylist.filter(
+              listproductArr.filter(
                 i => i.productID === item.id && i.billID === CodeBill,
               ).length == 0
             ) {
-              datapro1.forEach(i => {
+              productArr.forEach(i => {
                 if (item.id == i.id) {
                   let quanity = Number(i.Quanity) - Number(item.Quanity);
                   data.updatedataproduct(
@@ -504,7 +527,7 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
           // });
 
           let count = 0;
-          arraylist.forEach(item => {
+          listproductArr.forEach(item => {
             if (
               item.billID == CodeBill &&
               ProductArray.filter(i => i.id === item.productID).length === 0
@@ -537,7 +560,7 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
 
           //      }
           let datapro = await DataService.Getdata_dtService<any>('Products');
-          arraylist.forEach(item => {
+          listproductArr.forEach(item => {
             if (
               item.billID == CodeBill &&
               ProductArray.filter(i => i.id === item.productID).length === 0
@@ -744,7 +767,7 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
       codeBill: any;
     };
     const BookWaterDetail: React.FC<propsdetail> = ({
-      getdata,
+      // getdata,
       ProductSelected,
       getarrayproduct,
       codeBill,
@@ -1304,7 +1327,6 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
         setchangeMoney(CustomerMoney - Number(total()));
         console.log('update Status');
         databill.Status = 1;
-        let datatable = await DataService.Getdata_dtService<any>('Table');
         // data.getdata('Table').then(res => {
         //     console.log(res);
         //     for ( let key in res)
@@ -1689,7 +1711,7 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
                 fontWeight: '700',
                 marginBottom: 25,
               }}>
-              {Table?.Name}
+              {table?.Name}
             </Text>
             <View
               style={{
@@ -1858,9 +1880,13 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
           <TouchableOpacity
             onPress={() => {
               let flag1 = 0;
-
+              let ArrayNews= UpdateProductSelected;
+              console.log('7894564',itemsaved);
+              itemsaved.forEach(i=>{
+                ArrayNews = ArrayNews.filter(item=> item.id !== i.productID);
+              })
               dataproduct.forEach(item => {
-                UpdateProductSelected.forEach(i => {
+                ArrayNews.forEach(i => {
                   if (item.Quanity < i.Quanity && i.id == item.id) {
                     setAddError(true);
                     flag1 = 1;

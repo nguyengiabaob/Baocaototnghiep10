@@ -28,6 +28,7 @@ import { HistoryPaying } from './HistoryPaying';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Warning from '../../asset/svg/Warning.svg';
 import DataService from '../../services/dataservice';
+import database from '@react-native-firebase/database';
 type props ={
     navigation: StackNavigationProp<RoomParamList,'RoomScreen'>
 }
@@ -50,10 +51,15 @@ const [visibleModaEdit, setvisibleModalEdit] = useState(false);
 const [IDArea, setIDArea] = useState<Area>();
 const [visibleHisTable, setvisibleHisTable]= useState<boolean>(false);
 const [visibleHisPaying, setvisibleHisPaying]= useState<boolean>(false);
+const [Reload, setReload]= useState<boolean>('false');
 type propsModal={
   Visible: boolean,
 }
-
+useEffect(()=>{
+  database().ref().on('value',snapshot=>{
+    setReload(prev => !prev);
+  })
+},[])
 const DataArea1 =async ()=>{
 //     let datarray :any[] = [];
 //     data.getdata('Area').then(res=> {for ( let key in res)
@@ -129,13 +135,13 @@ useEffect(()=>{
     }
 },[visible]);
 useEffect(()=>{
-  if (isFocused === true)
+  if (isFocused === true || Reload == false || Reload == true)
   {
 
    DataArea1();
    DataTable();
   }
-},[isFocused]);
+},[isFocused,Reload]);
 
 const ModalAreaDeleted: React.FC = ()=>{
   const [visiblenotification, setvisiblenotification] = useState(false);

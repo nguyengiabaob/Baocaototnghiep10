@@ -19,6 +19,7 @@ import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {Checkbox} from 'react-native-paper';
 import DataService from '../../services/dataservice';
+import database from '@react-native-firebase/database';
 type props = {
   navigation: StackNavigationProp<ExpenseParamList, 'ExpenseMainScreen'>;
 };
@@ -36,6 +37,7 @@ export const ExpenseManagerScreen: React.FC<props> = ({navigation}: props) => {
   const [showdatepickervalue, setshodatepickervalue] = useState<Date>(
     new Date(),
   );
+  const [Reload, setReload]= useState<boolean>(false);
   const [DelArray, setDelArray] = useState<string[]>([]);
   const [flag, setflag] = useState<boolean>(false);
   const [CheckAll, setCheckAll] = useState<boolean>(false);
@@ -87,6 +89,11 @@ export const ExpenseManagerScreen: React.FC<props> = ({navigation}: props) => {
     let dta = await DataService.Getdata_dtService<any>('Expense');
     setArrayExpense(dta);
   };
+  useEffect(() => {
+    database()
+      .ref()
+      .on('child_changed', () => setReload(prev => !prev));
+  }, []);
   const oncheck = (id: string, check: boolean) => {
     if (check) {
       setDelArray(DelArray.filter(item => item !== id));
@@ -103,13 +110,13 @@ export const ExpenseManagerScreen: React.FC<props> = ({navigation}: props) => {
     }
   };
   useEffect(() => {
-    if (isFocused == true) {
+    if (isFocused == true || Reload === false || Reload === true) {
       getDataExpense();
     }
     if (flag == true) {
       getDataExpense();
     }
-  }, [isFocused, flag]);
+  }, [isFocused, flag, Reload]);
   const oncheckAll = (check: boolean) => {
     if (check) {
       setCheckAll(false);

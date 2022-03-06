@@ -5,12 +5,33 @@ import { MaterialCategory } from '../Model/MaterialCategory';
 import { Material } from '../Model/Material';
 import { Units } from '../Model/Unit';
 import { AttendanceMode } from '../Model/AttendanceModel';
+import database from '@react-native-firebase/database';
+import firebase from 'firebase';
 // import axios, {AxiosResponse} from 'axios';
 class data{
+static getRealTimeData (name: string)  {
+    var resultArray: any [] = [];
+    let temp :any = [];
+    return database()
+    .ref(`/${name}`)
+    .on('value', snapshot => {
+        for ( let key in  snapshot.val())
+        {
+            if ( key !== '0')
+            {
+                resultArray.push({
+                    id: key ,
+                    ...temp[key],
+                })
+            }
+           // console.log('789',resultArray);
+        }
+        return resultArray;
+    //   console.log('User data: ', snapshot.val());
+    });
+}
 static async getdata( name: string) :Promise<any>
 {
-
-    console.log('getdata');
     return await
    instance.get(`/${name}.json`)
     .then(response=>{
