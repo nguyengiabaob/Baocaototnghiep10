@@ -10,20 +10,27 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { CustomNotificationDel } from '../../Model/CustomNoficationDel';
 import BellNofi from '../../asset/svg/bellnotification.svg';
 import DataService from '../../services/dataservice';
+import database from '@react-native-firebase/database';
 type props ={
     getvisible: (data: any)=>void
 }
-
 export const HistoryPaying: React.FC<props>= ({getvisible})=> {
+
     const [datapaying,setdatapaying]=useState<any[]>([]);
     const [visbleModalDel,setvisibleModalDel]=useState<boolean>(false);
     const [itemSelected,setitemSelectedl]=useState<any>();
+    const [reload,setReload]= useState<boolean>(false);
     const tranferday = (d:string)=>{
         var month = new Date(d).getMonth() + 1;
         var date = new Date(d).getDate();
         var year = new Date(d).getFullYear();
        return date + '/' + month + '/' + year;
     };
+    useEffect(()=>{
+        database().ref().on('child-changed', ()=>{
+            setReload(prev=>!prev) 
+        })
+    })
     const getPaying= useCallback(async()=>{
         var dataArray1= await DataService.Getdata_dtService<any>('Bill');
         // data.getdata('Bill').then(res=> {
@@ -85,7 +92,7 @@ export const HistoryPaying: React.FC<props>= ({getvisible})=> {
     },[]) 
 useEffect(()=>{
     getPaying()
-},[getPaying]);
+},[getPaying,reload]);
 const onDelPaying= async()=>{
     data.deletedData('Bill',itemSelected.id);
     let dataArray = await DataService.Getdata_dtService<any>('ListProduct') ;

@@ -53,14 +53,15 @@ export const authSlice = createSlice({
 export const {updateStatus, checkStatus} = authSlice.actions;
 export const SigIn = (username: string , password: string): AppThunk => async (dispatch: AppDispatch)=>
 {
-    var data_fetch: Userdata[] = [];
-    data.getdata('user').then(async data_f=>{ 
-    for (let key in data_f)
-    { data_fetch.push({
-        id: key,
-        ...data_f[key],
-      });
-    }
+    // var data_fetch: Userdata[] = [];
+    // data.getdata('user').then(async data_f=>{ 
+    // for (let key in data_f)
+    // { data_fetch.push({
+    //     id: key,
+    //     ...data_f[key],
+    //   });
+    // }
+   let  data_fetch= await DataService.Getdata_dtService<Userdata>('user');
     let datauser = data_fetch.find((user)=>user.username === username && user.password == password);
     if (datauser !== undefined)
     {
@@ -75,7 +76,7 @@ export const SigIn = (username: string , password: string): AppThunk => async (d
          console.log(e);
        }
     }
-  });
+//   });
 };
 export const requestLogout = ():AppThunk =>async(dispatch,selector)=>{
     console.log(selector().auth.isLoggedGoogle);

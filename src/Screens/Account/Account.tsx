@@ -28,6 +28,8 @@ import CustomInput from '../../Model/CustomInput';
 import {CustomNotification} from '../../Model/CustomNofication';
 import BellNofi from '../../asset/svg/bellnotification.svg';
 import {TextInput} from 'react-native-paper';
+import DataService from '../../services/dataservice';
+import database from '@react-native-firebase/database'
 type Props = {
   navigation: StackNavigationProp<AccountNavigationParamList, 'AccountScreen'>;
   route: RouteProp<AccountNavigationParamList, 'AccountScreen'>;
@@ -54,6 +56,7 @@ const AccountScreen: React.FC<Props> = () => {
   const [erroremail, seterroremail] = useState<string>('');
   const [newpassword, setNewPassword] = useState<string>('');
   const [confirm, setconfirm] = useState<string>('');
+  const [Reload, setReload] = useState<boolean>(false);
   async function fetchid() {
     const user = await AuthService.getuserid();
     setusername(user);
@@ -64,38 +67,48 @@ const AccountScreen: React.FC<Props> = () => {
   }
 
   const [arrayuser, setarrayuser] = useState<Userdata[]>([]);
+  useEffect(()=>{
+    database().ref("/user").on('child-changed',()=>{
+      setReload(prev=> !prev)
+    })
+  },[])
+  const getUserData= async()=>{
+    let d = await DataService.Getdata_dtService<Userdata>('user');
+    setarrayuser(d);
+  }
   useEffect(() => {
     if (visibleEflag == true) {
-      var data_fetch: any[] = [];
-      data.getdata('user').then(res => {
-        for (let key in res) {
-          data_fetch.push({
-            id: key,
-            ...res[key],
-          });
-        }
-        setarrayuser(data_fetch);
-      });
+      getUserData();
+      // var data_fetch: any[] = [];
+      // data.getdata('user').then(res => {
+      //   for (let key in res) {
+      //     data_fetch.push({
+      //       id: key,
+      //       ...res[key],
+      //     });
+      //   }
+      //   setarrayuser(data_fetch);
+      // });
     }
     if (visiblechangePass === true) {
-      console.log('pass');
+      // console.log('pass');
       seterropass('');
       seterrorconfirm('');
       setNewPassword('');
       setconfirm('');
     }
-  }, [visibleEflag, visiblechangePass]);
+  }, [visibleEflag, visiblechangePass, Reload]);
   useEffect(() => {
-    var data_fetch: any[] = [];
-    data.getdata('user').then(res => {
-      for (let key in res) {
-        data_fetch.push({
-          id: key,
-          ...res[key],
-        });
-      }
-      setarrayuser(data_fetch);
-    });
+    // var data_fetch: any[] = [];
+    // data.getdata('user').then(res => {
+    //   for (let key in res) {
+    //     data_fetch.push({
+    //       id: key,
+    //       ...res[key],
+    //     });
+    //   }
+    //   setarrayuser(data_fetch);
+    // });
     fetchid();
   }, []);
   // useEffect(()=>{
@@ -132,16 +145,16 @@ const AccountScreen: React.FC<Props> = () => {
       service != '' ||
       (email != '' && format.test(email))
     ) {
-      var data_fetch: any[] = [];
-      data.getdata('user').then(res => {
-        for (let key in res) {
-          data_fetch.push({
-            id: key,
-            ...res[key],
-          });
-        }
-        let index = data_fetch.findIndex(item => item.id === username);
-        let user = data_fetch[index];
+      // var data_fetch: any[] = [];
+      // data.getdata('user').then(res => {
+      //   for (let key in res) {
+      //     data_fetch.push({
+      //       id: key,
+      //       ...res[key],
+      //     });
+      //   }
+        let index = arrayuser.findIndex((item: { id: any; })=> item.id === username);
+        let user = arrayuser[index];
         data
           .updateuser(
             'user',
@@ -162,7 +175,7 @@ const AccountScreen: React.FC<Props> = () => {
               setvisiblesuccess(true);
             }
           });
-      });
+      // });
     }
   };
   const checkpassword = (pass: string): boolean => {
@@ -197,16 +210,16 @@ const AccountScreen: React.FC<Props> = () => {
       ) {
         seterropass('');
         seterrorconfirm('');
-        var data_fetch: any[] = [];
-        data.getdata('user').then(res => {
-          for (let key in res) {
-            data_fetch.push({
-              id: key,
-              ...res[key],
-            });
-          }
-          let index = data_fetch.findIndex(item => item.id === username);
-          let user = data_fetch[index];
+        // var data_fetch: any[] = [];
+        // data.getdata('user').then(res => {
+        //   for (let key in res) {
+        //     data_fetch.push({
+        //       id: key,
+        //       ...res[key],
+        //     });
+        //   }
+          let index = arrayuser.findIndex((item: { id: any; }) => item.id === username);
+          let user = arrayuser[index];
           data
             .updateuser(
               'user',
@@ -227,7 +240,7 @@ const AccountScreen: React.FC<Props> = () => {
                 setvisiblechangesuccess(true);
               }
             });
-        });
+        // });
       } else {
         if (newpassword === password1) {
           seterropass('Mật khẩu mật khẩu trước');

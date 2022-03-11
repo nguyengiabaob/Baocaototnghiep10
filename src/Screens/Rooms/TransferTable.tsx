@@ -15,6 +15,7 @@ import WarningIcon from '../../asset/svg/Warning.svg';
 import BellNofi from '../../asset/svg/bellnotification.svg';
 import { StackNavigationProp } from '@react-navigation/stack';
 import DataService from '../../services/dataservice';
+import database from '@react-native-firebase/database'
 type props ={
     navigation: StackNavigationProp<RoomParamList,'SwapTable'>
     route: RouteProp<RoomParamList,'SwapTable'>
@@ -29,26 +30,27 @@ const [BillTable,setBillTable]= useState<any[]>([]);
 const [BookTable,setBookTable]= useState<any[]>([]);
 const [VisibleNotifi, setVisibleNotifi]= useState<boolean>(false);
 const [VisibleNotifiSuccess, setVisibleNotifiSuccess]= useState<boolean>(false);
-const getTable= useCallback( ()=>{
-      let datarray :any[] = [];
-      data.getdata('Table').then(res=> {for ( let key in res)
-      {
-          if (key !== '0')
-          {
-          datarray.push(
-              {
-                  id: key,
-                  ...res[key],
-              }
-          );
-          }
-      }
+const [reload,setReload]= useState<boolean>(false);
+const getTable= useCallback(async()=>{
+      // let datarray :any[] = [];
+      // data.getdata('Table').then(res=> {for ( let key in res)
+      // {
+      //     if (key !== '0')
+      //     {
+      //     datarray.push(
+      //         {
+      //             id: key,
+      //             ...res[key],
+      //         }
+      //     );
+      //     }
+      // }
+     let datarray= await  DataService.Getdata_dtService<Table>('Table')
       datarray.forEach(item=> {
         if (item.id === id)
         {
             setTable(item);
         }
-      })
       setdatatble(datarray);
   });
 },[id]);
@@ -59,19 +61,20 @@ const cancelModal=()=>
 {
   setVisibleNotifi(false);
 }
-const checkExistBill =() =>{
-  data.getdata('Bill').then(res=>{
-    var dataArray: any[]= [];
-    for (let key in res)
-    {
-      dataArray.push({
-        id: key,
-        ...res[key],
-      })
-    }
-    setBillTable(dataArray);
+const checkExistBill =async() =>{
+  let c= await DataService.Getdata_dtService<any>('Bill');
+  // data.getdata('Bill').then(res=>{
+  //   var dataArray: any[]= [];
+  //   for (let key in res)
+  //   {
+  //     dataArray.push({
+  //       id: key,
+  //       ...res[key],
+  //     })
+  //   }
+    setBillTable(c);
   
-  })
+
 }
 const checkBookTable =async() =>{
   let dataArray = await DataService.Getdata_dtService('BookTable') 
@@ -89,9 +92,14 @@ const checkBookTable =async() =>{
   // })
 }
 useEffect(()=>{
+  dataTable().ref('/Table').on('child-changed',()=>{
+      setReload(prev=> !prev);
+  })
+})
+useEffect(()=>{
   checkExistBill();
   checkBookTable();
-},[])
+},[reload])
 const TransferTable =() =>{
    if (table?.Status === 0 )
    {
