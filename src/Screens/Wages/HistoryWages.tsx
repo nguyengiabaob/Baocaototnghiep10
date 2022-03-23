@@ -14,6 +14,7 @@ import { getheight, getwidth, reponsiveheight, reponsivewidth } from "../../them
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Item } from "react-native-paper/lib/typescript/components/List/List";
 import DataService from "../../services/dataservice";
+import database from '@react-native-firebase/database'
 type props = {
     visible: boolean
 }
@@ -23,6 +24,7 @@ export const WagesHistory:React.FC<props> = ({visible}) =>{
     const [DetailWages, setDetailWages]=useState<boolean>(false);
     const [DetailStaff, setDetailstaff]=useState<Userdata>();
     const [detailSelected,setSelected]= useState<Wages>(); 
+    const [reload, setReload]= useState<boolean>(false);
     const isFocused= useIsFocused();
     const tranferday = (d:string)=>{
         var month = new Date(d).getMonth() + 1;
@@ -66,16 +68,22 @@ export const WagesHistory:React.FC<props> = ({visible}) =>{
          setDatauser(datarray);
     // });
 }
+useEffect(()=>{
+    database().ref('/Wages').on('child-changed', ()=>{
+        setReload(prev=> !prev)
+    })
+},[])
     useEffect(()=>{
     //     if (isFocused === true|| visible== true)
     // {
-    setTimeout((
-    )=>{ getallwages();
-        getalluser();
-    },5000)
-       
+    // setTimeout((
+    // )=>{ getallwages();
+    //     getalluser();
+    // },5000)
+       getalluser();
+       getallwages();
     //}
-    },[]);
+    },[reload]);
     useEffect(()=>{
         if (detailSelected != undefined)
     {

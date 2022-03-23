@@ -22,6 +22,7 @@ import {CustomNotification} from '../../Model/CustomNofication';
 import BellNofi from '../../asset/svg/bellnotification.svg';
 import {CustomNotificationDel} from '../../Model/CustomNoficationDel';
 import DataService from '../../services/dataservice';
+import database from '@react-native-firebase/database';
 type props = {
   getvisible: (data: any) => void;
 };
@@ -33,6 +34,7 @@ export const HistoryBookTable: React.FC<props> = ({getvisible}) => {
   const [datatable, setdataTable] = useState<any[]>([]);
   const [visibleModal, setvisibleModal] = useState<boolean>(false);
   const [visibleModalDel, setvisibleModalDel] = useState<boolean>(false);
+  const [reload,setReload]= useState<boolean>(false);
   const tranferday = (d: string) => {
     var month = new Date(d).getMonth() + 1;
     var date = new Date(d).getDate();
@@ -56,19 +58,20 @@ export const HistoryBookTable: React.FC<props> = ({getvisible}) => {
     });
     return name;
   };
-  const gettable = () => {
-    data.getdata('Table').then(res => {
-      var dataArray2: any[] = [];
-      for (let key in res) {
-        if (key !== '0') {
-          dataArray2.push({
-            id: key,
-            ...res[key],
-          });
-        }
-      }
+  const gettable = async() => {
+    // data.getdata('Table').then(res => {
+    //   var dataArray2: any[] = [];
+    //   for (let key in res) {
+    //     if (key !== '0') {
+    //       dataArray2.push({
+    //         id: key,
+    //         ...res[key],
+    //       });
+    //     }
+    //   }
+    let dataArray2= await DataService.Getdata_dtService<any>('Table')
       setdataTable(dataArray2);
-    });
+    // });
   };
   const getBookTable = async () => {
     var dataArray1 = await DataService.Getdata_dtService('BookTable');
@@ -109,11 +112,11 @@ export const HistoryBookTable: React.FC<props> = ({getvisible}) => {
     // })
   };
   useEffect(() => {
-    if (visibleModal === false) {
+    if (visibleModal === false|| reload == false || reload == true) {
       getBookTable();
       gettable();
     }
-  }, [visibleModal]);
+  }, [visibleModal,reload]);
   type propsedit = {
     visible: boolean;
   };
