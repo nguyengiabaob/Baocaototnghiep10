@@ -26,6 +26,7 @@ import DataService from '../services/dataservice';
 import {useAppSelector} from '../redux/hook';
 import {selectAuth} from '../redux/reducer/authslice';
 import database from '@react-native-firebase/database';
+import storage from '@react-native-firebase/storage';
 type props = {
   navigation: StackNavigationProp<
     EmployeeInformationParamList,
@@ -37,7 +38,7 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
   const [search, setsearch] = useState<string>('');
   const [flag, setflag] = useState<boolean>(false);
   const [ischeckbox, setcheckbox] = useState<boolean>(false);
-  const [datadel, setdatadel] = useState<string[]>([]);
+  const [datadel, setdatadel] = useState<any[]>([]);
   const [staffArray, setstaffArray] = useState<Userdata[]>([]);
   const [staffArraysearch, setstaffArraysearch] = useState<Userdata[]>([]);
   const [Reload, setReload] = useState<boolean>(false);
@@ -146,9 +147,14 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
   //     },
 
   // ];
+  const DelImage= (url:string)=>{
+    const imgref = storage().refFromURL(url);
+    imgref.delete().then(()=>{console.log('del Success')}).catch(e=> console.log(e));
+  }
   const ondel = async () => {
     if (datadel.length > 0) {
       datadel.forEach(item => {
+        DelImage(item.Avatar);
         data.deletedData('user', item);
       });
       let dataarray = await DataService.Getdata_dtService<any>('Assignment');
@@ -166,7 +172,7 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
       //     }
       datadel.forEach(item => {
         dataarray.forEach(i => {
-          if (i.EmployeeID == item) {
+          if (i.EmployeeID == item.id) {
             data.deletedData('Assignment', i.id);
           }
         });
@@ -179,7 +185,7 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
       navigation.setOptions({headerShown: true});
     }
   };
-  const oncheck = (id: string, check: boolean) => {
+  const oncheck = (id: any, check: boolean) => {
     if (check) {
       setdatadel(datadel.filter(item => item !== id));
     } else {
@@ -234,7 +240,7 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
         <ScrollView  style={{height: reponsiveheight(590)}}>
           {staffArraysearch.length > 0
             ? staffArraysearch.map(item => {
-                const checked = datadel.includes(item.id);
+                const checked = datadel.includes(item);
                 return (
                   <View key={item.id} style={styles.stylecontainer}>
                     {ischeckbox ? (
@@ -291,7 +297,7 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
                 );
               })
             : staffArray.map(item => {
-                const checked = datadel.includes(item.id);
+                const checked = datadel.includes(item);
                 return (
                   <View key={item.id} style={styles.stylecontainer}>
                     {typeUser === 0 ? (

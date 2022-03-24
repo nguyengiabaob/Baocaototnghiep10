@@ -22,6 +22,8 @@ import { Userdata } from '../Model/User';
 import BellNofi from '../asset/svg/bellnotification.svg';
 import IconCheck from '../asset/svg/check.svg';
 import { CustomNotification } from '../Model/CustomNofication';
+import { useAppDispatch, useAppSelector } from '../redux/hook';
+import { requestLogout, selectAuth } from '../redux/reducer/authslice';
 type props ={
     navigation: StackNavigationProp<EmployeeInformationParamList,'AddstaffScreen'>
 }
@@ -41,6 +43,11 @@ const [datepickervalue,setdatepickervalue] = useState<string>();
 const [pickImg, setPickImage] = useState<ImageData[]>([]);
 const [visible, setvisible] = useState<boolean>(false);
 const [service,setservice] = useState<string>('');
+const {id}=useAppSelector(selectAuth);
+const dispatch = useAppDispatch();
+  function onLogOut() {
+    dispatch(requestLogout());
+  }
 
 const openModal = ()=>{
     setvisible(true);
@@ -100,7 +107,7 @@ async function addDataStaff (){
     }
     if(phone !== '' && Email !== '' && Name !=='' && service !== '' && erroremail=='' && errorphone=='' && errorservice=='' && ErrorName=='')
     {
-        data.postdatauser('user','none', 'none', phone,Email, gen, urlimg, Name,1,new Date(showdatepickervalue).toDateString(),service).then(res=>{if (res === true)
+        data.UpdateDatauserNew(phone,Email, gen, urlimg, Name,new Date(showdatepickervalue).toDateString(),id).then(res=>{if (res === true)
         {
             console.log('true');
             openModal();
@@ -233,9 +240,9 @@ async function addDataStaff (){
                    }} style={{width:reponsivewidth(230)}} inputstyle={{fontSize:16,marginBottom:-10}} />
                </View>
             </View>
-            <View style={style.fieldinfo}>
+            {/* <View style={style.fieldinfo}>
                <View style={{flexDirection: 'row', alignItems:'center', flex:0.35, marginLeft:6}} >
-                   {/* <Fethericon name="user" size={20} color="#94cdf5"/> */}
+             
                    <Text style={{marginHorizontal:8}}>Chức vụ</Text>
                </View>
                <View style={{flex:0.7, marginTop:10}}>
@@ -252,7 +259,7 @@ async function addDataStaff (){
 
                    }} style={{width:reponsivewidth(230)}} inputstyle={{fontSize:16,marginBottom:-10}} />
                </View>
-            </View>
+            </View> */}
             <View style={[style.fieldinfo, { height:reponsiveheight(150),}]}>
                <View style={{flexDirection: 'row', alignItems:'center', flex:0.35, marginLeft:6}} >
                    {/* <Fethericon name="user" size={20} color="#94cdf5"/> */}
@@ -277,7 +284,7 @@ async function addDataStaff (){
             <TouchableOpacity onPress={()=>{addDataStaff()}} style={style.button}>
                 {/* <Fethericon name="log-out" size={20} color="#FFF"/> */}
                 <View style={{flex:1}}>
-                <Text style={{ color:'#FFF', marginHorizontal:8, alignSelf:'center'}}>Thêm</Text>
+                <Text style={{ color:'#FFF', marginHorizontal:8, alignSelf:'center'}}>Cập nhật</Text>
                 </View>
                 </TouchableOpacity>
             </View>
@@ -296,7 +303,7 @@ async function addDataStaff (){
                         </Pressable>
                     </View>
             </Overlay> */}
-            <CustomNotification visible={visible} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} title="Thông báo" iconContent={ <IconCheck   width={reponsivewidth(150)} height={reponsiveheight(60)} /> } onCancel={()=>cancelModal() } Content="Bạn đã thêm nhân viên thành công !"/>
+            <CustomNotification visible={visible} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} title="Thông báo" iconContent={ <IconCheck   width={reponsivewidth(150)} height={reponsiveheight(60)} /> } onCancel={()=>{cancelModal(); onLogOut() }} Content="Bạn đã cập nhật thành công !"/>
         </View>
     );
 };

@@ -10,9 +10,11 @@ import TabNavigator from './tabnavigation';
 import {LoginstackParamList} from './types';
 import {Register} from '../Screens/Register/Register';
 import {ForgotPassword} from '../Screens/ForgotPassword/ForgotPassword';
+import { AddStaffScreen } from '../Staff/AddStaff';
 const LoginStack = createStackNavigator<LoginstackParamList>();
 const LoginNavigator: React.FC = () => {
   const {isLoggedIn} = useAppSelector(selectAuth);
+  const {name} = useAppSelector(selectAuth);
   const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(checklogin());
@@ -21,11 +23,11 @@ const LoginNavigator: React.FC = () => {
   const {Navigator, Screen} = LoginStack;
   return (
     <Navigator screenOptions={{headerShown: false}}>
-      {isLoggedIn ? (
+      {isLoggedIn== true && name ? (
         <Screen name="TabNavigator" component={TabNavigator} />
-      ) : (
-        <Screen name="LoginScreen" component={LoginScreen} />
-      )}
+      ) : isLoggedIn== true && !name ? (
+        <Screen name="UpdateUserInformation" component={AddStaffScreen} />
+      ): <Screen name="LoginScreen" component={LoginScreen} />}
       <Screen name="RegisterScreen" component={Register} />
       <Screen name="ForgotPasswordSceen" component={ForgotPassword} />
     </Navigator>

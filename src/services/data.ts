@@ -90,7 +90,21 @@ static async getuser(name:string , id: string) :Promise<any>
         return true;
     }).catch((e)=>{console.log(e);});
 }
-
+static  async UpdateDatauserNew( phone: string, Email:string, Gender:string, Avatar: string, Name: string, dateofbirth: string, id: string )
+{
+    return await
+    instance.patch(`/user/${id}.json`,{
+       phone: phone,
+       Email:Email,
+       Gender: Gender,
+       Avatar: Avatar,
+       Name: Name,
+       dateofbirth: dateofbirth,
+    }).then(response=>{
+        console.log(response.data);
+        return true;
+    }).catch((e)=>{console.log(e);});
+}
 
 static async updateuser (nametable : string, username: string, password: string, phone: string , Email:string, Gender:string, Avatar: string, Name: string, type:Number, dateofbirth: string, service:string ,id:string ): Promise<any>
 {
