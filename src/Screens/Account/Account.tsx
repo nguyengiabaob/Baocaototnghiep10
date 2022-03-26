@@ -29,7 +29,8 @@ import {CustomNotification} from '../../Model/CustomNofication';
 import BellNofi from '../../asset/svg/bellnotification.svg';
 import {TextInput} from 'react-native-paper';
 import DataService from '../../services/dataservice';
-import database from '@react-native-firebase/database'
+import database from '@react-native-firebase/database';
+import TableComponent from '../../Model/TableComponent'
 type Props = {
   navigation: StackNavigationProp<AccountNavigationParamList, 'AccountScreen'>;
   route: RouteProp<AccountNavigationParamList, 'AccountScreen'>;
@@ -57,6 +58,21 @@ const AccountScreen: React.FC<Props> = () => {
   const [newpassword, setNewPassword] = useState<string>('');
   const [confirm, setconfirm] = useState<string>('');
   const [Reload, setReload] = useState<boolean>(false);
+  const [visiblePermission, setvisiblePermission]= useState<boolean>(false);
+  const col= [
+    {
+      name: 'Người dùng',
+      key: 'Name',
+      width:'50%'
+    },
+    {
+      name: 'Admin',
+      key: '2',
+      width:'50%'
+    }
+  ]
+
+
   async function fetchid() {
     const user = await AuthService.getuserid();
     setusername(user);
@@ -68,7 +84,7 @@ const AccountScreen: React.FC<Props> = () => {
 
   const [arrayuser, setarrayuser] = useState<Userdata[]>([]);
   useEffect(()=>{
-    database().ref("/user").on('child-changed',()=>{
+    database().ref("/user").on('child_changed',()=>{
       setReload(prev=> !prev)
     })
   },[])
@@ -380,6 +396,9 @@ const AccountScreen: React.FC<Props> = () => {
               style={style.btn_action}>
               <Text style={{marginLeft: 25, fontSize: 16}}>Đổi mật khẩu</Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={()=>{
+              setvisiblePermission(true);
+            }}></TouchableOpacity>
           </View>
           <Overlay isVisible={visibleEditinfo}>
             <View style={style.container_visbleSetting}>
@@ -583,6 +602,29 @@ const AccountScreen: React.FC<Props> = () => {
               }}
               Content="Bạn đã cập nhật thành công !"
             />
+          </Overlay>
+          <Overlay isVisible={visiblePermission}>
+              <View>
+              <View style={style.style_other}>
+                <View
+                  style={{
+                    justifyContent: 'flex-start',
+                    width: reponsivewidth(50),
+                  }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setvisiblechangePass(false);
+                    }}>
+                    <MaterialIcons name="clear" size={28} color="#efefef" />
+                  </TouchableOpacity>
+                </View>
+                <View style={style.container_MainSetting}>
+                  <Text style={style.text_Setting}>Phân quyền</Text>
+                </View>
+                <TableComponent columns={col} data={arrayuser}/>
+              </View>
+              
+              </View>
           </Overlay>
         </View>
       </Overlay>

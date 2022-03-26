@@ -9,6 +9,7 @@ export type LoginstackParamList={
     LoginScreen: undefined;
     RegisterScreen:undefined;
     ForgotPasswordSceen: undefined;
+    UpdateUserInformation: undefined;
 }
 export type RootStackParamList={
     Main: NavigatorScreenParams<MainStackParamList>;
