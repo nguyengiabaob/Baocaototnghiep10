@@ -18,11 +18,14 @@ import storage from '@react-native-firebase/storage';
 import data from '../services/data';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { EmployeeInformationParamList } from '../navigation/types';
+import { useAppSelector } from '../redux/hook';
+import { selectAuth } from '../redux/reducer/authslice';
 type props ={
     user: Userdata,
     navigation : StackNavigationProp<EmployeeInformationParamList,'UserInformation'>
 }
 export const DetailUser: React.FC<props> = ({user, navigation}:props)=>{
+const {type} =useAppSelector(selectAuth);
 const [Name, setName] = useState<string>('');
 const [Service, setService] = useState<string>('');
 const [errorphone, seterrorphone]= useState<string>('');
@@ -294,6 +297,7 @@ async function UpdateStaff (){
                </View>
             </View>
             </ScrollView>
+            { type == 0  &&
             <View style={{justifyContent:'center',alignItems:'center'}}>
             <TouchableOpacity onPress={()=>UpdateStaff()} style={style.button}>
                 {/* <Fethericon name="log-out" size={20} color="#FFF"/> */}
@@ -302,6 +306,7 @@ async function UpdateStaff (){
                 </View>
                 </TouchableOpacity>
             </View>
+            }
             <CustomNotification visible={visible} title="Thông báo"  iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} iconContent={ <IconCheck   width={reponsivewidth(150)} height={reponsiveheight(60)} /> } onCancel={()=>{setvisible(false); navigation.goBack()}} Content="Lưu thông tin thành thành công !"/>
         </View>
 

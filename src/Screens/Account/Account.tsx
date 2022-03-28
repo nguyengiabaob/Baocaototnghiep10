@@ -59,6 +59,7 @@ const AccountScreen: React.FC<Props> = () => {
   const [confirm, setconfirm] = useState<string>('');
   const [Reload, setReload] = useState<boolean>(false);
   const [visiblePermission, setvisiblePermission]= useState<boolean>(false);
+  const {typeUser} =useAppSelector(selectAuth);
   const col= [
     {
       name: 'Người dùng',
@@ -378,7 +379,7 @@ const AccountScreen: React.FC<Props> = () => {
               </TouchableOpacity>
             </View>
             <View style={style.container_MainSetting}>
-              <Text style={style.text_Setting}>Setting</Text>
+              <Text style={style.text_Setting}>Cài đặt</Text>
             </View>
           </View>
           <View style={{backgroundColor: '#FFFF'}}>
@@ -396,9 +397,12 @@ const AccountScreen: React.FC<Props> = () => {
               style={style.btn_action}>
               <Text style={{marginLeft: 25, fontSize: 16}}>Đổi mật khẩu</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={()=>{
-              setvisiblePermission(true);
-            }}></TouchableOpacity>
+            { typeUser == 0 &&
+               <TouchableOpacity onPress={()=>{
+                setvisiblePermission(true);
+              }}><Text>Phân quyền</Text></TouchableOpacity>
+            }
+           
           </View>
           <Overlay isVisible={visibleEditinfo}>
             <View style={style.container_visbleSetting}>

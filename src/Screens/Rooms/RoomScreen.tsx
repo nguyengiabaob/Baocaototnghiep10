@@ -56,7 +56,7 @@ type propsModal={
   Visible: boolean,
 }
 useEffect(()=>{
-  database().ref().on('value',snapshot=>{
+  database().ref().on('value',()=>{
     setReload(prev => !prev);
   })
 },[])

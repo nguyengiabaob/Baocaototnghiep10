@@ -123,9 +123,9 @@ const LoginScreen: React.FC<Props> = ({navigation}:Props) => {
          <View>
            <CustomInput title="Password" icon={<Feather size={20} name="lock"/>} onchange={text=>setpassword(text)} secureTextEntry={hiddenPassword ? true : false} iconRight={hiddenPassword ? <Feather onPress={()=>showPassword()} name="eye-off" size={20}/> : <Feather onPress={()=>showPassword()}  name="eye" size={20}/>} />
          </View>
-         <View style={{alignSelf:'flex-end', marginRight:15}}>
+         {/* <View style={{alignSelf:'flex-end', marginRight:15}}>
            <CustomHyperLink onPress={()=>{navigation.navigate('ForgotPasswordSceen')}} title="Bạn quên mật khẩu ?"/>
-         </View>
+         </View> */}
          <View style={style.view_btndangnhap}>
            <TouchableOpacity onPress ={()=>onLogin(user, pass)}><Text style={{fontSize:18,color:'#FFFFFFFF',backgroundColor:'#3c72c3'}}>{'Đăng nhập'}</Text></TouchableOpacity>
          </View>
@@ -134,7 +134,8 @@ const LoginScreen: React.FC<Props> = ({navigation}:Props) => {
            <ButtonFacebook style={{marginRight:15}}/>
            <ButtonGoogle/>
          </View> */}
-         <CustomHyperLink onPress={()=>{navigation.navigate('RegisterScreen')}} style={{marginTop:10}} title="Đăng ký tài khoản mới"/>
+         {/* <CustomHyperLink onPress={()=>{navigation.navigate('RegisterScreen')}} style={{marginTop:10}} title="Đăng ký tài khoản mới"/> */}
+         <CustomHyperLink onPress={()=>{navigation.navigate('ForgotPasswordSceen')}} title="Bạn quên mật khẩu ?"/>
          </View>
     </KeyboardAvoidingView>
   );
