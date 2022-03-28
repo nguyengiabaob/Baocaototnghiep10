@@ -5,7 +5,7 @@ import {
   StackNavigationProp,
 } from '@react-navigation/stack';
 import React, {useCallback, useEffect, useState} from 'react';
-import { ScrollView, StyleSheet, View} from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, View} from 'react-native';
 import {CheckBox, Text} from 'react-native-elements';
 import {
 //   TouchableHighlight,
@@ -208,7 +208,7 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
     );
   };
   return (
-    <View>
+    <SafeAreaView>
       {ischeckbox && renderheader()}
       <View style={styles.containerOption}>
         <Searchbar
@@ -368,7 +368,7 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
               })}
         </ScrollView>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 export default ListStaffScreen;

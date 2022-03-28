@@ -3,7 +3,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import Logoimg from '../../asset/svg/logo.svg';
-import {Image, ImageBackground, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {Image, ImageBackground, KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import Toast from 'react-native-toast-message';
 import { getheight, getwidth, reponsiveheight, reponsivewidth } from '../../theme/Metric';
 import { useState } from 'react';
@@ -14,7 +14,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import {  LoginstackParamList } from '../../navigation/types';
 import { Userdata } from '../../Model/User';
 import Feather from 'react-native-vector-icons/Feather';
-import { selectAuth, SigIn, testfunction } from '../../redux/reducer/authslice';
+import { selectAuth, SigIn } from '../../redux/reducer/authslice';
 import { useDispatch } from 'react-redux';
 import { useAppDispatch, useAppSelector } from '../../redux/hook';
 import CustomInput from '../../Model/CustomInput';
@@ -113,7 +113,7 @@ const LoginScreen: React.FC<Props> = ({navigation}:Props) => {
     <KeyboardAvoidingView
     behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     style={{flex: 1}}>
-    <View style={style.containter}>
+    <SafeAreaView style={style.containter}>
       <View style={style.container_logo}>
         <Logoimg width={reponsivewidth(350)} height={reponsiveheight(350)}/>
        </View>
@@ -136,7 +136,7 @@ const LoginScreen: React.FC<Props> = ({navigation}:Props) => {
          </View> */}
          {/* <CustomHyperLink onPress={()=>{navigation.navigate('RegisterScreen')}} style={{marginTop:10}} title="Đăng ký tài khoản mới"/> */}
          <CustomHyperLink onPress={()=>{navigation.navigate('ForgotPasswordSceen')}} title="Bạn quên mật khẩu ?"/>
-         </View>
+         </SafeAreaView>
     </KeyboardAvoidingView>
   );
 };

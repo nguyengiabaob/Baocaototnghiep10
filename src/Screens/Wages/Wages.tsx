@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Button, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, Text, TextInputChangeEventData, View, TouchableOpacity } from 'react-native';
+import { Button, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, Text, TextInputChangeEventData, View, TouchableOpacity, SafeAreaView } from 'react-native';
 import { Input, Overlay, SearchBar } from 'react-native-elements';
 import { TextInput } from 'react-native-gesture-handler';
 import PersonIcon from '../../asset/svg/person.svg';
@@ -144,7 +144,7 @@ export const Wages :React.FC = ()=>{
      };
         return (
             <Modalize modalStyle={{elevation: 10 }}  ref={modalizeRef} modalHeight={reponsiveheight(750)}  onClosed={onClosed}  rootStyle={{height:reponsiveheight(800), elevation:20}} >
-              <View >
+              <SafeAreaView>
                   <View style={{borderBottomColor:'#b7b7b7',borderWidth:1, width:reponsivewidth(400)}}>
                       <Text style={{fontSize:18, fontWeight:'700',textAlign:'center', padding:8}}>Danh sách nhân viên</Text>
                   </View>
@@ -244,7 +244,7 @@ export const Wages :React.FC = ()=>{
                       <Text style={{fontSize:16,color:'#FFF',fontWeight:'700'}}> Chọn</Text>
                   </TouchableOpacity>
               </View>
-              </View>
+              </SafeAreaView>
               </Modalize>
           );
     };
@@ -275,7 +275,7 @@ export const Wages :React.FC = ()=>{
         if (EmployeeIDselected.length > 0)
         {
            return (
-                <View style={{flexDirection:'row', alignItems:'center'}}>
+                <SafeAreaView style={{flexDirection:'row', alignItems:'center'}}>
                  <Text style={{fontWeight:'700',marginLeft:25,fontSize:16}}>Nhân viên</Text>
                 <View style={[styles.shadowNames,{flexDirection:'row',marginLeft:30,backgroundColor:'#849ecf',paddingTop:15, paddingLeft:10, paddingRight:1, paddingBottom:15,borderRadius:5,}]}>
                     <Pressable style={{flexDirection:'row'}}>
@@ -297,7 +297,7 @@ export const Wages :React.FC = ()=>{
                     <Text>x</Text>
                 </Pressable>
                 </View>
-               </View>
+               </SafeAreaView>
            );
         }
     }
@@ -325,7 +325,7 @@ export const Wages :React.FC = ()=>{
 
 }
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
         <View style={[styles.shadowNames,{flexDirection:'row',alignItems:'center',marginBottom:15,borderColor:'#606060', borderWidth:1, width:reponsivewidth(150), backgroundColor:'#dbdada', borderRadius:10, marginLeft:5}]}>
             <EvilIcons name="calendar" size={32}/>
 
@@ -382,7 +382,7 @@ export const Wages :React.FC = ()=>{
             <CustomNotification visible={AddSuccess} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} title="Thông báo"  onCancel={()=>setAddSuccess(false) } Content="Bạn đã thêm thành công !"/>
            <CustomNotification visible= {AddError}  iconTitle={<Warning width={reponsivewidth(30)} height={reponsiveheight(30)}/>} title="Thông báo"  onCancel={()=>setAddError(false) } Content="Xin vui lòng nhập lại" />
            {renderModalMonth()}
-        </View>
+        </SafeAreaView>
     );
 }
     const styles = StyleSheet.create({

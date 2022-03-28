@@ -4,6 +4,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {
   Animated,
   Image,
+  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -124,7 +125,7 @@ const Attendance: React.FC<props> = ({navigation}) => {
     ).start();
   }, []);
   return (
-    <View style={{flex: 1, backgroundColor:'#2596be1c'}}>
+    <SafeAreaView style={{flex: 1, backgroundColor:'#2596be1c'}}>
       <View style={{flexDirection: 'row', marginTop: 25}}>
         <EvilIcons name="calendar" style={{fontSize: 30}} />
         <Text
@@ -195,7 +196,7 @@ const Attendance: React.FC<props> = ({navigation}) => {
         }}
         Content={content}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 export default Attendance;

@@ -2,7 +2,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import {Image, StyleSheet, TextInput, TouchableOpacity, View} from 'react-native';
+import {Image, SafeAreaView, StyleSheet, TextInput, TouchableOpacity, View} from 'react-native';
 import {Overlay, SearchBar, Text} from 'react-native-elements';
 import {
   getheight,
@@ -152,7 +152,7 @@ const onEdit=(index: number )=>
   },[getListMaterial]);
   return (
     <Overlay isVisible={visible}>
-      <View
+      <SafeAreaView
         style={{
           width: getwidth(),
           height: getheight(),
@@ -284,14 +284,14 @@ const onEdit=(index: number )=>
         <CustomNotificationDel visible={visibleDel} title="Thông báo" Content='Bạn có muốn xóa nguyên liệu' iconTitle={<Warning width={reponsivewidth(30)} height={reponsiveheight(30)}/>} onCancel={()=>setvisibleDel(false)} onAction={()=>onDelete(DelItem,ItemAdding)} />
         <CustomNotification visible={visbleSucces} title="Thông báo" Content='Bạn đã thêm thành công' iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} onCancel={()=>setvisbleSucces(false)} />
         <CustomNotification onCancel={()=>setvisbleError(false)} visible={visbleError} title="Thông báo" Content='Thêm không thành công' iconTitle={<Warning width={reponsivewidth(30)} height={reponsiveheight(30)} />} />
-      </View>
+      </SafeAreaView>
 
           {/* Tạo component cho modalize */}
 
 
 
           <Modalize ref={modalizeRef} modalHeight={reponsiveheight(750)}  onClosed={cancelModalize } rootStyle={{height:reponsiveheight(800)}} >
-          <View >
+          <SafeAreaView >
               <View style={{borderBottomColor:'#b7b7b7',borderWidth:1, width:reponsivewidth(400)}}>
                   <Text style={{fontSize:18, fontWeight:'700',textAlign:'center', padding:8}}>{'Nguyên liệu'}</Text>
               </View>
@@ -301,7 +301,7 @@ const onEdit=(index: number )=>
               <View>
                  <ScrollView />
               </View>
-          </View>
+          </SafeAreaView>
           </Modalize>
     </Overlay>
   );

@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import {StackNavigationProp} from '@react-navigation/stack';
 import React, {useCallback, useEffect} from 'react';
-import {Image, TouchableOpacity} from 'react-native';
+import {Image, SafeAreaView, TouchableOpacity} from 'react-native';
 import {Text, TextInput, View} from 'react-native';
 // import Addproduct from '../asset/svg/box.svg';
 import CustomHeader from '../../Model/CustomHeader';
@@ -138,7 +138,7 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
     getStringMaterial();
   },[getStringMaterial])
   return (
-    <View>
+    <SafeAreaView>
       <CustomHeader
         title="Thêm sản phẩm"
         onpress={() => {
@@ -389,7 +389,7 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
         onCancel={() => setshowError(false)}
         Content="Xin vui lòng nhập lại"
       />
-    </View>
+    </SafeAreaView>
   );
 };
 const style = StyleSheet.create({

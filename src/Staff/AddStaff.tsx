@@ -115,7 +115,7 @@ async function addDataStaff (){
     }
 };
     return (
-        <View style={style.container}>
+        <SafeAreaView style={style.container}>
             {/* <CustomHeader title="Thêm nhân viên"  onpress={()=>{navigation.goBack()}}/> */}
             <View style={{flexDirection:'row', justifyContent:'center' ,alignItems:'center', marginTop:12, backgroundColor:'#226cb3', width:reponsivewidth(395),borderRadius:5}}>
                 <IconTitle width={reponsivewidth(40)} height={reponsiveheight(40)}/>
@@ -304,7 +304,7 @@ async function addDataStaff (){
                     </View>
             </Overlay> */}
             <CustomNotification visible={visible} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} title="Thông báo" iconContent={ <IconCheck   width={reponsivewidth(150)} height={reponsiveheight(60)} /> } onCancel={()=>{cancelModal(); onLogOut() }} Content="Bạn đã cập nhật thành công !"/>
-        </View>
+        </SafeAreaView>
     );
 };
 const style = StyleSheet.create({

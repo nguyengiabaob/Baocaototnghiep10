@@ -2,6 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {
+  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
@@ -53,7 +54,7 @@ export const AddExpenseManager: React.FC = () => {
     }
   };
   return (
-    <View>
+    <SafeAreaView>
       <View style={style.containerfiled}>
         <View
           style={{
@@ -177,7 +178,7 @@ export const AddExpenseManager: React.FC = () => {
         onCancel={() => setAddError(false)}
         Content="Xin vui lòng nhập lại"
       />
-    </View>
+    </SafeAreaView>
   );
 };
 const style = StyleSheet.create({

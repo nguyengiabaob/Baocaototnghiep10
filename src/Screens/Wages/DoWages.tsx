@@ -3,6 +3,7 @@
 import React, {useEffect, useState} from 'react';
 import {Text, View} from 'react-native';
 import {Tab, TabView} from 'react-native-elements';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {WagesHistory} from './HistoryWages';
 import {Wages} from './Wages';
 export const TimeKeeping: React.FC = () => {
@@ -12,7 +13,7 @@ export const TimeKeeping: React.FC = () => {
     setload(prev => !prev);
   }, [index]);
   return (
-    <View style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1}}>
       <Tab
         indicatorStyle={{backgroundColor: '#67bff3'}}
         value={index}
@@ -36,6 +37,6 @@ export const TimeKeeping: React.FC = () => {
           <WagesHistory visible={load} />
         </TabView.Item>
       </TabView>
-    </View>
+    </SafeAreaView>
   );
 };

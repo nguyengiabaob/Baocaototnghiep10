@@ -217,7 +217,7 @@ export const ExpenseManagerScreen: React.FC<props> = ({navigation}: props) => {
     }
   }, [DelArray.length]);
   return (
-    <View style={style.container}>
+    <SafeAreaView style={style.container}>
       <View>
         {showmodeldate && (
           <DateTimePicker
@@ -1119,7 +1119,7 @@ export const ExpenseManagerScreen: React.FC<props> = ({navigation}: props) => {
           </TouchableOpacity>
         </View>
       </Overlay>
-    </View>
+    </SafeAreaView>
   );
 };
 const style = StyleSheet.create({

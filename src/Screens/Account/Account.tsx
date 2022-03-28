@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import Fethericon from 'react-native-vector-icons/Feather';
 import Usericon from '../../asset/svg/user.svg';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -296,7 +296,7 @@ const AccountScreen: React.FC<Props> = () => {
     }
   });
   return (
-    <View style={style.container}>
+    <SafeAreaView style={style.container}>
       <View style={style.containericon}>
         <View style={style.icon_setting}>
           <TouchableOpacity onPress={() => setvisibleSetting(true)}>
@@ -632,7 +632,7 @@ const AccountScreen: React.FC<Props> = () => {
           </Overlay>
         </View>
       </Overlay>
-    </View>
+    </SafeAreaView>
   );
 };
 export default AccountScreen;

@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import { useIsFocused } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { BottomSheet, Input, ListItem, Overlay, SpeedDial } from 'react-native-elements';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import { Area } from '../../Model/Area';
@@ -442,7 +442,7 @@ useEffect(()=>{
 //     );
 //   };
     return (
-        <>
+        <SafeAreaView>
         <View style={styles.ContainterFlastList} >
         
         <FlatList
@@ -515,7 +515,7 @@ useEffect(()=>{
    }
   </Overlay> */}
    
-        </>
+        </SafeAreaView>
     );
 
 };
