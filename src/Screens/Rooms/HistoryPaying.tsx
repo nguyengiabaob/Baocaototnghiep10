@@ -11,6 +11,8 @@ import { CustomNotificationDel } from '../../Model/CustomNoficationDel';
 import BellNofi from '../../asset/svg/bellnotification.svg';
 import DataService from '../../services/dataservice';
 import database from '@react-native-firebase/database';
+import CustomHyperLink from '../../Model/CustomHyperLink';
+import HistoryPayingDetail from './HistoryPayingDetail';
 type props ={
     getvisible: (data: any)=>void
 }
@@ -20,6 +22,8 @@ export const HistoryPaying: React.FC<props>= ({getvisible})=> {
     const [visbleModalDel,setvisibleModalDel]=useState<boolean>(false);
     const [itemSelected,setitemSelectedl]=useState<any>();
     const [reload,setReload]= useState<boolean>(false);
+    const [detail, setDetail]= useState<boolean>(false);
+    const [idclick, setidclick]= useState<any>();
     const tranferday = (d:string)=>{
         var month = new Date(d).getMonth() + 1;
         var date = new Date(d).getDate();
@@ -157,6 +161,9 @@ const onDelPaying= async()=>{
                         <MaterialCommunityIcons size={32} name="delete" color={'#999999'}/>
                      </TouchableOpacity>
                  </View>
+                 <View>
+                    <CustomHyperLink onPress={()=>{ setDetail(true); setidclick(item.id) }}/>
+                </View>
                  </View>
                 </View>
 
@@ -166,6 +173,7 @@ const onDelPaying= async()=>{
                     } 
                 </ScrollView>
                 <CustomNotificationDel visible={visbleModalDel} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} Content={"Bạn có thực sự muốn xóa hóa đơn này không"} title="Thông báo"  onCancel={()=>setvisibleModalDel(false)} onAction={onDelPaying}/>
+                <HistoryPayingDetail  visible={detail} idBill={idclick} onCancel={setDetail}/>
             </SafeAreaView>
         )
 }

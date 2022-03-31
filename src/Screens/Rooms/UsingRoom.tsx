@@ -3,7 +3,7 @@
 import { useIsFocused } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
-import { FlatList, SafeAreaView, ScrollView, StyleSheet, Text, Toucac, Touchable, TouchableHighlightComponent, View } from 'react-native';
+import { FlatList, SafeAreaView, ScrollView, StyleSheet, Text, Touchable, TouchableHighlightComponent, View } from 'react-native';
 import { TouchableHighlight, TouchableOpacity } from 'react-native-gesture-handler';
 import { Area } from '../../Model/Area';
 import { CustomBottomSheet } from '../../Model/CustomBottomSheet';

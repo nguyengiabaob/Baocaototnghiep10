@@ -113,7 +113,7 @@ async function UpdateStaff (){
     {
         img = user.Avatar;
     }
-    data.updateuser('user','none', 'none',phonepick,emailpick, gen, img, name, 1,new Date(showdatepickervalue).toDateString(),service,user.id).then(res=>{if (res === true)
+    data.updateuser('user',phonepick,emailpick, gen, img, name,new Date(showdatepickervalue).toDateString(),user.id).then(res=>{if (res === true)
     {
        setvisible(true);
     }});

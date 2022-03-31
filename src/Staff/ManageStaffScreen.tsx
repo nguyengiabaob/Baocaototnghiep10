@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {SafeAreaView, StyleSheet, View} from 'react-native';
 import CustomBox from '../Model/CustomBox';
 import CustomBoxItem from '../Model/CustomBoxItem';
 // import ManageRequest from '../asset/svg/signing.svg';
@@ -24,7 +24,7 @@ type props = {
 const ManageStaffScreen: React.FC<props> = ({navigation}: props) => {
   const {typeUser, userName} = useSelector(selectAuth);
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <CustomHeader
         title="Quản lý nhân sự"
         onpress={() => navigation.goBack()}
@@ -104,7 +104,7 @@ const ManageStaffScreen: React.FC<props> = ({navigation}: props) => {
           />
         </ScrollView>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 export default ManageStaffScreen;

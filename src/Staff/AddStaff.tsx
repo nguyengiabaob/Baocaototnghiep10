@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useRef, useState } from 'react';
-import { StyleSheet, TextInput, View ,ScrollView, TouchableOpacity, Pressable, Image} from 'react-native';
+import { StyleSheet, TextInput, View ,ScrollView, TouchableOpacity, Pressable, Image, SafeAreaView} from 'react-native';
 import { CheckBox, Overlay, Text } from 'react-native-elements';
 import CustomInput from '../Model/CustomInput';
 import Imageadd from '../asset/svg/images-interface-symbol.svg';
