@@ -3,7 +3,7 @@
 import { RouteProp, useIsFocused } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import CustomHeader from '../Model/CustomHeader';
 import { DetailUser } from '../Model/DetailUser';
 import { Userdata } from '../Model/User';
@@ -39,10 +39,10 @@ useEffect(()=>{
     }
 },[id,isFocused]);
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             {userPick && <DetailUser navigation={navigation} user={userPick}/>}
             {/* <CustomH eader title="Thông tin nhân viên" onpress={()=>navigation.goBack()}/> */}
-        </View>
+        </SafeAreaView>
     );
 };
 const styles = StyleSheet.create(

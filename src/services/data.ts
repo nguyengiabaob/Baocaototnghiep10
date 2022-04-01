@@ -106,15 +106,11 @@ static  async UpdateDatauserNew( phone: string, Email:string, Gender:string, Ava
     }).catch((e)=>{console.log(e);});
 }
 
-static async updateuser (nametable : string, username: string, password: string, phone: string , Email:string, Gender:string, Avatar: string, Name: string, type:Number, dateofbirth: string, service:string ,id:string ): Promise<any>
+static async updateuser (nametable : string, phone: string , Email:string, Gender:string, Avatar: string, Name: string, dateofbirth: string ,id:string ): Promise<any>
 {
     return await
-    instance.put(`/${nametable}/${id}.json`,{
-       username:username,
-       password: password,
+    instance.patch(`/${nametable}/${id}.json`,{
        phone: phone,
-       service :service,
-       type: type,
        Email:Email,
        Gender: Gender,
        Avatar: Avatar,

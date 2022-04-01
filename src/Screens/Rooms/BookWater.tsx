@@ -6,6 +6,7 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {
   FlatList,
   Image,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   TextInput,
@@ -774,7 +775,7 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
     }) => {
       const [valueQuality, setvaluequality] = useState<number>(1);
       return (
-        <View
+        <SafeAreaView
           style={{
             width: getwidth(),
             height: getheight(),
@@ -990,13 +991,13 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
               </Text>
             </View>
           </View>
-        </View>
+        </SafeAreaView>
       );
     };
 
     //Component BookWaterDetail
     return (
-      <View
+      <SafeAreaView
         style={{
           width: getwidth(),
           height: getheight(),
@@ -1270,7 +1271,7 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
             codeBill={bill}
           />
         </Overlay>
-      </View>
+      </SafeAreaView>
     );
   };
 
@@ -1371,7 +1372,7 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
       }
     };
     return (
-      <View
+      <SafeAreaView
         style={{
           width: getwidth(),
           height: getheight(),
@@ -1676,13 +1677,13 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
           onCancel={() => setShowError(false)}
           Content=" Số tiền không đủ thanh toán xin vui lòng nhập lại"
         />
-      </View>
+      </SafeAreaView>
     );
   };
 
   //Component BookWater
   return (
-    <View style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1}}>
       {console.log('codeBill', CodeBill)}
       {console.log('UpdateProductselected', UpdateProductSelected)}
       <View
@@ -1955,7 +1956,7 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
         }}
         Content="Xin vui lòng nhập lại"
       />
-    </View>
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({

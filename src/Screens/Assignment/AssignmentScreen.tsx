@@ -5,6 +5,7 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   NativeSyntheticEvent,
   Pressable,
+  SafeAreaView,
   StyleSheet,
   TextInputChangeEventData,
   TouchableOpacity,
@@ -1001,7 +1002,7 @@ export const AssignmentScreen: React.FC<props> = ({navigation}: props) => {
     data.deletedatAssignment('Assignment', id);
   };
   return (
-    <>
+    <SafeAreaView>
       <View style={styles.container}>
         <CustomHeader
           title="Lịch thi công trong tuần"
@@ -1209,7 +1210,7 @@ export const AssignmentScreen: React.FC<props> = ({navigation}: props) => {
           setVisibleModal(false);
         }}
       />
-    </>
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({

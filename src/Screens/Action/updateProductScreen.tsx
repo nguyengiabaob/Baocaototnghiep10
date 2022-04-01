@@ -3,7 +3,7 @@
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Image, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { Image, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, TextInput, View } from 'react-native';
 import { MediaType } from 'react-native-image-picker';
 import { Button, Dialog, Paragraph, Portal, Provider } from 'react-native-paper';
@@ -162,9 +162,14 @@ useEffect(()=>{
                     i.Total= i.Number * dataProduct?.Quanity;
                 })
             }
-         await data.updatedataproduct('Products',id,nameproduct == '' ? dataProduct?.name_product : nameproduct , priceproduct > 0 ? priceproduct : Number(dataProduct.Price_product)  , quanity > 0 ? quanity : Number(dataProduct.Quanity), urlimg ? urlimg : dataProduct.Image, ChooseCate ? ChooseCate.id : catergory[0].id, dataproduct.length > 0 ? dataproduct : [] );
+            let res= await data.updatedataproduct('Products',id,nameproduct == '' ? dataProduct?.name_product : nameproduct , priceproduct > 0 ? priceproduct : Number(dataProduct.Price_product)  , quanity > 0 ? quanity : Number(dataProduct.Quanity), urlimg ? urlimg : dataProduct.Image, ChooseCate ? ChooseCate.id : catergory[0].id, dataproduct.length > 0 ? dataproduct : [] )
+        if(res==true )
+        {
+            showDialog();
         }
-         showDialog();
+        }
+        
+         
     
 
        // }
@@ -187,7 +192,7 @@ useEffect(()=>{
         );
     };
     return (
-        <View>
+        <SafeAreaView>
             {console.log('adsadsa',ChooseCate)}
             <CustomHeader title="Cập nhật thông tin sản phẩm " onpress={()=>{navigation.goBack();}}/>
           <View style={{borderColor:'#D3D3D3',
@@ -367,7 +372,7 @@ useEffect(()=>{
                <TouchableOpacity style={[ style.btnExit,{alignItems:'center', alignSelf:'center'}]} onPress={()=>setShowChooseCate(false)}><Text style={{color:'#FFFF'}}>Thoát</Text></TouchableOpacity>
             </Overlay>
             <CustomNotification visible={visible} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} title="Thông báo"  onCancel={()=>hideDialog() } Content="Bạn đã cập nhật thành công !"/>
-        </View>
+        </SafeAreaView>
     );
 };
 export default UpdateProductScreen;

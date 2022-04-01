@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import { RouteProp } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { ScrollView, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, ScrollView, TouchableOpacity, View } from 'react-native';
 import { Overlay, Text } from 'react-native-elements';
 import { Table } from '../../Model/Table';
 import { RoomParamList, RootStackParamList } from '../../navigation/types';
@@ -92,7 +92,7 @@ const checkBookTable =async() =>{
   // })
 }
 useEffect(()=>{
-  dataTable().ref('/Table').on('child-changed',()=>{
+  database().ref('/Table').on('child_changed',()=>{
       setReload(prev=> !prev);
   })
 })
@@ -134,7 +134,7 @@ const TransferTable =() =>{
    }
 }
     return (
-        <View style={{flex:1, marginTop:25}}>
+        <SafeAreaView style={{flex:1, marginTop:25}}>
             <View style={{justifyContent:'center', alignItems:'center' }}>
                 <Text style={{fontSize:18,fontWeight:'700'}}>Thông tin Chuyển bàn</Text>
             </View>
@@ -191,6 +191,6 @@ const TransferTable =() =>{
           </Overlay>
           <CustomNotification visible={VisibleNotifiSuccess} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} title="Thông báo"  onCancel={()=>{setVisibleNotifiSuccess(false); navigation.goBack();}  } Content="Bạn đã chuyển bàn thành công !"/>
           <CustomNotification visible={VisibleNotifi} iconTitle={<WarningIcon width={reponsivewidth(30)} height={reponsiveheight(30)}/>} title="Thông báo"  onCancel={()=>cancelModal() } Content="Không thể chuyển bàn vì bàn chưa được đặt !"/>
-        </View>
+        </SafeAreaView>
     )
 }

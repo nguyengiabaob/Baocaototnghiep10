@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import { useIsFocused } from "@react-navigation/native";
 import React, { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, TouchableOpacity, View } from  'react-native';
+import { Pressable, SafeAreaView, StyleSheet, TouchableOpacity, View } from  'react-native';
 import { Text } from 'react-native-elements';
 import { Overlay } from "react-native-elements/dist/overlay/Overlay";
 import { ScrollView } from 'react-native-gesture-handler';
@@ -69,7 +69,7 @@ export const WagesHistory:React.FC<props> = ({visible}) =>{
     // });
 }
 useEffect(()=>{
-    database().ref('/Wages').on('child-changed', ()=>{
+    database().ref('/Wages').on('child_changed', ()=>{
         setReload(prev=> !prev)
     })
 },[])
@@ -95,7 +95,7 @@ useEffect(()=>{
     }
     },[detailSelected,Datauser]);
     return (
-        <View>
+        <SafeAreaView>
             <ScrollView style={{height:reponsiveheight(620)}}>
                 {DataWages.length > 0 ? DataWages.map(item =>{
                     let user = Datauser.filter(i=> i.id == item.EmployeeID );
@@ -181,7 +181,7 @@ useEffect(()=>{
     
 </Overlay>
 }
-        </View>
+        </SafeAreaView>
     )
 }
 const styles = StyleSheet.create({

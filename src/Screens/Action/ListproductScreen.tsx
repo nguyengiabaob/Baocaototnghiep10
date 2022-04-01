@@ -5,6 +5,7 @@ import React, {useCallback} from 'react';
 import {
   Image,
   Pressable,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -211,7 +212,7 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
       });
     };
     return (
-      <View style={{width: reponsivewidth(300), height: reponsiveheight(250)}}>
+      <SafeAreaView style={{width: reponsivewidth(300), height: reponsiveheight(250)}}>
         <View style={style.TitleOverlAdd}>
           <Text
             style={{
@@ -256,7 +257,7 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
             <Text style={{color: '#FFFF'}}>Thoát</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </SafeAreaView>
     );
   };
   const ModalUpdateCatergory: React.FC = () => {
@@ -340,7 +341,7 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
       });
     };
     return (
-      <View
+      <SafeAreaView
         style={{
           width: getwidth(),
           height: getheight(),
@@ -587,11 +588,11 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
             Content="Tên nhóm sản phẩm đã tồn tại !"
           />
         </View>
-      </View>
+      </SafeAreaView>
     );
   };
   return (
-    <View style={style.container}>
+    <SafeAreaView style={style.container}>
       <CustomHeader
         title="Danh sách sản phẩm"
         onpress={() => {
@@ -879,7 +880,7 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
         onCancel={() => setvisibleNofitication(false)}
         Content="Tên nhóm sản phẩm đã tồn tại !"
       />
-    </View>
+    </SafeAreaView>
   );
 };
 const style = StyleSheet.create({

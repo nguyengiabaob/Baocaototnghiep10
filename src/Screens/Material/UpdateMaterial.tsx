@@ -2,6 +2,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {
   Image,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -201,7 +202,7 @@ const UpdateMaterial: React.FC<props> = ({
     });
   };
   return (
-    <View style={{width: reponsivewidth(330), height: reponsiveheight(600)}}>
+    <SafeAreaView style={{width: reponsivewidth(330), height: reponsiveheight(600)}}>
       <View>
         <View style={style.TitleOverlAdd}>
           <Text
@@ -594,7 +595,7 @@ const UpdateMaterial: React.FC<props> = ({
         onCancel={() => setshowError(false)}
         Content="Xin vui lòng nhập lại"
       />
-    </View>
+    </SafeAreaView>
   );
 };
 const style = StyleSheet.create({

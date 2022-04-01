@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import { RouteProp } from "@react-navigation/native";
 import React, { useCallback, useEffect, useState } from "react";
-import { ScrollView, TouchableOpacity, View } from "react-native";
+import { SafeAreaView, ScrollView, TouchableOpacity, View } from "react-native";
 import { Overlay, Text } from "react-native-elements";
 import { Input } from "react-native-elements/dist/input/Input";
 import { Area } from "../../Model/Area";
@@ -111,7 +111,7 @@ const  SaveData =()=>{
 }
     return ( 
      
-        <View style={{justifyContent:'flex-start',flex:1, marginTop:25}}>
+        <SafeAreaView style={{justifyContent:'flex-start',flex:1, marginTop:25}}>
             <View style={{marginLeft:15}} >
                 <Text style={{fontSize:18, fontWeight:'700'}}>Tên Bàn :</Text>
                 <Input containerStyle={{width: reponsivewidth(350)}} onChangeText={(text)=>{setName(text)}}>
@@ -207,7 +207,7 @@ const  SaveData =()=>{
       </View>
       </View>
       </Overlay>
-    </View>
+    </SafeAreaView>
      
     )
 }

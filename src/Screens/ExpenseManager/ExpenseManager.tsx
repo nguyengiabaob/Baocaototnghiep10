@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import {reponsiveheight, reponsivewidth} from '../../theme/Metric';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -217,7 +217,7 @@ export const ExpenseManagerScreen: React.FC<props> = ({navigation}: props) => {
     }
   }, [DelArray.length]);
   return (
-    <View style={style.container}>
+    <SafeAreaView style={style.container}>
       <View>
         {showmodeldate && (
           <DateTimePicker
@@ -1119,7 +1119,7 @@ export const ExpenseManagerScreen: React.FC<props> = ({navigation}: props) => {
           </TouchableOpacity>
         </View>
       </Overlay>
-    </View>
+    </SafeAreaView>
   );
 };
 const style = StyleSheet.create({

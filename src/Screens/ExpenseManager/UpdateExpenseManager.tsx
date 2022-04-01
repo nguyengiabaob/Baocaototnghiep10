@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useState } from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { reponsiveheight, reponsivewidth } from "../../theme/Metric";
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import BellNofi from '../../asset/svg/bellnotification.svg';
@@ -74,7 +74,7 @@ export const UpdateExpenseManager: React.FC<props>=({route})=>{
         }
     }
     return (
-        <View>
+        <SafeAreaView>
               <View style={style.containerfiled}>
               <View style={{flexDirection:'row',alignItems:'center',marginBottom:15,borderColor:'#606060', borderWidth:1, width:reponsivewidth(150), backgroundColor:'#fbfbfb', borderRadius:5, marginTop:15}}>
                 <EvilIcons name="calendar" size={32}/>
@@ -109,7 +109,7 @@ export const UpdateExpenseManager: React.FC<props>=({route})=>{
             </View>
             <CustomNotification visible={AddSuccess} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} title="Thông báo"  onCancel={()=>setAddSuccess(false) } Content="Bạn đã cập nhật thành công !"/>
            <CustomNotification visible= {AddError}  iconTitle={<Warning width={reponsivewidth(30)} height={reponsiveheight(30)}/>} title="Thông báo"  onCancel={()=>setAddError(false) } Content="Xin vui lòng nhập lại" />
-        </View>
+        </SafeAreaView>
     )
 }
 const style= StyleSheet.create({

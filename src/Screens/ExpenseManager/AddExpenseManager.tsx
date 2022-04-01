@@ -2,6 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {
+  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
@@ -14,7 +15,13 @@ import BellNofi from '../../asset/svg/bellnotification.svg';
 import Warning from '../../asset/svg/Warning.svg';
 import {CustomNotification} from '../../Model/CustomNofication';
 import data from '../../services/data';
-export const AddExpenseManager: React.FC = () => {
+import { StackNavigationProp } from '@react-navigation/stack';
+import { ExpenseParamList } from '../../navigation/types';
+type props ={
+  navigation: StackNavigationProp<ExpenseParamList, 'AddExpenseScreen'>
+}
+export const AddExpenseManager: React.FC<props> = ({navigation}) => {
+  
   const [ExpenseName, setExpenseName] = useState<string>('');
   const [ExpenseContent, setExpenseContent] = useState<string>('');
   const [ExpenseTotal, setExpenseTotal] = useState<number>(0);
@@ -48,12 +55,13 @@ export const AddExpenseManager: React.FC = () => {
         .then(res => {
           if (res === true) {
             setAddSuccess(true);
+            navigation.goBack();
           }
         });
     }
   };
   return (
-    <View>
+    <SafeAreaView>
       <View style={style.containerfiled}>
         <View
           style={{
@@ -177,7 +185,7 @@ export const AddExpenseManager: React.FC = () => {
         onCancel={() => setAddError(false)}
         Content="Xin vui lòng nhập lại"
       />
-    </View>
+    </SafeAreaView>
   );
 };
 const style = StyleSheet.create({

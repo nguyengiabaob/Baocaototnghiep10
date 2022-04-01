@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
-import { Text, TouchableOpacity, View,ScrollView } from 'react-native';
+import { Text, TouchableOpacity, View,ScrollView, SafeAreaView } from 'react-native';
 import CustomHeader from '../../Model/CustomHeader';
 import { RoomParamList } from '../../navigation/types';
 import { Input, Overlay, Tab, TabView} from 'react-native-elements';
@@ -51,12 +51,12 @@ const [visibleModaEdit, setvisibleModalEdit] = useState(false);
 const [IDArea, setIDArea] = useState<Area>();
 const [visibleHisTable, setvisibleHisTable]= useState<boolean>(false);
 const [visibleHisPaying, setvisibleHisPaying]= useState<boolean>(false);
-const [Reload, setReload]= useState<boolean>('false');
+const [Reload, setReload]= useState<boolean>(false);
 type propsModal={
   Visible: boolean,
 }
 useEffect(()=>{
-  database().ref().on('value',snapshot=>{
+  database().ref().on('value',()=>{
     setReload(prev => !prev);
   })
 },[])
@@ -310,7 +310,7 @@ const Deletetable = ()=>{
 //   ) 
 // }
 return (
-  <View style={{width:reponsivewidth(330), height: reponsiveheight(520)}}>
+  <SafeAreaView style={{width:reponsivewidth(330), height: reponsiveheight(520)}}>
   <View style={{justifyContent:'center', alignItems:'center',borderBottomColor:'#67bff3', borderBottomWidth:2}}>
   <Text style={{fontSize:16, paddingBottom:5, fontWeight:'700'}}>Bàn</Text>
 </View>
@@ -392,7 +392,7 @@ return (
 }
 </View>
 </Overlay>
-</View>
+</SafeAreaView>
 )
 }
 const ModalTable:React.FC = ()=>{
@@ -436,7 +436,7 @@ useEffect(()=>{
     }
   }
   return (
-    <View style={{width:reponsivewidth(320), height: reponsiveheight(450)}}>
+    <SafeAreaView style={{width:reponsivewidth(320), height: reponsiveheight(450)}}>
       <View style={{justifyContent:'center', alignItems:'center',borderBottomColor:'#67bff3', borderBottomWidth:2}}>
       <Text style={{fontSize:16, paddingBottom:5, fontWeight:'700'}}>Thêm Bàn</Text>
       </View>
@@ -507,7 +507,7 @@ useEffect(()=>{
       </View>
       </View>
       </Overlay>
-    </View>
+    </SafeAreaView>
   );
 };
 const ModalArea: React.FC = ()=>{
@@ -522,7 +522,7 @@ const ModalArea: React.FC = ()=>{
   }
 };
   return (
-    <View style={{width:reponsivewidth(320), height: reponsiveheight(300)}}>
+    <SafeAreaView style={{width:reponsivewidth(320), height: reponsiveheight(300)}}>
         <View style={{justifyContent:'center', alignItems:'center',borderBottomColor:'#67bff3', borderBottomWidth:2}}>
           <Text style={{fontSize:16, paddingBottom:5, fontWeight:'700'}}>Thêm Khu vực</Text>
       </View>
@@ -547,7 +547,7 @@ const ModalArea: React.FC = ()=>{
             </Text>
           </TouchableOpacity>
         </View>
-    </View>
+    </SafeAreaView>
   );
 };
 const ModalEditArea:React.FC =()=>{
@@ -569,7 +569,7 @@ const ModalEditArea:React.FC =()=>{
     };
     const [valueAreaName, setValueAreaName] = useState<string>('');
     return (
-      <View style={{justifyContent:'flex-start',flex:1, marginTop:25}}>
+      <SafeAreaView style={{justifyContent:'flex-start',flex:1, marginTop:25}}>
         {console.log('IDAREA', IDArea)}
       <View style={{marginLeft:15}} >
       <Text style={{fontSize:18, fontWeight:'700'}}>Tên Bàn :</Text>
@@ -596,11 +596,11 @@ const ModalEditArea:React.FC =()=>{
                   </Text>
                </TouchableOpacity>
               </View>
-  </View>
+  </SafeAreaView>
     )
   }
   return (
-    <View>
+    <SafeAreaView>
       <View style={{justifyContent:'center', alignItems:'center',borderBottomColor:'#67bff3', borderBottomWidth:2}}>
           <Text style={{fontSize:16, paddingBottom:5, fontWeight:'700'}}>Khu vực</Text>
       </View>
@@ -633,11 +633,11 @@ const ModalEditArea:React.FC =()=>{
           <ModalDetalEdit/>
           </View>
       </Overlay>
-    </View>
+    </SafeAreaView>
   )
 }
     return (
-        <>
+        <SafeAreaView>
             <CustomHeader title="Danh sách phòng bàn" onpress={()=>navigation.goBack()}/>
             <Tab indicatorStyle={{backgroundColor:'#67bff3'}}  value={index} onChange={setIndex}>
   <Tab.Item containerStyle={{backgroundColor: '#02569E' }} titleStyle={{color:'#fff',fontSize:14}}  title="Tất cả" />
@@ -737,7 +737,7 @@ const ModalEditArea:React.FC =()=>{
   <Overlay isVisible={visibleHisPaying}>
       <HistoryPaying getvisible={setvisibleHisPaying}/>
   </Overlay>
-</>
+</SafeAreaView>
 
     );
 

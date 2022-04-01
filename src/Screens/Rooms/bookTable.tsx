@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useCallback, useEffect, useState} from 'react';
-import {Pressable, TouchableOpacity, View} from 'react-native';
+import {Pressable, SafeAreaView, TouchableOpacity, View} from 'react-native';
 import {Text} from 'react-native-elements';
 import {TextInput} from 'react-native-paper';
 import IconbookTable from '../../asset/svg/booktable.svg';
@@ -91,7 +91,7 @@ export const BookTable: React.FC<props> = ({route}) => {
     console.log('slots', Slots);
   };
   return (
-    <View style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1}}>
       <View style={{marginTop: 25}}>
         <View
           style={{
@@ -220,6 +220,6 @@ export const BookTable: React.FC<props> = ({route}) => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };

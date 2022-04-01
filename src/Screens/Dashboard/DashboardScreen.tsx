@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import {RouteProp} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {Pressable, ScrollView, StyleSheet, Text} from 'react-native';
+import {Pressable, SafeAreaView, ScrollView, StyleSheet, Text} from 'react-native';
 import {View} from 'react-native';
 import Logoimg from '../../asset/svg/logo.svg';
 import Bell from '../../asset/svg/Bell_1.svg';
@@ -49,7 +49,7 @@ const DashboardScreen: React.FC<Props> = ({navigation, route}: Props) => {
     }
   }, [isLoggedGoogle, isLoggedIn, username]);
   return (
-    <View style={style.container}>
+    <SafeAreaView style={style.container}>
       <View style={style.Top}>
         <View>
           <Logoimg width={reponsivewidth(150)} height={reponsiveheight(150)} />
@@ -158,7 +158,7 @@ const DashboardScreen: React.FC<Props> = ({navigation, route}: Props) => {
           </View>
         </ScrollView>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 const style = StyleSheet.create({

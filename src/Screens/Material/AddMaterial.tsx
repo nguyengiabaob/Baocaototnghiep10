@@ -2,6 +2,7 @@
 import React, {useState} from 'react';
 import {
   Image,
+  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
@@ -152,7 +153,7 @@ const AddMaterial: React.FC<Props> = ({oncancel, onItemArray}: Props) => {
   //   }
   // }, [showAddUnit]);;
   return (
-    <View style={{width: getwidth(), height: getheight(), flex: 1}}>
+    <SafeAreaView style={{width: getwidth(), height: getheight(), flex: 1}}>
       <View
         style={{
           flexDirection: 'row',
@@ -527,7 +528,7 @@ const AddMaterial: React.FC<Props> = ({oncancel, onItemArray}: Props) => {
         onCancel={() => setshowError(false)}
         Content="Xin vui lòng nhập lại"
       />
-    </View>
+    </SafeAreaView>
   );
 };
 const style = StyleSheet.create({

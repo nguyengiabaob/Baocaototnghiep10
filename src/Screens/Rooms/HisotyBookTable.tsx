@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import {useIsFocused} from '@react-navigation/native';
 import React, {useCallback, useEffect, useState} from 'react';
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {SafeAreaView, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {Overlay, Text} from 'react-native-elements';
 import {ScrollView} from 'react-native-gesture-handler';
 import {TextInput} from 'react-native-paper';
@@ -211,7 +211,7 @@ export const HistoryBookTable: React.FC<props> = ({getvisible}) => {
       setTableSelected(undefined);
     }, []);
     return (
-      <View style={{flex: 1}}>
+      <SafeAreaView style={{flex: 1}}>
         <View style={{marginTop: -12}}>
           <View
             style={[
@@ -445,7 +445,7 @@ export const HistoryBookTable: React.FC<props> = ({getvisible}) => {
           onCancel={() => cancelModal()}
           Content="Cập nhật thành công !"
         />
-      </View>
+      </SafeAreaView>
     );
   };
   const onDelBookTable = () => {

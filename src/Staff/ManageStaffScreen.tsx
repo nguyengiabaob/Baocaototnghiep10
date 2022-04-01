@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {SafeAreaView, StyleSheet, View} from 'react-native';
 import CustomBox from '../Model/CustomBox';
 import CustomBoxItem from '../Model/CustomBoxItem';
 // import ManageRequest from '../asset/svg/signing.svg';
@@ -17,13 +17,14 @@ import {ManageEmployeePramaList} from '../navigation/types';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useSelector} from 'react-redux';
 import {selectAuth} from '../redux/reducer/authslice';
+import { useAppSelector } from '../redux/hook';
 type props = {
   navigation: StackNavigationProp<ManageEmployeePramaList, 'MainScreen'>;
 };
 const ManageStaffScreen: React.FC<props> = ({navigation}: props) => {
   const {typeUser, userName} = useSelector(selectAuth);
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <CustomHeader
         title="Quản lý nhân sự"
         onpress={() => navigation.goBack()}
@@ -39,6 +40,12 @@ const ManageStaffScreen: React.FC<props> = ({navigation}: props) => {
           />
 
           {/* <CustomBoxItem Avatarimg={<ManageRequest width={reponsivewidth(50)} height={reponsiveheight(50)}/>} title="Quản lý yêu cầu" isBadge={true} BadgeSucess={30} BadgeDontRead={50} BadgeUnAccept={5}/> */}
+         
+
+         
+          {
+            // Phân quyền admin
+          typeUser ==0 && 
           <CustomBoxItem
             Style={{marginTop: 25}}
             onPress={() => {
@@ -52,6 +59,8 @@ const ManageStaffScreen: React.FC<props> = ({navigation}: props) => {
             }
             title="Chấm công"
           />
+          }
+          {
           <CustomBoxItem
             Style={{marginTop: 25}}
             onPress={() => {
@@ -65,6 +74,7 @@ const ManageStaffScreen: React.FC<props> = ({navigation}: props) => {
             }
             title="Lịch công trong tuần "
           />
+        }
           {/* <CustomBoxItem Avatarimg={<Assign  width={reponsivewidth(50)} height={reponsiveheight(50)} />} title="Phân công"/> */}
           <CustomBoxItem
             Style={{marginTop: 25}}
@@ -94,7 +104,7 @@ const ManageStaffScreen: React.FC<props> = ({navigation}: props) => {
           />
         </ScrollView>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 export default ManageStaffScreen;

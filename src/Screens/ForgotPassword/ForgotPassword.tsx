@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState }  from "react";
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { CustomNotification } from "../../Model/CustomNofication";
 import { getheight, getwidth, reponsiveheight, reponsivewidth } from '../../theme/Metric';
 import BellNofi from '../../asset/svg/bellnotification.svg';
@@ -95,7 +95,7 @@ export const ForgotPassword:React.FC<Props> =({navigation})=>{
         <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{flex: 1}}>
-        <View style={style.containter}>
+        <SafeAreaView style={style.containter}>
           <View style={style.container_logo}>
             <Logoimg width={reponsivewidth(150)} height={reponsiveheight(150)}/>
            </View>
@@ -115,7 +115,7 @@ export const ForgotPassword:React.FC<Props> =({navigation})=>{
                <ButtonGoogle/>
              </View> */}
              {/* <CustomHyperLink style={{marginTop:10}} title="Đăng ký tài khoản mới"/> */}
-             </View>
+             </SafeAreaView>
              <CustomNotification visible={visible} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} title="Thông báo"  onCancel={()=>{setvisible(false);navigation.goBack();}} Content="Mật khẩu được gửi tới mail của bạn !"/>
         </KeyboardAvoidingView>
     )

@@ -3,7 +3,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import Logoimg from '../../asset/svg/logo.svg';
-import {Image, ImageBackground, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {Image, ImageBackground, KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import Toast from 'react-native-toast-message';
 import { getheight, getwidth, reponsiveheight, reponsivewidth } from '../../theme/Metric';
 import { useState } from 'react';
@@ -14,7 +14,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import {  LoginstackParamList } from '../../navigation/types';
 import { Userdata } from '../../Model/User';
 import Feather from 'react-native-vector-icons/Feather';
-import { selectAuth, SigIn, testfunction } from '../../redux/reducer/authslice';
+import { selectAuth, SigIn } from '../../redux/reducer/authslice';
 import { useDispatch } from 'react-redux';
 import { useAppDispatch, useAppSelector } from '../../redux/hook';
 import CustomInput from '../../Model/CustomInput';
@@ -113,7 +113,7 @@ const LoginScreen: React.FC<Props> = ({navigation}:Props) => {
     <KeyboardAvoidingView
     behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     style={{flex: 1}}>
-    <View style={style.containter}>
+    <SafeAreaView style={style.containter}>
       <View style={style.container_logo}>
         <Logoimg width={reponsivewidth(350)} height={reponsiveheight(350)}/>
        </View>
@@ -123,9 +123,9 @@ const LoginScreen: React.FC<Props> = ({navigation}:Props) => {
          <View>
            <CustomInput title="Password" icon={<Feather size={20} name="lock"/>} onchange={text=>setpassword(text)} secureTextEntry={hiddenPassword ? true : false} iconRight={hiddenPassword ? <Feather onPress={()=>showPassword()} name="eye-off" size={20}/> : <Feather onPress={()=>showPassword()}  name="eye" size={20}/>} />
          </View>
-         <View style={{alignSelf:'flex-end', marginRight:15}}>
+         {/* <View style={{alignSelf:'flex-end', marginRight:15}}>
            <CustomHyperLink onPress={()=>{navigation.navigate('ForgotPasswordSceen')}} title="Bạn quên mật khẩu ?"/>
-         </View>
+         </View> */}
          <View style={style.view_btndangnhap}>
            <TouchableOpacity onPress ={()=>onLogin(user, pass)}><Text style={{fontSize:18,color:'#FFFFFFFF',backgroundColor:'#3c72c3'}}>{'Đăng nhập'}</Text></TouchableOpacity>
          </View>
@@ -134,8 +134,9 @@ const LoginScreen: React.FC<Props> = ({navigation}:Props) => {
            <ButtonFacebook style={{marginRight:15}}/>
            <ButtonGoogle/>
          </View> */}
-         <CustomHyperLink onPress={()=>{navigation.navigate('RegisterScreen')}} style={{marginTop:10}} title="Đăng ký tài khoản mới"/>
-         </View>
+         {/* <CustomHyperLink onPress={()=>{navigation.navigate('RegisterScreen')}} style={{marginTop:10}} title="Đăng ký tài khoản mới"/> */}
+         <CustomHyperLink onPress={()=>{navigation.navigate('ForgotPasswordSceen')}} title="Bạn quên mật khẩu ?"/>
+         </SafeAreaView>
     </KeyboardAvoidingView>
   );
 };

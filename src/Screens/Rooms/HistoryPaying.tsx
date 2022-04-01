@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useState } from 'react';
-import { TouchableOpacity, View,ScrollView, StyleSheet } from 'react-native';
+import { TouchableOpacity, View,ScrollView, StyleSheet, SafeAreaView } from 'react-native';
 import { Text } from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import data from '../../services/data';
@@ -11,6 +11,8 @@ import { CustomNotificationDel } from '../../Model/CustomNoficationDel';
 import BellNofi from '../../asset/svg/bellnotification.svg';
 import DataService from '../../services/dataservice';
 import database from '@react-native-firebase/database';
+import CustomHyperLink from '../../Model/CustomHyperLink';
+import HistoryPayingDetail from './HistoryPayingDetail';
 type props ={
     getvisible: (data: any)=>void
 }
@@ -20,6 +22,8 @@ export const HistoryPaying: React.FC<props>= ({getvisible})=> {
     const [visbleModalDel,setvisibleModalDel]=useState<boolean>(false);
     const [itemSelected,setitemSelectedl]=useState<any>();
     const [reload,setReload]= useState<boolean>(false);
+    const [detail, setDetail]= useState<boolean>(false);
+    const [idclick, setidclick]= useState<any>();
     const tranferday = (d:string)=>{
         var month = new Date(d).getMonth() + 1;
         var date = new Date(d).getDate();
@@ -27,7 +31,7 @@ export const HistoryPaying: React.FC<props>= ({getvisible})=> {
        return date + '/' + month + '/' + year;
     };
     useEffect(()=>{
-        database().ref().on('child-changed', ()=>{
+        database().ref().on('child_changed', ()=>{
             setReload(prev=>!prev) 
         })
     })
@@ -115,7 +119,7 @@ const onDelPaying= async()=>{
     // })
 }
     return (
-            <View style={{width:getwidth(), height:getheight(),flex:1, marginTop:-9.5}}>
+            <SafeAreaView style={{width:getwidth(), height:getheight(),flex:1, marginTop:-9.5}}>
                 <View style={[{flexDirection:'row', justifyContent:'flex-start',padding:18, backgroundColor:'#67bff3', borderColor:'#e5e5e5', borderWidth:2}]}>
                 <View style={{alignSelf:'flex-start', justifyContent:'flex-start', width:reponsivewidth(50)}}>
                 <TouchableOpacity onPress={()=>getvisible(false)}>
@@ -125,7 +129,7 @@ const onDelPaying= async()=>{
                 <Text style={{alignSelf:'center',fontSize:17, width:reponsivewidth(300), textAlign:'left', color:'#FFFF', fontWeight:'700'}}>Lịch sử thanh toán</Text>
                 </View>
                 <ScrollView>
-                {console.log(datapaying.length > 0)}
+                {/* {console.log(datapaying.length > 0)} */}
                 {datapaying.length > 0 && datapaying.map(item=>{
                     return (
                 <View style={[ styles.Shadowbox ,{justifyContent:'center',alignItems:'center',width: reponsivewidth(350),alignSelf:'center', paddingRight:25, marginLeft:15, paddingTop:15, paddingBottom:20, marginTop:15, height:reponsiveheight(180),borderLeftColor: item.Status === 1 ? '#3ca739' : '#eb792d', borderLeftWidth:10, borderRadius:5, }]}>
@@ -157,6 +161,9 @@ const onDelPaying= async()=>{
                         <MaterialCommunityIcons size={32} name="delete" color={'#999999'}/>
                      </TouchableOpacity>
                  </View>
+                 <View>
+                    <CustomHyperLink onPress={()=>{ setDetail(true); setidclick(item.id) }}/>
+                </View>
                  </View>
                 </View>
 
@@ -166,7 +173,8 @@ const onDelPaying= async()=>{
                     } 
                 </ScrollView>
                 <CustomNotificationDel visible={visbleModalDel} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} Content={"Bạn có thực sự muốn xóa hóa đơn này không"} title="Thông báo"  onCancel={()=>setvisibleModalDel(false)} onAction={onDelPaying}/>
-            </View>
+                <HistoryPayingDetail  visible={detail} idBill={idclick} onCancel={setDetail}/>
+            </SafeAreaView>
         )
 }
 const styles = StyleSheet.create({
