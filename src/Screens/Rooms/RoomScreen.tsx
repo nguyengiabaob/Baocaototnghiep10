@@ -29,6 +29,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Warning from '../../asset/svg/Warning.svg';
 import DataService from '../../services/dataservice';
 import database from '@react-native-firebase/database';
+import Loading from '../../Helper/Loader/Loading';
 type props ={
     navigation: StackNavigationProp<RoomParamList,'RoomScreen'>
 }
@@ -52,14 +53,16 @@ const [IDArea, setIDArea] = useState<Area>();
 const [visibleHisTable, setvisibleHisTable]= useState<boolean>(false);
 const [visibleHisPaying, setvisibleHisPaying]= useState<boolean>(false);
 const [Reload, setReload]= useState<boolean>(false);
+const [loading, setloading]= useState<boolean>(false);
 type propsModal={
   Visible: boolean,
 }
 useEffect(()=>{
   database().ref().on('value',()=>{
     setReload(prev => !prev);
-  })
-},[])
+
+  });
+},[]);
 const DataArea1 =async ()=>{
 //     let datarray :any[] = [];
 //     data.getdata('Area').then(res=> {for ( let key in res)
@@ -78,7 +81,7 @@ const DataArea1 =async ()=>{
 // });
   let dta = await DataService.Getdata_dtService<any>('Area');
   setdataArea1(dta);
-}
+};
 const DataTable =async()=>{
     let datarray = await DataService.Getdata_dtService<any>('Table');
     let datarraytable = await DataService.Getdata_dtService<any>('BookTable');
@@ -115,14 +118,14 @@ const DataTable =async()=>{
           item.Status= 1;
           data.UpdateTable(item.Name,item.id,item.Type, item.Slots,item.Status).then(res=>{if(res=== true){
             console.log("update");
-          }})
+          }});
         }
-      })
-    })
+      });
+    });
     setdataTable(datarray);
 // });
 // })
-}
+};
 // useEffect(()=>{
 //   let time =setTimeout(DataTable(),9000);
 //   clearTimeout(time);
@@ -137,9 +140,15 @@ useEffect(()=>{
 useEffect(()=>{
   if (isFocused === true || Reload == false || Reload == true)
   {
+    setloading(true);
+    Promise.all<any>(
+      [DataArea1(), DataTable()]
+    ).then(
+      ()=>{
+        setloading(false);
+      }
+    );
 
-   DataArea1();
-   DataTable();
   }
 },[isFocused,Reload]);
 
@@ -161,16 +170,16 @@ const DetalArea = ()=>{
   {
    AreaDeleted.forEach(item=>{
      data.DeleteArea(item.id);
-   })
+   });
 }
-}
+};
 type props ={
   Visible: boolean
 
 }
 
 const NotificationDel: React.FC <props> = ({Visible}: props)=>{
- 
+
   return (
     <View>
 
@@ -193,7 +202,7 @@ const NotificationDel: React.FC <props> = ({Visible}: props)=>{
             // }
             if ( visibleModaAreaDel === true)
             {
-  
+
               DetalArea();
               setvisiblenotification(false);
               setvisibleModalAreaDel(false);
@@ -204,18 +213,18 @@ const NotificationDel: React.FC <props> = ({Visible}: props)=>{
               Xác nhận
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={()=>{setvisibleModalAreaDel( false); setvisible(false)}}   style={{ backgroundColor:'#226cb3',padding:10, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4}}>
+          <TouchableOpacity onPress={()=>{setvisibleModalAreaDel( false); setvisible(false);}}   style={{ backgroundColor:'#226cb3',padding:10, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4}}>
             <Text style={{color:'#FFFF'}}>
               Thoát
             </Text>
           </TouchableOpacity>
         </View>
     </View>
-  
+
 }
 </View>
-  ) 
-}
+  );
+};
   return (
 
     <View style={{width:reponsivewidth(330), height: reponsiveheight(520)}}>
@@ -228,7 +237,7 @@ const NotificationDel: React.FC <props> = ({Visible}: props)=>{
                dataArea1. map(item=>{
                 const pressedbox = AreaDeleted.includes(item);
                  return (
-                  <TouchableOpacity  key={item.id} onPress={()=>{onPress(item,pressedbox)}}    style={{ width:reponsivewidth(315) ,flexDirection:'row',borderColor:'#c1bbbb', borderWidth:0.6, marginTop:15, marginLeft:10, height:reponsiveheight(90), justifyContent:'center', alignItems:'center' ,borderRadius:4}}>
+                  <TouchableOpacity  key={item.id} onPress={()=>{onPress(item,pressedbox);}}    style={{ width:reponsivewidth(315) ,flexDirection:'row',borderColor:'#c1bbbb', borderWidth:0.6, marginTop:15, marginLeft:10, height:reponsiveheight(90), justifyContent:'center', alignItems:'center' ,borderRadius:4}}>
                   <CustomBox  stylecontainet={{padding:5, width:reponsiveheight(240)}} pressed={pressedbox}  isAvatar={false} title={item.Name}  />
                  </TouchableOpacity>
                  );
@@ -243,22 +252,22 @@ const NotificationDel: React.FC <props> = ({Visible}: props)=>{
           <TouchableOpacity onPress={()=>{
             let a = false;
             AreaDeleted.forEach(item=> {
-              let tables = dataTable.filter(i=> i.Type === item.id )
+              let tables = dataTable.filter(i=> i.Type === item.id );
               if (tables.length > 0 )
                 { setcheckArea(true);
-                  a =true;
+                  a = true;
                   return;
                 }
 
-            })
-            if(a ===false)
+            });
+            if (a === false)
               setvisiblenotification(true);
           }} style={{ backgroundColor:'#226cb3',padding:10, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4,marginRight:40}}>
             <Text style={{color:'#FFFF'}}>
               Xóa
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={()=>{setAreaDeleted([]); setvisibleModalAreaDel( false); setvisible(false)}}   style={{ backgroundColor:'#226cb3',padding:10, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4}}>
+          <TouchableOpacity onPress={()=>{setAreaDeleted([]); setvisibleModalAreaDel( false); setvisible(false);}}   style={{ backgroundColor:'#226cb3',padding:10, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4}}>
             <Text style={{color:'#FFFF'}}>
               Thoát
             </Text>
@@ -283,19 +292,19 @@ const DelTable: React.FC =()=>{
     }
     else
     {
-      console.log('array', [...TableDeleted, item])
+      console.log('array', [...TableDeleted, item]);
         await setTableDeleted([...TableDeleted, item]);
     }
-    
+
 };
 const Deletetable = ()=>{
   console.log('tab',TableDeleted);
   if (TableDeleted.length>0)
   {
-   
+
    TableDeleted.forEach(item=>{
      data.deletedData('Table',item.id);
-   })
+   });
 }
 };
 // type props ={
@@ -304,10 +313,10 @@ const Deletetable = ()=>{
 // }
 
 // const NotificationDel: React.FC <props> = ({Visible,table}: props)=>{
- 
+
 //   return (
-   
-//   ) 
+
+//   )
 // }
 return (
   <SafeAreaView style={{width:reponsivewidth(330), height: reponsiveheight(520)}}>
@@ -320,7 +329,7 @@ return (
        dataTable. map(item=>{
         const pressedbox = TableDeleted.includes(item);
          return (
-          <TouchableOpacity  key={item.id} onPress={async()=>{await onPress(item,pressedbox)}}    style={{ width:reponsivewidth(315) ,flexDirection:'row',borderColor:'#c1bbbb', borderWidth:0.6, marginTop:15, marginLeft:10, height:reponsiveheight(90), justifyContent:'center', alignItems:'center' ,borderRadius:4}}>
+          <TouchableOpacity  key={item.id} onPress={async()=>{await onPress(item,pressedbox);}}    style={{ width:reponsivewidth(315) ,flexDirection:'row',borderColor:'#c1bbbb', borderWidth:0.6, marginTop:15, marginLeft:10, height:reponsiveheight(90), justifyContent:'center', alignItems:'center' ,borderRadius:4}}>
           <CustomBox  stylecontainet={{padding:5, width:reponsiveheight(240)}} pressed={pressedbox}  isAvatar={false} title={item.Name}  />
          </TouchableOpacity>
          );
@@ -328,20 +337,20 @@ return (
       }
   </ScrollView>
 </View>
-  
+
 <View style={{flexDirection:'row',alignItems:'flex-end', justifyContent:'flex-end', marginRight:5}}>
   <Text>Đã chọn </Text><Text style={{fontWeight:'700', marginLeft:5}}>{TableDeleted.length}</Text>
 </View>
 <View style={{flexDirection:'row',marginTop:20,alignItems:'center',justifyContent:'center'}}>
   <TouchableOpacity onPress={()=>{
     setvisiblenotification(true);
-    
+
   }} style={{ backgroundColor:'#226cb3',padding:10, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4,marginRight:40}}>
     <Text style={{color:'#FFFF'}}>
       Xóa
     </Text>
   </TouchableOpacity>
-  <TouchableOpacity onPress={()=>{setvisibleModalTableDel( false); setvisible(false)}}   style={{ backgroundColor:'#226cb3',padding:10, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4}}>
+  <TouchableOpacity onPress={()=>{setvisibleModalTableDel( false); setvisible(false);}}   style={{ backgroundColor:'#226cb3',padding:10, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4}}>
     <Text style={{color:'#FFFF'}}>
       Thoát
     </Text>
@@ -381,7 +390,7 @@ return (
           Xác nhận
         </Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={()=>{setvisibleModalAreaDel( false); setvisible(false)}}   style={{ backgroundColor:'#226cb3',padding:10, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4}}>
+      <TouchableOpacity onPress={()=>{setvisibleModalAreaDel( false); setvisible(false);}}   style={{ backgroundColor:'#226cb3',padding:10, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4}}>
         <Text style={{color:'#FFFF'}}>
           Thoát
         </Text>
@@ -393,8 +402,8 @@ return (
 </View>
 </Overlay>
 </SafeAreaView>
-)
-}
+);
+};
 const ModalTable:React.FC = ()=>{
   const [dataArea, setdataArea]= useState<Area[]>([]);
   const [AreaSelected, setAreaSelected]= useState<Area>();
@@ -421,7 +430,7 @@ useEffect(()=>{
   const ChoosenArea = (item: Area)=>{
     setTimeout(()=>setAreaSelected(item),10);
     setTimeout(()=>setvisibleTable(false),10);
-  }
+  };
   const [visibleTable, setvisibleTable] = useState<boolean>(false);
   const [nameTable, setnameTable] = useState<string>('');
   const [TableSlots, setTableSlots] = useState<number>(0);
@@ -434,7 +443,7 @@ useEffect(()=>{
         console.log('Posted Table');
       }});
     }
-  }
+  };
   return (
     <SafeAreaView style={{width:reponsivewidth(320), height: reponsiveheight(450)}}>
       <View style={{justifyContent:'center', alignItems:'center',borderBottomColor:'#67bff3', borderBottomWidth:2}}>
@@ -462,7 +471,7 @@ useEffect(()=>{
                 </View>
             </View>
         :
-        <TouchableOpacity onPress={()=>{setvisibleTable(true)}} style={{marginTop:20, alignItems:'center', backgroundColor:'#c5c2c2', width:reponsivewidth(310),alignSelf:'center',padding:10}}>
+        <TouchableOpacity onPress={()=>{setvisibleTable(true);}} style={{marginTop:20, alignItems:'center', backgroundColor:'#c5c2c2', width:reponsivewidth(310),alignSelf:'center',padding:10}}>
           <Text>Chọn khu vực</Text>
         </TouchableOpacity>
         }
@@ -476,7 +485,7 @@ useEffect(()=>{
               Thêm
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={()=>{setvisibleModaltable(false),setvisible(false)}}  style={{ backgroundColor:'#226cb3',padding:10, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4}}>
+          <TouchableOpacity onPress={()=>{setvisibleModaltable(false),setvisible(false);}}  style={{ backgroundColor:'#226cb3',padding:10, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4}}>
             <Text style={{color:'#FFFF'}}>
               Thoát
             </Text>
@@ -494,7 +503,7 @@ useEffect(()=>{
           {
             dataArea.map(item=>{
               return (
-                <TouchableOpacity key={item.id} onPress={()=>{ChoosenArea(item)}} style={{width:reponsivewidth(320), alignSelf:'center'}}>
+                <TouchableOpacity key={item.id} onPress={()=>{ChoosenArea(item);}} style={{width:reponsivewidth(320), alignSelf:'center'}}>
                      <CustomBoxItem Style={{backgroundColor:'#e3e2e287',borderColor:'#6666667d', borderWidth:0.45, borderRadius:0}} title={item.Name}/>
                 </TouchableOpacity>
               );
@@ -503,7 +512,7 @@ useEffect(()=>{
         </ScrollView>
       </View>
       <View style={{alignItems:'center', marginTop:25}}>
-          <TouchableOpacity onPress={()=>{setvisibleTable(false)}} style={{ backgroundColor:'#226cb3',padding:5, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4}} ><Text style={{color:'#FFFF'}}>Thoát</Text></TouchableOpacity>
+          <TouchableOpacity onPress={()=>{setvisibleTable(false);}} style={{ backgroundColor:'#226cb3',padding:5, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4}} ><Text style={{color:'#FFFF'}}>Thoát</Text></TouchableOpacity>
       </View>
       </View>
       </Overlay>
@@ -517,7 +526,7 @@ const ModalArea: React.FC = ()=>{
   {
   data.postArea(nameArea).then(res=> {
     if (res === true)
-    { console.log('posted Area')}
+    { console.log('posted Area');}
   });
   }
 };
@@ -541,7 +550,7 @@ const ModalArea: React.FC = ()=>{
               Thêm
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={()=>{setvisibleModalArea( false); setvisible(false)}}   style={{ backgroundColor:'#226cb3',padding:10, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4}}>
+          <TouchableOpacity onPress={()=>{setvisibleModalArea( false); setvisible(false);}}   style={{ backgroundColor:'#226cb3',padding:10, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4}}>
             <Text style={{color:'#FFFF'}}>
               Thoát
             </Text>
@@ -555,7 +564,7 @@ const ModalEditArea:React.FC =()=>{
     const SaveArea= (id :string)=>{
       if ( IDArea !== undefined)
       {
-        
+
         data.UpdateArea(valueAreaName === '' ? IDArea.Name : valueAreaName, id).then(res=> {if ( res === true){
           console.log('Update Area');
         }});
@@ -590,15 +599,15 @@ const ModalEditArea:React.FC =()=>{
                       Lưu
                   </Text>
                </TouchableOpacity>
-               <TouchableOpacity onPress={()=>{setvisibleModalDetail(false)}}  style={{ backgroundColor:'#226cb3',padding:10, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4}}>
+               <TouchableOpacity onPress={()=>{setvisibleModalDetail(false);}}  style={{ backgroundColor:'#226cb3',padding:10, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4}}>
                    <Text style={{color:'#FFFF'}}>
                       Thoát
                   </Text>
                </TouchableOpacity>
               </View>
   </SafeAreaView>
-    )
-  }
+    );
+  };
   return (
     <SafeAreaView>
       <View style={{justifyContent:'center', alignItems:'center',borderBottomColor:'#67bff3', borderBottomWidth:2}}>
@@ -609,7 +618,7 @@ const ModalEditArea:React.FC =()=>{
           {
             dataArea1.map(item=>{
               return (
-                <TouchableOpacity key={item.id} onPress={async()=>{ await setIDArea(item); setvisibleModalDetail(true)}} style={{width:reponsivewidth(340), alignSelf:'center', flexDirection:'row', alignItems:'center', justifyContent:'center'}}>
+                <TouchableOpacity key={item.id} onPress={async()=>{ await setIDArea(item); setvisibleModalDetail(true);}} style={{width:reponsivewidth(340), alignSelf:'center', flexDirection:'row', alignItems:'center', justifyContent:'center'}}>
                      <CustomBoxItem Style={{backgroundColor:'#e3e2e287',borderColor:'#6666667d', borderWidth:0.45, borderRadius:0, width:reponsivewidth(280)}} title={item.Name}/>
                      <View style={{justifyContent:'center', alignItems:'center'}} >
                        <AntDesign name="edit"  size={28}/>
@@ -621,12 +630,12 @@ const ModalEditArea:React.FC =()=>{
         </ScrollView>
       </View>
       <View style={{marginTop:65, justifyContent:'center', alignItems:'center'}}>
-                <TouchableOpacity onPress={()=>{setvisibleModalEdit(false); setvisible(false)}}  style={{ backgroundColor:'#226cb3',padding:10, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4}}>
+                <TouchableOpacity onPress={()=>{setvisibleModalEdit(false); setvisible(false);}}  style={{ backgroundColor:'#226cb3',padding:10, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4}}>
                  <Text style={{color:'#FFFF'}}>
                     Thoát
                 </Text>
              </TouchableOpacity>
-      
+
       </View>
       <Overlay  isVisible={visibleModalDetail}>
           <View style={{width:reponsivewidth(320), height: reponsiveheight(300)}}>
@@ -634,11 +643,11 @@ const ModalEditArea:React.FC =()=>{
           </View>
       </Overlay>
     </SafeAreaView>
-  )
-}
+  );
+};
     return (
-        <SafeAreaView>
-            <CustomHeader title="Danh sách phòng bàn" onpress={()=>navigation.goBack()}/>
+        <SafeAreaView style={{flex:1}}>
+            <CustomHeader viewContainer={{marginBottom:5}} title="Danh sách phòng bàn" onpress={()=>navigation.goBack()}/>
             <Tab indicatorStyle={{backgroundColor:'#67bff3'}}  value={index} onChange={setIndex}>
   <Tab.Item containerStyle={{backgroundColor: '#02569E' }} titleStyle={{color:'#fff',fontSize:14}}  title="Tất cả" />
   <Tab.Item containerStyle={{backgroundColor: '#02569E' }} titleStyle={{color:'#fff',fontSize:14}}  title="Sử dụng" />
@@ -660,7 +669,7 @@ const ModalEditArea:React.FC =()=>{
   isOpen={openhistory}
   icon={<MaterialCommunityIcons name="note-multiple-outline" size={25} color={'#FFFF'}/>}
   openIcon={{ name: 'close', color: '#fff' }}
-  onOpen={() => {setOpenHistory(!openhistory); setOpen(false)}}
+  onOpen={() => {setOpenHistory(!openhistory); setOpen(false);}}
   onClose={() => setOpenHistory(!openhistory)}
   transitionDuration={30}
 >
@@ -669,13 +678,13 @@ const ModalEditArea:React.FC =()=>{
     color={'#02569E'}
     icon={<AntDesign name="profile" size={22} color={'#FFFF'}/>}
     title="Lịch sử đặt bàn"
-    onPress={()=>{setvisibleHisTable(true)}}
+    onPress={()=>{setvisibleHisTable(true);}}
   />
    <SpeedDial.Action
     color={'#02569E'}
     icon={<FontAwesome5 name="money-check-alt" size={22} color={'#FFFF'}/>}
     title="Lịch sử thanh toán"
-    onPress={()=>{setvisibleHisPaying(true)}}
+    onPress={()=>{setvisibleHisPaying(true);}}
   />
 </SpeedDial>
  <SpeedDial
@@ -683,7 +692,7 @@ const ModalEditArea:React.FC =()=>{
   isOpen={open}
   icon={{ name: 'edit', color: '#fff' }}
   openIcon={{ name: 'close', color: '#fff' }}
-  onOpen={() => {setOpen(!open); setOpenHistory(false)}}
+  onOpen={() => {setOpen(!open); setOpenHistory(false);}}
   onClose={() => setOpen(!open)}
   transitionDuration={30}
 >
@@ -691,13 +700,13 @@ const ModalEditArea:React.FC =()=>{
     color={'#02569E'}
     icon={{ name: 'add', color: '#FFFF' }}
     title="Thêm bàn"
-    onPress={() =>{setvisible(true), setvisibleModaltable( true) } }
+    onPress={() =>{setvisible(true), setvisibleModaltable( true); } }
   />
   <SpeedDial.Action
     color={'#02569E'}
     icon={<MaterialIcons name="add-business" size={25} color={'#FFFF'}/>}
     title="Thêm khu vực"
-    onPress={()=>{setvisible(true); setvisibleModalArea( true)}  }
+    onPress={()=>{setvisible(true); setvisibleModalArea( true);}  }
   />
   <SpeedDial.Action
     color={'#02569E'}
@@ -709,13 +718,13 @@ const ModalEditArea:React.FC =()=>{
     color={'#02569E'}
     icon={<MaterialCommunityIcons name="table-remove" size={25} color={'#FFFF'}/>}
     title="Xóa bàn"
-    onPress={()=>{setvisible(true); setvisibleModalTableDel( true)}  }
+    onPress={()=>{setvisible(true); setvisibleModalTableDel( true);}  }
   />
    <SpeedDial.Action
     color={'#02569E'}
     icon={<MaterialCommunityIcons name="table-remove" size={25} color={'#FFFF'}/>}
     title="Chỉnh sửa Khu vực"
-    onPress={()=>{setvisible(true); setvisibleModalEdit( true)}  }
+    onPress={()=>{setvisible(true); setvisibleModalEdit( true);}  }
   />
 </SpeedDial>
   <Overlay isVisible={visible}>
@@ -727,7 +736,7 @@ const ModalEditArea:React.FC =()=>{
        <ModalAreaDeleted/>
        : visibleModaATableDel === true  ?
        <DelTable/>
-       : visibleModaEdit === true ? 
+       : visibleModaEdit === true ?
        <ModalEditArea/> : undefined
    }
   </Overlay>
@@ -737,7 +746,8 @@ const ModalEditArea:React.FC =()=>{
   <Overlay isVisible={visibleHisPaying}>
       <HistoryPaying getvisible={setvisibleHisPaying}/>
   </Overlay>
-</SafeAreaView>
+  <Loading visible={loading}/>
+  </SafeAreaView>
 
     );
 

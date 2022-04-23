@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  TextInput
 } from 'react-native';
 import {View} from 'react-native';
 import {ListproductNavigationPramaList} from '../../navigation/types';
@@ -30,6 +31,7 @@ import {
   Button,
   Checkbox,
   Dialog,
+  Modal,
   Paragraph,
   Portal,
   Provider,
@@ -39,7 +41,6 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {SearchBar} from 'react-native-elements';
 import {Overlay} from 'react-native-elements/dist/overlay/Overlay';
-import {TextInput} from 'react-native-gesture-handler';
 import {CustomNotification} from '../../Model/CustomNofication';
 import BellNofi from '../../asset/svg/bellnotification.svg';
 import Warning from '../../asset/svg/Warning.svg';
@@ -49,6 +50,11 @@ import {ModelDelete} from '../../Model/ModelDelete';
 import {useIsFocused} from '@react-navigation/native';
 import DataService from '../../services/dataservice';
 import database from '@react-native-firebase/database';
+import Loading from '../../Helper/Loader/Loading';
+import storage from '@react-native-firebase/storage';
+import ListMaterialView from './SupportComponent/ListMaterialView';
+import { ConfigMaterial } from '../../Model/ConfigMaterialModel';
+import ListProductMaterial from './SupportComponent/ListProductMaterial';
 type Props = {
   navigation: StackNavigationProp<
     ListproductNavigationPramaList,
@@ -74,23 +80,42 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
   const [dataproduct, setdataproduct] = useState<Product[]>([]);
   const [ListSearch, setListSearch] = useState<Product[]>([]);
   const [ModelDel, setModelDel] = useState<boolean>(false);
-  const [ListCheckProduct, setListCheckProduct] = useState<string[]>([]);
+  const [ListCheckProduct, setListCheckProduct] = useState<any[]>([]);
   const [ModalDelete, setModalDelete] = useState<boolean>(false);
   const [CheckAll, setCheckAll] = useState<boolean>(false);
   const isFocused = useIsFocused();
   const [Reload, setReload]= useState<boolean>(false);
+  const [loading,setLoading]= useState<boolean>(false);
+  const [VisibleMaterial, setVisibleMaterial] = useState<boolean>(false);
+  const [AllListMaterial,setAllMaterial]= useState<any[]>([]);
+  const [selectedItem,SetselectedItem]= useState<any>();
+  
+  const getMaterial = async ()=>{
+    let newData= await DataService.Getdata_dtService<ConfigMaterial>('ConfigMaterial');
+    setAllMaterial(newData);
+  }
   const getDataProduct = async () => {
     let dta = await DataService.Getdata_dtService<Product>('Products');
-    console.log('123456789',dta);
+    // console.log('123456789',dta);
     setdataproduct(dta);
   };
+  const DelImage= (url:string)=>{
+    const imgref = storage().refFromURL(url);
+    imgref.delete().then(()=>{console.log('del Success')}).catch(e=> console.log(e));
+  }
   useEffect(()=>{
-    database().ref().on('child_changed', snapshot=>{
-      setReload(prev => !prev)
+    database().ref('/Products').on('child_changed', snapshot=>{
+      setReload(prev => !prev);
+    })
+    database().ref('/ConfigMaterial').on('child_changed', snapshot=>{
+      setReload(prev => !prev);
     })
   },[])
   useEffect(() => {
-    if (isFocused === true && ModalDelete == false || Reload=== false || Reload === true) {
+    if (isFocused === true && ModalDelete == false || Reload === false || Reload === true) {
+      setLoading(true);
+     Promise.all([getDataProduct(), getMaterial()])
+      .then(()=> setLoading(false) );
       // let arrayproduct:any[] = [];
       // data.getdata('Products').then(res=>{
       //     for (let key in res)
@@ -104,7 +129,7 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
       //     }
       //     setdataproduct(arrayproduct);
       // });
-      getDataProduct();
+     
     }
   }, [isFocused, ModalDelete, Reload]);
   useEffect(() => {
@@ -112,7 +137,7 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
       setModelDel(false);
     }
   }, [ListCheckProduct]);
-  const oncheckproduct = (id: string, check: boolean) => {
+  const oncheckproduct = (id: any, check: boolean) => {
     if (check) {
       setListCheckProduct(ListCheckProduct.filter(item => item !== id));
     } else {
@@ -125,8 +150,9 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
   }
   function deleteproduct() {
     if (ListCheckProduct.length > 0) {
-      ListCheckProduct.forEach(item => {
-        data.deletedataproduct('Products', item);
+      ListCheckProduct.map(item => {
+        DelImage(item.Image);
+        data.deletedataproduct('Products', item.id);
       });
     }
 
@@ -147,12 +173,12 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
       let datacheck: any[] = [];
       if (ListSearch.length > 0) {
         ListSearch.forEach(item => {
-          datacheck.push(item.id);
+          datacheck.push(item);
         });
         setListCheckProduct(datacheck);
       } else {
         dataproduct.forEach(item => {
-          datacheck.push(item.id);
+          datacheck.push(item);
         });
         setListCheckProduct(datacheck);
       }
@@ -212,7 +238,9 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
       });
     };
     return (
-      <SafeAreaView style={{width: reponsivewidth(300), height: reponsiveheight(250)}}>
+     
+           <Overlay isVisible={visibleoverlayAddCater} >
+         <SafeAreaView style={{width: reponsivewidth(300), height: reponsiveheight(250)}}>
         <View style={style.TitleOverlAdd}>
           <Text
             style={{
@@ -258,339 +286,10 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
           </TouchableOpacity>
         </View>
       </SafeAreaView>
+      </Overlay>
     );
   };
-  const ModalUpdateCatergory: React.FC = () => {
-    const [ListCheck, setListCheck] = useState<string[]>([]);
-    const [Modeldel, setModeldel] = useState<boolean>(false);
-    const [notificationldel, setnofiticationdel] = useState<boolean>(false);
-    const [UpdateDetail, setupdatedetail] = useState<boolean>(false);
-    const [valInput, setValInput] = useState<string>('');
-    const [ChoosenItem, setChoosenItem] = useState<any>();
-    const [visibleNofiticationUpdate, setvisibleNotificationUpdate] =
-      useState<boolean>(false);
-    const [visibleNofiError, setvisibleNofiError] = useState<boolean>(false);
-    const oncheck = (id: string, check: boolean) => {
-      if (check) {
-        setListCheck(ListCheck.filter(item => item !== id));
-      } else {
-        setListCheck([id, ...ListCheck]);
-      }
-    };
-    const [DataCatergory, setDataCatergory] = useState<any[]>([]);
-    const GetCatergory = () => {
-      data.getdata('Catergory').then(res => {
-        var dataArray: any[] = [];
-        for (let key in res) {
-          if (key != '0') {
-            dataArray.push({
-              id: key,
-              ...res[key],
-            });
-          }
-        }
-        setDataCatergory(dataArray);
-      });
-    };
-    useEffect(() => {
-      if (notificationldel === false) {
-        GetCatergory();
-      }
-    }, [notificationldel]);
-    useEffect(() => {
-      if (visibleNofiticationUpdate === false) {
-        console.log('123');
-        GetCatergory();
-      }
-    }, [visibleNofiticationUpdate]);
-    const DeleCatergory = () => {
-      if (ListCheck.length > 0) {
-        ListCheck.forEach(item => {
-          data.deletedData('Catergory', item);
-        });
-      }
-      setnofiticationdel(false);
-    };
-    const UpdateCatergory = (text: string) => {
-      data.getdata('Catergory').then(res => {
-        var dataArray: any[] = [];
-        for (let key in res) {
-          if (key !== '0') {
-            dataArray.push({
-              id: key,
-              ...res[key],
-            });
-          }
-        }
-        if (
-          dataArray.filter(
-            item =>
-              item.Name.toLocaleLowerCase('en-VN') ===
-              text.toLocaleLowerCase('en-VN'),
-          ).length === 0
-        ) {
-          data.UpdateCatergory(ChoosenItem.id, text).then(result => {
-            if (result === true) {
-              console.log('Data Update');
-              setvisibleNotificationUpdate(true);
-            }
-          });
-        } else {
-          setvisibleNofiError(true);
-        }
-      });
-    };
-    return (
-      <SafeAreaView
-        style={{
-          width: getwidth(),
-          height: getheight(),
-          flex: 1,
-          marginTop: -10.5,
-        }}>
-        <View
-          style={[
-            {
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              padding: 18,
-              backgroundColor: '#67bff3',
-              borderColor: '#e5e5e5',
-              borderWidth: 2,
-            },
-          ]}>
-          <View
-            style={{
-              alignSelf: 'flex-start',
-              justifyContent: 'flex-start',
-              width: reponsivewidth(50),
-            }}>
-            <TouchableOpacity
-              onPress={() => {
-                setvisibleOverplayUpdateCater(false);
-                setvisibleOverplayAdd(false);
-              }}>
-              <MaterialIcons name="arrow-back" size={28} color="#efefef" />
-            </TouchableOpacity>
-          </View>
-          <Text
-            style={{
-              alignSelf: 'center',
-              fontSize: 17,
-              width: reponsivewidth(250),
-              textAlign: 'left',
-              color: '#FFFF',
-              fontWeight: '700',
-            }}>
-            Cập nhật nhóm sản phẩm
-          </Text>
-        </View>
-        {Modeldel === true && (
-          <View
-            style={[
-              style.shadowNames,
-              {
-                alignItems: 'center',
-                flexDirection: 'row',
-                justifyContent: 'flex-end',
-                backgroundColor: '#02569E',
-                marginTop: 15,
-                padding: 10,
-              },
-            ]}>
-            <Pressable
-              onPress={() => {
-                setnofiticationdel(true);
-              }}>
-              <MaterialIcons name="delete" size={32} color={'#FFFF'} />
-            </Pressable>
-            <Text style={{marginRight: 20, color: '#FFFF'}}>Xóa</Text>
-            <Pressable
-              onPress={() => {
-                setModeldel(false), setListCheck([]);
-              }}>
-              <MaterialIcons name="clear" size={30} color={'#FFFF'} />
-            </Pressable>
-          </View>
-        )}
-        <View>
-          <ScrollView style={{height: reponsiveheight(580), marginTop: 20}}>
-            {DataCatergory.length > 0 ? (
-              DataCatergory.map(item => {
-                let checked = ListCheck.includes(item.id);
-                return (
-                  <View
-                    style={[
-                      style.shadowNames,
-                      {
-                        flexDirection: 'row',
-                        borderTopColor: '#e8e8e8',
-                        borderTopWidth: 0.1,
-                        alignItems: 'center',
-                        padding: 15,
-                        marginTop: 8,
-                      },
-                    ]}>
-                    <View
-                      style={{
-                        alignSelf: 'flex-start',
-                        width: '40%',
-                        alignItems: 'center',
-                      }}>
-                      <Checkbox
-                        color={'#02569E'}
-                        status={checked ? 'checked' : 'unchecked'}
-                        onPress={() => {
-                          if (Modeldel === false) {
-                            setModeldel(true);
-                          }
-                          oncheck(item.id, checked);
-                        }}
-                      />
-                    </View>
-                    <TouchableOpacity
-                      onPress={() => {
-                        setChoosenItem(item);
-                        setupdatedetail(true);
-                      }}
-                      disabled={Modeldel}
-                      style={{width: '60%', alignItems: 'flex-start'}}>
-                      <Text style={{textAlign: 'center', fontSize: 18}}>
-                        {item.Name}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                );
-              })
-            ) : (
-              <View
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  flexDirection: 'row',
-                  height: reponsiveheight(580),
-                }}>
-                <AntDesign
-                  name="dropbox"
-                  size={40}
-                  color="#b4b4b4"
-                  style={{opacity: 0.4}}
-                />
-                <Text style={{opacity: 0.4, marginLeft: 8}}>No Data</Text>
-              </View>
-            )}
-          </ScrollView>
-          {/* { DataCatergory.length > 0 &&
-            <View style={{flexDirection:'row', alignSelf:'center', marginTop:35}}>
-                <TouchableOpacity style={[ style.btnExit,{alignItems:'center', alignSelf:'center', marginRight:25}]} onPress={()=>setvisibleOverplayUpdateCater(false)}><Text style={{color:'#FFFF'}}>Lưu</Text></TouchableOpacity>
-                <TouchableOpacity style={[ style.btnExit,{alignItems:'center', alignSelf:'center'}]} onPress={()=>{setvisibleOverplayUpdateCater(false); setvisibleOverplayAdd(false)}}><Text style={{color:'#FFFF'}}>Thoát</Text></TouchableOpacity>
-            </View>
-            } */}
-          <CustomNotificationDel
-            visible={notificationldel}
-            onAction={() => DeleCatergory()}
-            onCancel={() => {
-              setnofiticationdel(false);
-            }}
-            iconTitle={
-              <BellNofi
-                width={reponsivewidth(30)}
-                height={reponsiveheight(30)}
-              />
-            }
-            Content="Bạn có thực sự muốn xóa "
-          />
-          <Overlay isVisible={UpdateDetail}>
-            <View
-              style={{
-                width: reponsivewidth(300),
-                height: reponsiveheight(250),
-              }}>
-              <View style={style.TitleOverlAdd}>
-                <Text
-                  style={{
-                    fontSize: 18,
-                    textAlign: 'center',
-                    color: '#000000',
-                    paddingBottom: 2,
-                    fontWeight: '700',
-                  }}>
-                  Thêm nhóm sản phẩm
-                </Text>
-              </View>
-              <View
-                style={[style.styletxtInput, {marginTop: 28, borderRadius: 4}]}>
-                <TextInput
-                  defaultValue={ChoosenItem?.Name}
-                  onChangeText={text => {
-                    setValInput(text);
-                  }}
-                  style={{padding: 18}}
-                  placeholder="Tên nhóm sản phẩm"
-                />
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignSelf: 'center',
-                  marginTop: 35,
-                }}>
-                <TouchableOpacity
-                  style={[
-                    style.btnExit,
-                    {
-                      alignItems: 'center',
-                      alignSelf: 'center',
-                      marginRight: 25,
-                    },
-                  ]}
-                  onPress={() => {
-                    UpdateCatergory(valInput);
-                    setupdatedetail(false);
-                  }}>
-                  <Text style={{color: '#FFFF'}}>Lưu</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    style.btnExit,
-                    {alignItems: 'center', alignSelf: 'center'},
-                  ]}
-                  onPress={() => {
-                    setupdatedetail(false);
-                  }}>
-                  <Text style={{color: '#FFFF'}}>Thoát</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Overlay>
-          <CustomNotification
-            visible={visibleNofiticationUpdate}
-            iconTitle={
-              <BellNofi
-                width={reponsivewidth(30)}
-                height={reponsiveheight(30)}
-              />
-            }
-            title="Thông báo"
-            onCancel={() => setvisibleNotificationUpdate(false)}
-            Content="Bạn đã cập nhật thành công !"
-          />
-          <CustomNotification
-            visible={visibleNofiError}
-            iconTitle={
-              <Warning
-                width={reponsivewidth(30)}
-                height={reponsiveheight(30)}
-              />
-            }
-            title="Thông báo"
-            onCancel={() => setvisibleNofiError(false)}
-            Content="Tên nhóm sản phẩm đã tồn tại !"
-          />
-        </View>
-      </SafeAreaView>
-    );
-  };
+  
   return (
     <SafeAreaView style={style.container}>
       <CustomHeader
@@ -727,9 +426,10 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
           <View style={style.ContainerButton}>
             {ListSearch.length > 0
               ? ListSearch.map(item => {
-                  let check = ListCheckProduct.includes(item.id);
+                  let check = ListCheckProduct.includes(item);
                   return (
                     <Customitemproduct
+                      onClickImage={()=>{SetselectedItem(item); setVisibleMaterial(true)}}
                       item={item}
                       checked={check}
                       oncheck={oncheckproduct}
@@ -751,12 +451,14 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
                         edit(item.id);
                       }}
                     />
+                   
                   );
                 })
               : dataproduct.map(item => {
-                  let check = ListCheckProduct.includes(item.id);
+                  let check = ListCheckProduct.includes(item);
                   return (
                     <Customitemproduct
+                      onClickImage={()=>{SetselectedItem(item); setVisibleMaterial(true)}}
                       item={item}
                       checked={check}
                       oncheck={oncheckproduct}
@@ -778,6 +480,7 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
                         edit(item.id);
                       }}
                     />
+                
                   );
                 })}
           </View>
@@ -796,18 +499,18 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
                           </Dialog>
                           </Portal>
                           </Provider> */}
-      </View>
-      <Overlay isVisible={visibleoverlayAdd}>
-        {visibleoverlayAddCater === true ? (
+            
+            <Overlay isVisible={visibleoverlayAdd}>
+        {/* {visibleoverlayAddCater === true ? (
           <ModalAddCatergory />
         ) : visibleoverlayUpdateCater === true ? (
           <ModalUpdateCatergory />
-        ) : (
+        ) :  */}
           <>
             <View
               style={{
                 width: reponsivewidth(300),
-                height: reponsiveheight(200),
+                height: reponsiveheight(300),
               }}>
               <View style={style.TitleOverlAdd}>
                 <Text
@@ -822,8 +525,21 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
                 </Text>
               </View>
               <View style={style.TitleOverlAdd_content}>
+              <TouchableOpacity
+                  onPress={() => {
+                    setvisibleOverplayAdd(false);
+                    navigation.navigate('ListMaterialScreen');
+
+                  }}
+                  style={[
+                    style.btnChoosenAdd,
+                    {marginVertical: 10, padding: 15},
+                  ]}>
+                  <Text>Danh sách nguyên liệu</Text>
+                </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
+                    setvisibleOverplayAdd(false);
                     setvisibleOverplayAddCater(true);
                   }}
                   style={[
@@ -834,14 +550,15 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
-                    setvisibleOverplayUpdateCater(true);
+                   setvisibleOverplayAdd(false);
+                   navigation.navigate('ListCategoryScreen')
                   }}
                   style={[style.btnChoosenAdd, {padding: 15}]}>
                   <Text>Cập nhật nhóm sản phẩm mới</Text>
                 </TouchableOpacity>
               </View>
             </View>
-            <TouchableOpacity
+            <TouchableOpacity 
               style={[
                 style.btnExit,
                 {alignItems: 'center', alignSelf: 'center'},
@@ -850,8 +567,15 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
               <Text style={{color: '#FFFF'}}>Thoát</Text>
             </TouchableOpacity>
           </>
-        )}
+
       </Overlay>
+      {
+        selectedItem && AllListMaterial.filter(x=>x.id === selectedItem.ListMaterial ).length>0   &&  <ListProductMaterial visible={VisibleMaterial} onExit={setVisibleMaterial} List={selectedItem.ListMaterial && AllListMaterial.filter(x=>x.id === selectedItem.ListMaterial )[0].ListMaterial}/>
+      }
+     
+      {visibleoverlayAddCater == true  && <ModalAddCatergory />}
+      {/* {visibleoverlayUpdateCater == true  && <ModalUpdateCatergory />} */}
+      </View>
       <CustomNotificationDel
         visible={ModalDelete}
         iconTitle={
@@ -880,6 +604,8 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
         onCancel={() => setvisibleNofitication(false)}
         Content="Tên nhóm sản phẩm đã tồn tại !"
       />
+      <Loading visible={loading} />
+     
     </SafeAreaView>
   );
 };
@@ -948,4 +674,349 @@ const style = StyleSheet.create({
     elevation: 4,
   },
 });
-export default ListproductScreen;
+type props ={ 
+  navigation: StackNavigationProp<ListproductNavigationPramaList,'ListCategoryScreen'>
+}
+const ModalUpdateCatergory: React.FC<props> = ({navigation}) => {
+  const [ListCheck, setListCheck] = useState<string[]>([]);
+  const [Modeldel, setModeldel] = useState<boolean>(false);
+  const [notificationldel, setnofiticationdel] = useState<boolean>(false);
+  const [UpdateDetail, setupdatedetail] = useState<boolean>(false);
+  const [valInput, setValInput] = useState<string>('');
+  const [ChoosenItem, setChoosenItem] = useState<any>();
+  const [visibleNofiticationUpdate, setvisibleNotificationUpdate] =
+    useState<boolean>(false);
+  const [visibleNofiError, setvisibleNofiError] = useState<boolean>(false);
+  const oncheck = (id: string, check: boolean) => {
+    if (check) {
+      setListCheck(ListCheck.filter(item => item !== id));
+    } else {
+      setListCheck([id, ...ListCheck]);
+    }
+  };
+  const [DataCatergory, setDataCatergory] = useState<any[]>([]);
+  const GetCatergory = () => {
+    data.getdata('Catergory').then(res => {
+      var dataArray: any[] = [];
+      for (let key in res) {
+        if (key != '0') {
+          dataArray.push({
+            id: key,
+            ...res[key],
+          });
+        }
+      }
+      setDataCatergory(dataArray);
+    });
+  };
+  useEffect(()=>{
+    if(ListCheck.length == 0)
+    {
+      setModeldel(false);
+    }
+  },[ListCheck])
+  useEffect(() => {
+    if (notificationldel === false) {
+      GetCatergory();
+    }
+  }, [notificationldel]);
+  useEffect(() => {
+    if (visibleNofiticationUpdate === false) {
+      console.log('123');
+      GetCatergory();
+    }
+  }, [visibleNofiticationUpdate]);
+  const DeleCatergory = () => {
+    if (ListCheck.length > 0) {
+      ListCheck.forEach(item => {
+        data.deletedData('Catergory', item);
+      });
+    }
+    setnofiticationdel(false);
+  };
+  const UpdateCatergory = (text: string) => {
+    data.getdata('Catergory').then(res => {
+      var dataArray: any[] = [];
+      for (let key in res) {
+        if (key !== '0') {
+          dataArray.push({
+            id: key,
+            ...res[key],
+          });
+        }
+      }
+      if (
+        dataArray.filter(
+          item =>
+            item.Name.toLocaleLowerCase('en-VN') ===
+            text.toLocaleLowerCase('en-VN'),
+        ).length === 0
+      ) {
+        data.UpdateCatergory(ChoosenItem.id, text).then(result => {
+          if (result === true) {
+            console.log('Data Update');
+            setvisibleNotificationUpdate(true);
+          }
+        });
+      } else {
+        setvisibleNofiError(true);
+      }
+    });
+  };
+  return (
+    <SafeAreaView
+      style={{
+        width: getwidth(),
+        height: getheight(),
+        flex: 1,
+        marginTop: -10.5,
+      }}>
+      <View
+        style={[
+          {
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            padding: 18,
+            backgroundColor: '#67bff3',
+            borderColor: '#e5e5e5',
+            borderWidth: 2,
+          },
+        ]}>
+        <View
+          style={{
+            alignSelf: 'flex-start',
+            justifyContent: 'flex-start',
+            width: reponsivewidth(50),
+          }}>
+          <TouchableOpacity
+            onPress={() => {
+              // setvisibleOverplayUpdateCater(false);
+              // setvisibleOverplayAdd(false);
+              navigation.navigate('ListProductScreen');
+            }}>
+            <MaterialIcons name="arrow-back" size={28} color="#efefef" />
+          </TouchableOpacity>
+        </View>
+        <Text
+          style={{
+            alignSelf: 'center',
+            fontSize: 17,
+            width: reponsivewidth(250),
+            textAlign: 'left',
+            color: '#FFFF',
+            fontWeight: '700',
+          }}>
+          Cập nhật nhóm sản phẩm
+        </Text>
+      </View>
+      {Modeldel === true && (
+        <View
+          style={[
+            style.shadowNames,
+            {
+              alignItems: 'center',
+              flexDirection: 'row',
+              justifyContent: 'flex-end',
+              backgroundColor: '#02569E',
+              marginTop: 15,
+              padding: 10,
+            },
+          ]}>
+          <Pressable
+            onPress={() => {
+              setnofiticationdel(true);
+            }}>
+            <MaterialIcons name="delete" size={32} color={'#FFFF'} />
+          </Pressable>
+          <Text style={{marginRight: 20, color: '#FFFF'}}>Xóa</Text>
+          <Pressable
+            onPress={() => {
+              setModeldel(false), setListCheck([]);
+            }}>
+            <MaterialIcons name="clear" size={30} color={'#FFFF'} />
+          </Pressable>
+        </View>
+      )}
+      <View>
+        <ScrollView style={{height: reponsiveheight(580), marginTop: 20}}>
+          {DataCatergory.length > 0 ? (
+            DataCatergory.map(item => {
+              let checked = ListCheck.includes(item.id);
+              return (
+                <View
+                  style={[
+                    style.shadowNames,
+                    {
+                      flexDirection: 'row',
+                      borderTopColor: '#e8e8e8',
+                      borderTopWidth: 0.1,
+                      alignItems: 'center',
+                      padding: 15,
+                      marginTop: 8,
+                    },
+                  ]}>
+                  <View
+                    style={{
+                      alignSelf: 'flex-start',
+                      width: '40%',
+                      alignItems: 'center',
+                    }}>
+                    <Checkbox
+                      color={'#02569E'}
+                      status={checked ? 'checked' : 'unchecked'}
+                      onPress={() => {
+                        if (Modeldel === false) {
+                          setModeldel(true);
+                        }
+                        oncheck(item.id, checked);
+                      }}
+                    />
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setChoosenItem(item);
+                      setupdatedetail(true);
+                    }}
+                    disabled={Modeldel}
+                    style={{width: '60%', alignItems: 'flex-start'}}>
+                    <Text style={{textAlign: 'center', fontSize: 18}}>
+                      {item.Name}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              );
+            })
+          ) : (
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'row',
+                height: reponsiveheight(580),
+              }}>
+              <AntDesign
+                name="dropbox"
+                size={40}
+                color="#b4b4b4"
+                style={{opacity: 0.4}}
+              />
+              <Text style={{opacity: 0.4, marginLeft: 8}}>No Data</Text>
+            </View>
+          )}
+        </ScrollView>
+        {/* { DataCatergory.length > 0 &&
+          <View style={{flexDirection:'row', alignSelf:'center', marginTop:35}}>
+              <TouchableOpacity style={[ style.btnExit,{alignItems:'center', alignSelf:'center', marginRight:25}]} onPress={()=>setvisibleOverplayUpdateCater(false)}><Text style={{color:'#FFFF'}}>Lưu</Text></TouchableOpacity>
+              <TouchableOpacity style={[ style.btnExit,{alignItems:'center', alignSelf:'center'}]} onPress={()=>{setvisibleOverplayUpdateCater(false); setvisibleOverplayAdd(false)}}><Text style={{color:'#FFFF'}}>Thoát</Text></TouchableOpacity>
+          </View>
+          } */}
+        <CustomNotificationDel
+          visible={notificationldel}
+          onAction={() => DeleCatergory()}
+          onCancel={() => {
+            setnofiticationdel(false);
+          }}
+          iconTitle={
+            <BellNofi
+              width={reponsivewidth(30)}
+              height={reponsiveheight(30)}
+            />
+          }
+          Content="Bạn có thực sự muốn xóa? "
+        />
+        <Overlay isVisible={UpdateDetail}>
+          <View
+            style={{
+              width: reponsivewidth(300),
+              height: reponsiveheight(250),
+            }}>
+            <View style={style.TitleOverlAdd}>
+              <Text
+                style={{
+                  fontSize: 18,
+                  textAlign: 'center',
+                  color: '#000000',
+                  paddingBottom: 2,
+                  fontWeight: '700',
+                }}>
+                Thêm nhóm sản phẩm
+              </Text>
+            </View>
+            <View
+              style={[style.styletxtInput, {marginTop: 28, borderRadius: 4}]}>
+              <TextInput
+                defaultValue={ChoosenItem?.Name}
+                onChangeText={text => {
+                  setValInput(text);
+                }}
+                style={{padding: 18}}
+                placeholder="Tên nhóm sản phẩm"
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignSelf: 'center',
+                marginTop: 35,
+              }}>
+              <TouchableOpacity
+                style={[
+                  style.btnExit,
+                  {
+                    alignItems: 'center',
+                    alignSelf: 'center',
+                    marginRight: 25,
+                  },
+                ]}
+                onPress={() => {
+                  UpdateCatergory(valInput);
+                  setupdatedetail(false);
+                }}>
+                <Text style={{color: '#FFFF'}}>Lưu</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  style.btnExit,
+                  {alignItems: 'center', alignSelf: 'center'},
+                ]}
+                onPress={() => {
+                  setupdatedetail(false);
+                }}>
+                <Text style={{color: '#FFFF'}}>Thoát</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Overlay>
+        <CustomNotification
+          visible={visibleNofiticationUpdate}
+          iconTitle={
+            <BellNofi
+              width={reponsivewidth(30)}
+              height={reponsiveheight(30)}
+            />
+          }
+          title="Thông báo"
+          onCancel={() => setvisibleNotificationUpdate(false)}
+          Content="Bạn đã cập nhật thành công !"
+        />
+        <CustomNotification
+          visible={visibleNofiError}
+          iconTitle={
+            <Warning
+              width={reponsivewidth(30)}
+              height={reponsiveheight(30)}
+            />
+          }
+          title="Thông báo"
+          onCancel={() => setvisibleNofiError(false)}
+          Content="Tên nhóm sản phẩm đã tồn tại !"
+        />
+      </View>
+    </SafeAreaView>
+  );
+};
+export  {
+  ListproductScreen,
+  ModalUpdateCatergory,
+
+};

@@ -92,7 +92,7 @@ const Attendance: React.FC<props> = ({navigation}) => {
     let initalData: AttendanceMode = {
       userId: userId ? userId : '',
       date: new Date().toString(),
-      Time: new Date().toString(),
+      time: new Date().toString(),
       type: type,
     };
 
@@ -100,8 +100,8 @@ const Attendance: React.FC<props> = ({navigation}) => {
       if (res == true) {
         setcontent(
           `Bạn đã điễm danh giờ ${type} là : ${new Date(
-            initalData.Time,
-          ).getHours()}: ${new Date(initalData.Time).getMinutes()}`,
+            initalData.time,
+          ).getHours()}: ${new Date(initalData.time).getMinutes()}`,
         );
         setvisbleAlert(true);
       }
@@ -165,7 +165,7 @@ const Attendance: React.FC<props> = ({navigation}) => {
               fontSize: 25,
               fontWeight: '700',
             }}>
-             {userName}
+            {userName}
           </Text>
         </View>
       </View>

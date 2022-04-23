@@ -40,13 +40,16 @@ export type ListproductNavigationPramaList ={
     ListProductScreen: undefined,
     UpdateProductScreen: {id: string}
     AddproductScreen: undefined,
+    ListMaterialScreen: undefined
+    ListCategoryScreen: undefined
 }
 export type ManageEmployeePramaList ={
     MainScreen: undefined,
     EmployeeInformationParamList: undefined,
-    Assignment: undefined,
+    AssignmentParamaList: undefined,
     Wages:undefined,
-    AttendanceScreen: undefined
+    AttendanceScreen: undefined,
+    CreateAccount : undefined,
 }
 export type EmployeeInformationParamList= {
     ListStaffScreen: undefined,
@@ -73,5 +76,9 @@ export type MaterialParamList={
     ListMaterialScreen: undefined
     AddMaterialScreen:undefined
     UpdateMaterialScreen: {id: string}
+}
+export type AssignmentParamaList = {
+    Assignment: undefined
+    ListGeneralTimeWork: undefined
 }
 

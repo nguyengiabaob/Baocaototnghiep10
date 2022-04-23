@@ -3,6 +3,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {
   Image,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -21,6 +22,7 @@ import MonthSelector from 'react-native-month-selector';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import moment from 'moment';
 import DataService from '../../services/dataservice';
+import database from '@react-native-firebase/database'
 export const ChartScreen: React.FC = () => {
   const [labelmonth, setlabelmonth] = useState<any>([]);
   const [labelyear, setlabelyear] = useState<any>([]);
@@ -40,7 +42,15 @@ export const ChartScreen: React.FC = () => {
   const [Filtermodel, setFilter] = useState<string>('');
   const [ModeYearclick, setYearclick] = useState<any>(new Date().getFullYear());
   const [showmodelyear, setshowmodelyear] = useState<boolean>(false);
-
+  const [reload,setReload] =useState<boolean>(false);
+  const RealTime = ()=>{
+    database().ref().on('child_changed', ()=>{
+      setReload(prev=> !prev);
+    });
+  }
+  useEffect(()=>{
+    RealTime();
+  },[])
   const createLabel = () => {
     let dataArray: any[] = [];
     let dataArrayyear: any[] = [];
@@ -54,14 +64,14 @@ export const ChartScreen: React.FC = () => {
         i == 31 ||
         i == 16
       )
-        dataArray.push(`${i}`);
+        {dataArray.push(`${i}`);}
       else {
         dataArray.push(' ');
       }
     }
     for (let i = 1; i <= 12; i++) {
       if (i == 1 || i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12)
-        dataArrayyear.push(`${i}`);
+        {dataArrayyear.push(`${i}`);}
       else {
         dataArrayyear.push(' ');
       }
@@ -80,12 +90,12 @@ export const ChartScreen: React.FC = () => {
       count++;
     }
     console.log(count);
-    if (count === 4 || count === 5) return 'ng';
+    if (count === 4 || count === 5) {return 'ng';}
     // else
     //   if (count === 5)
     //     return "trm";
-    else if (count === 6) return 'tr';
-    else if (count === 9) return 'tỷ';
+    else if (count === 6) {return 'tr';}
+    else if (count === 9) {return 'tỷ';}
     return '';
   };
   const getBill = async() => {
@@ -389,21 +399,25 @@ export const ChartScreen: React.FC = () => {
     [GetdatasetfilterMonth, Filtermodel],
   );
   useEffect(() => {
-    createLabel();
+    if (reload === true || reload === false)
+    {
+      createLabel();
     getBill();
     getExpense();
     getWages();
     getProduct();
     getLisProduct();
     getProduct();
-  }, []);
+    }
+    
+  }, [reload]);
   useEffect(() => {
     DataChart(optionDay);
     getinventory();
     getTopSeller();
   }, [DataChart, optionDay, getinventory, getTopSeller]);
   return (
-    <View style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1}}>
       {console.log(arrayTotal)}
       <View style={styles.container}>
         <View
@@ -449,6 +463,7 @@ export const ChartScreen: React.FC = () => {
         {console.log(arrayTotal)}
         <View style={[{alignItems: 'center', width: getwidth() - 10}]}>
           <BarChart
+          
             data={{
               labels:
                 Filtermodel == '2' || Filtermodel == ''
@@ -461,17 +476,20 @@ export const ChartScreen: React.FC = () => {
                 },
               ],
             }}
-            width={getwidth() - 10} // from react-native
-            height={220}
+
+            width={getwidth()-10} // from react-native
+            height={200}
+            xLabelsOffset={5}
             yAxisLabel=""
             yAxisSuffix={unit}
-            //yLabelsOffset={1}
-            yAxisInterval={0.5} // optional, defaults to 1
+            yLabelsOffset={20}
+            yAxisInterval={1} // optional, defaults to 1
             chartConfig={{
+              stackedBar : true,
               scrollableInfoSize: {width: reponsivewidth(700), height: 220},
               scrollableInfoViewStyle: {backgroundColor: 'red'},
               height: 5000,
-              barPercentage: 0.3,
+              barPercentage: arrayTotal.length > 12 ? 0.18 : 0.3 ,
               fillShadowGradient: '#02569E',
               fillShadowGradientOpacity: 1,
               backgroundColor: '#ffffff',
@@ -480,8 +498,12 @@ export const ChartScreen: React.FC = () => {
               decimalPlaces: 2, // optional, defaults to 2dp
               color: (opacity = 1) => `rgba(2, 86, 185, ${opacity})`,
               labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              style: {},
-
+              style: {
+                borderRadius: 16,
+                marginVertical:8,
+                padding:5,
+                paddingRight:0,
+              },
               propsForBackgroundLines: {
                 strokeWidth: 1,
                 stroke: '#e3e3e3',
@@ -803,7 +825,7 @@ export const ChartScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
       </Overlay>
-    </View>
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({

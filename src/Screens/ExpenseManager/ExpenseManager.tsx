@@ -1,6 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import {reponsiveheight, reponsivewidth} from '../../theme/Metric';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -20,6 +26,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import {Checkbox} from 'react-native-paper';
 import DataService from '../../services/dataservice';
 import database from '@react-native-firebase/database';
+import Loading from '../../Helper/Loader/Loading';
 type props = {
   navigation: StackNavigationProp<ExpenseParamList, 'ExpenseMainScreen'>;
 };
@@ -37,10 +44,11 @@ export const ExpenseManagerScreen: React.FC<props> = ({navigation}: props) => {
   const [showdatepickervalue, setshodatepickervalue] = useState<Date>(
     new Date(),
   );
-  const [Reload, setReload]= useState<boolean>(false);
+  const [Reload, setReload] = useState<boolean>(false);
   const [DelArray, setDelArray] = useState<string[]>([]);
   const [flag, setflag] = useState<boolean>(false);
   const [CheckAll, setCheckAll] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const tranferday = (d: string) => {
     var month = new Date(d).getMonth() + 1;
     var date = new Date(d).getDate();
@@ -110,12 +118,18 @@ export const ExpenseManagerScreen: React.FC<props> = ({navigation}: props) => {
     }
   };
   useEffect(() => {
-    if (isFocused == true || Reload === false || Reload === true) {
-      getDataExpense();
+    if (
+      isFocused === true ||
+      Reload === false ||
+      Reload === true ||
+      flag === true
+    ) {
+      setLoading(true);
+      Promise.resolve(getDataExpense()).then(() => setLoading(false));
     }
-    if (flag == true) {
-      getDataExpense();
-    }
+    // if (flag == true) {
+    //   getDataExpense();
+    // }
   }, [isFocused, flag, Reload]);
   const oncheckAll = (check: boolean) => {
     if (check) {
@@ -128,11 +142,21 @@ export const ExpenseManagerScreen: React.FC<props> = ({navigation}: props) => {
         ArrayExpense.length > 0 &&
         Filtermodel === '' &&
         ArrayExpense.filter(
-          item => new Date(item.CreateDate).getDate() === new Date().getDate(),
+          item =>
+            new Date(item.CreateDate).getDate() === new Date().getDate() &&
+            new Date(item.CreateDate).getMonth() + 1 ===
+              new Date().getMonth() + 1 &&
+            new Date(item.CreateDate).getFullYear() ===
+              new Date().getFullYear(),
         ).length > 0
       ) {
         ArrayExpense.filter(
-          item => new Date(item.CreateDate).getDate() === new Date().getDate(),
+          item =>
+            new Date(item.CreateDate).getDate() === new Date().getDate() &&
+            new Date(item.CreateDate).getMonth() + 1 ===
+              new Date().getMonth() + 1 &&
+            new Date(item.CreateDate).getFullYear() ===
+              new Date().getFullYear(),
         ).forEach(item => {
           datacheck.push(item.id);
         });
@@ -327,7 +351,11 @@ export const ExpenseManagerScreen: React.FC<props> = ({navigation}: props) => {
             Filtermodel === '' &&
             ArrayExpense.filter(
               item =>
-                new Date(item.CreateDate).getDate() === new Date().getDate(),
+                new Date(item.CreateDate).getDate() === new Date().getDate() &&
+                new Date(item.CreateDate).getMonth() + 1 ===
+                  new Date().getMonth() + 1 &&
+                new Date(item.CreateDate).getFullYear() ===
+                  new Date().getFullYear(),
             ).length > 0) ||
           (Filtermodel == '1' &&
             ModeYear &&
@@ -353,6 +381,41 @@ export const ExpenseManagerScreen: React.FC<props> = ({navigation}: props) => {
                   new Date(datepickervalue).getDate() &&
                 new Date(item.CreateDate).getFullYear() ===
                   new Date(datepickervalue).getFullYear(),
+            ).length > 0) ||
+          (Filtermodel == '1' &&
+            ModeYear &&
+            ArrayExpense.filter(
+              item => new Date(item.CreateDate).getFullYear() === ModeYear,
+            ).length > 0) ||
+          (Filtermodel == '2' &&
+            choosenModel &&
+            ArrayExpense.filter(
+              item =>
+                new Date(item.CreateDate).getMonth() + 1 ===
+                  new Date(choosenModel).getMonth() + 1 &&
+                new Date(item.CreateDate).getFullYear() ===
+                  new Date(choosenModel).getFullYear(),
+            ).length > 0) ||
+          (Filtermodel == '3' &&
+            datepickervalue &&
+            ArrayExpense.filter(
+              item =>
+                new Date(item.CreateDate).getMonth() + 1 ===
+                  new Date(datepickervalue).getMonth() + 1 &&
+                new Date(item.CreateDate).getDate() ===
+                  new Date(datepickervalue).getDate() &&
+                new Date(item.CreateDate).getFullYear() ===
+                  new Date(datepickervalue).getFullYear(),
+            ).length > 0) ||
+          (ArrayExpense.length > 0 &&
+            Filtermodel === '' &&
+            ArrayExpense.filter(
+              item =>
+                new Date(item.CreateDate).getDate() === new Date().getDate() &&
+                new Date(item.CreateDate).getMonth() + 1 ===
+                  new Date().getMonth() + 1 &&
+                new Date(item.CreateDate).getFullYear() ===
+                  new Date().getFullYear(),
             ).length > 0) ||
           (ArrayExpense.length > 0 && Filtermodel === '0') ? (
             <View
@@ -708,11 +771,21 @@ export const ExpenseManagerScreen: React.FC<props> = ({navigation}: props) => {
               Filtermodel === '' &&
               ArrayExpense.filter(
                 item =>
-                  new Date(item.CreateDate).getDate() === new Date().getDate(),
+                  new Date(item.CreateDate).getDate() ===
+                    new Date().getDate() &&
+                  new Date(item.CreateDate).getMonth() + 1 ===
+                    new Date().getMonth() + 1 &&
+                  new Date(item.CreateDate).getFullYear() ===
+                    new Date().getFullYear(),
               ).length > 0 ? (
               ArrayExpense.filter(
                 item =>
-                  new Date(item.CreateDate).getDate() === new Date().getDate(),
+                  new Date(item.CreateDate).getDate() ===
+                    new Date().getDate() &&
+                  new Date(item.CreateDate).getMonth() + 1 ===
+                    new Date().getMonth() + 1 &&
+                  new Date(item.CreateDate).getFullYear() ===
+                    new Date().getFullYear(),
               ).map(item => {
                 let check = DelArray.includes(item.id);
                 return (
@@ -1119,6 +1192,7 @@ export const ExpenseManagerScreen: React.FC<props> = ({navigation}: props) => {
           </TouchableOpacity>
         </View>
       </Overlay>
+      <Loading visible={loading} />
     </SafeAreaView>
   );
 };

@@ -14,7 +14,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import {  LoginstackParamList } from '../../navigation/types';
 import { Userdata } from '../../Model/User';
 import Feather from 'react-native-vector-icons/Feather';
-import { selectAuth, SigIn } from '../../redux/reducer/authslice';
+import { intialIsLogging, selectAuth, SigIn } from '../../redux/reducer/authslice';
 import { useDispatch } from 'react-redux';
 import { useAppDispatch, useAppSelector } from '../../redux/hook';
 import CustomInput from '../../Model/CustomInput';
@@ -35,10 +35,11 @@ const LoginScreen: React.FC<Props> = ({navigation}:Props) => {
   const [passwordError,setpasswordError] = useState<boolean>(false);
   const [hiddenPassword, sethiddenPassword] = useState<boolean>(false); 
   const dispatch = useAppDispatch();
+  const {isLogging} = useAppSelector(selectAuth);
   // const selector= useAppSelector(selectAuth);
 
   useEffect(()=>{
-    if (usernameError === true || passwordError === true)
+    if (usernameError === true || passwordError === true || isLogging === true)
     {
     Toast.show({
       type : 'error',
@@ -47,8 +48,10 @@ const LoginScreen: React.FC<Props> = ({navigation}:Props) => {
     });
     setusernameError(false);
     setpasswordError(false);
+    dispatch(intialIsLogging());
   }
-},[passwordError, usernameError]);
+
+},[passwordError, usernameError, isLogging]);
   // useEffect(()=>{
   // //   var data_fetch: any[] = [];
   // //   data.getdata('user').then(data_f=>{ for (let key in data_f)
@@ -95,7 +98,7 @@ const LoginScreen: React.FC<Props> = ({navigation}:Props) => {
     setusernameError(usernameInputError);
     return usernameInputError && passwordInputError;
   }
-  const  onLogin  = (username:string , password:string)=>
+  const  onLogin  = async (username:string , password:string)=>
   {
     if (checkInput() === true)
      {
@@ -106,7 +109,7 @@ const LoginScreen: React.FC<Props> = ({navigation}:Props) => {
       dispatch(
       SigIn(username,password)
       );
-      // navigation.navigate('TabNavigator',{User:user});
+      
     }
   }
   return (

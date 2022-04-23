@@ -1,3 +1,4 @@
+/* eslint-disable no-lone-blocks */
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -12,11 +13,11 @@ import { reponsiveheight, reponsivewidth } from '../../theme/Metric';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import { Modalize } from 'react-native-modalize';
 import data from '../../services/data';
-import CustomBox from "../../Model/CustomBox";
-import { Userdata } from "../../Model/User";
+import CustomBox from '../../Model/CustomBox';
+import { Userdata } from '../../Model/User';
 import BellNofi from '../../asset/svg/bellnotification.svg';
 import Warning from '../../asset/svg/Warning.svg';
-import { CustomNotification } from "../../Model/CustomNofication";
+import { CustomNotification } from '../../Model/CustomNofication';
 import DataService from '../../services/dataservice';
 import MonthSelector from 'react-native-month-selector';
 import moment from 'moment';
@@ -24,13 +25,74 @@ import { AttendanceMode } from '../../Model/AttendanceModel';
 export const Wages :React.FC = ()=>{
  const [DataAssignment, setDataAssignment] = useState<Userdata[]>([]);
  const [EmployeeIDselected, setEmployeeIDselected] = useState<Userdata[]>([]);
- const [AddSuccess, setAddSuccess]= useState<boolean>(false);
- const [AddError, setAddError]= useState<boolean>(false);
- const [chooosenMonth, setChoosenMonth]= useState<any>();
- const [visibleMonth, setVisibleMonth]= useState<boolean>(false);
- const [ArrayTime, setArrayTime]= useState<any[]>();
- const [AttendanceLog, setAttendanceLog]= useState<AttendanceMode[]>();
- const renderModalMonth=useCallback(()=>{
+ const [AddSuccess, setAddSuccess] = useState<boolean>(false);
+ const [AddError, setAddError] = useState<boolean>(false);
+ const [chooosenMonth, setChoosenMonth] = useState<any>();
+ const [visibleMonth, setVisibleMonth] = useState<boolean>(false);
+ const [ArrayTime, setArrayTime] = useState<any[]>();
+ const [AttendanceLog, setAttendanceLog] = useState<AttendanceMode[]>();
+ const [stringTime, setstringTime] = useState<string>('');
+ const [ArrayWages,SetArrayWages]= useState<any[]>();
+ const getTextTimeWork = (array: any []) =>
+ {
+     let a = '';
+     array.forEach(i=>{
+         a += i.TimeWork ==0 ? '' :i.TimeWork  + ',';
+     });
+     return a;
+ };
+ const CaculatedTimeWork = useCallback(async(DayCheck: any)=>{
+    let arr : any[] = [];
+    if (EmployeeIDselected.length > 0)
+    {
+        let a = await DataService.Getdata_dtService<AttendanceMode>('LogAttendance');
+        EmployeeIDselected.forEach(item=>{
+            let countStart = 0;
+            let countEnd = 0;
+           a.forEach(i=> {
+                if (i.userId === item.id && new Date(i.date).getMonth() + 1 == new Date( DayCheck).getMonth() + 1 && new Date(i.date).getFullYear() === new Date( DayCheck).getFullYear() )
+                {
+                    if (i.type == 'Bắt đầu')
+                    {
+                        countStart +=   Number(Number(new Date(i.time).getMinutes() / 60).toFixed(2));
+                        // console.log('TimeArray',  new Date(i.time).geHours());
+                    }
+                    else
+                    {
+                        if (i.type == 'Kết thúc')
+                        {
+                            countEnd += Number(Number(new Date(i.time).getMinutes() / 60).toFixed(2));
+                            // console.log('TimeArray',  i);
+                        }
+                    }
+                }
+           });
+           console.log('countEnd',   countEnd );
+           console.log('countStart',  countStart );
+           arr.push({
+               ...item,
+               TimeWork: countEnd === 0 || countStart === 0 ? 0 :  countEnd - countStart,
+               DateLog: new Date(DayCheck).toDateString(),
+
+           });
+        });
+        console.log('TimeArray', arr);
+        setstringTime(getTextTimeWork(arr));
+        SetArrayWages(arr);
+        return arr;
+    }
+    setstringTime(getTextTimeWork(arr));
+    SetArrayWages(arr);
+    return [];
+ } ,[EmployeeIDselected]);
+ useEffect(()=>{
+     if (chooosenMonth)
+     {
+         console.log('78956456',chooosenMonth);
+        CaculatedTimeWork(chooosenMonth);
+     }
+ },[chooosenMonth,CaculatedTimeWork])
+ const renderModalMonth = useCallback(()=>{
     return (
         <Overlay isVisible={visibleMonth}>
 <View
@@ -41,6 +103,7 @@ export const Wages :React.FC = ()=>{
   }}>
   <MonthSelector
     onMonthTapped={month => {
+      console.log('month',month.toDate());
       setChoosenMonth(month.toDate());
       setVisibleMonth(false);
     //   setModalCalendar(false);
@@ -72,8 +135,8 @@ export const Wages :React.FC = ()=>{
 </View>
 {/* <Text>dsadsad</Text> */}
 </Overlay>
-    )
-},[visibleMonth])
+    );
+},[visibleMonth]);
  type props={
     Visible :boolean,
     onClosed?: ()=>void,
@@ -85,9 +148,9 @@ export const Wages :React.FC = ()=>{
         const modalizeRef = useRef<Modalize>(null);
         const [dataSelected, setdataSelected]  = useState<Userdata []>([]);
         const [valueSearch, setvalueSearch] = useState<string>('');
-        const [dataQuery,setdataQuery]= useState<any[]>([]);
+        const [dataQuery,setdataQuery] = useState<any[]>([]);
         const [Datauser1,setDatauser1] = useState<Userdata[]>([]);
-        
+
         const getalluser = async()=>{
         let datarray = await DataService.Getdata_dtService<Userdata>('user');
        setDatauser1(datarray);
@@ -138,7 +201,7 @@ export const Wages :React.FC = ()=>{
 
     function onFinishChoose () {
 
-        setTimeout(()=>{ setEmployeeIDselected(dataSelected)},1000);
+        setTimeout(()=>{ setEmployeeIDselected(dataSelected);},1000);
         modalizeRef.current?.close();
        //}
      };
@@ -167,7 +230,7 @@ export const Wages :React.FC = ()=>{
                           if ( check1 === 1)
                           {
                             return (
-                                <TouchableOpacity disabled={true} key={item.id}  onPress={()=>{onPress(item, pressedBox)}}  style={{ width:reponsivewidth(370) ,flexDirection:'row',borderColor:'#c1bbbb', borderWidth:0.6, marginTop:15, marginLeft:10, height:reponsiveheight(85), justifyContent:'center', alignItems:'center' ,borderRadius:4}}>
+                                <TouchableOpacity disabled={true} key={item.id}  onPress={()=>{onPress(item, pressedBox);}}  style={{ width:reponsivewidth(370) ,flexDirection:'row',borderColor:'#c1bbbb', borderWidth:0.6, marginTop:15, marginLeft:10, height:reponsiveheight(85), justifyContent:'center', alignItems:'center' ,borderRadius:4}}>
                                 <CustomBox  stylecontainet={{padding:10}} pressed={pressedBox} isAvatar={true} title={item.Name} subtitle={item.service} avatar={{uri:item.Avatar}}/>
                             </TouchableOpacity>
                               );
@@ -175,7 +238,7 @@ export const Wages :React.FC = ()=>{
                           else
                           {
                           return (
-                            <TouchableOpacity key={item.id}  onPress={()=>{onPress(item, pressedBox)}}  style={{ width:reponsivewidth(370) ,flexDirection:'row',borderColor:'#c1bbbb', borderWidth:0.6, marginTop:15, marginLeft:10, height:reponsiveheight(85), justifyContent:'center', alignItems:'center' ,borderRadius:4}}>
+                            <TouchableOpacity key={item.id}  onPress={()=>{onPress(item, pressedBox);}}  style={{ width:reponsivewidth(370) ,flexDirection:'row',borderColor:'#c1bbbb', borderWidth:0.6, marginTop:15, marginLeft:10, height:reponsiveheight(85), justifyContent:'center', alignItems:'center' ,borderRadius:4}}>
                                     <CustomBox  stylecontainet={{padding:10}} pressed={pressedBox} isAvatar={true} title={item.Name} subtitle={item.service} avatar={{uri:item.Avatar}}/>
                             </TouchableOpacity>
                         );
@@ -184,7 +247,7 @@ export const Wages :React.FC = ()=>{
                           else
                           {
                           return (
-                            <TouchableOpacity key={item.id}  onPress={()=>{onPress(item, pressedBox)}}  style={{ width:reponsivewidth(370) ,flexDirection:'row',borderColor:'#c1bbbb', borderWidth:0.6, marginTop:15, marginLeft:10, height:reponsiveheight(85), justifyContent:'center', alignItems:'center' ,borderRadius:4}}>
+                            <TouchableOpacity key={item.id}  onPress={()=>{onPress(item, pressedBox);}}  style={{ width:reponsivewidth(370) ,flexDirection:'row',borderColor:'#c1bbbb', borderWidth:0.6, marginTop:15, marginLeft:10, height:reponsiveheight(85), justifyContent:'center', alignItems:'center' ,borderRadius:4}}>
                                     <CustomBox  stylecontainet={{padding:10}} pressed={pressedBox} isAvatar={true} title={item.Name} subtitle={item.service} avatar={{uri:item.Avatar}}/>
                             </TouchableOpacity>
                         );
@@ -206,7 +269,7 @@ export const Wages :React.FC = ()=>{
                                   if (check === 1)
                                   {
                                         return (
-                                        <TouchableOpacity key={item.id} disabled={true} onPress={()=>{onPress(item, pressedBox)}}  style={{ width:reponsivewidth(370) ,flexDirection:'row',borderColor:'#c1bbbb', borderWidth:0.6, marginTop:15, marginLeft:10, height:reponsiveheight(85), justifyContent:'center', alignItems:'center' ,borderRadius:4}}>
+                                        <TouchableOpacity key={item.id} disabled={true} onPress={()=>{onPress(item, pressedBox);}}  style={{ width:reponsivewidth(370) ,flexDirection:'row',borderColor:'#c1bbbb', borderWidth:0.6, marginTop:15, marginLeft:10, height:reponsiveheight(85), justifyContent:'center', alignItems:'center' ,borderRadius:4}}>
                                                 <CustomBox stylecontainet={{padding:10}} pressed={pressedBox} isAvatar={true} title={item.Name} subtitle={item.service} avatar={{uri:item.Avatar}}/>
                                         </TouchableOpacity>
                                     );
@@ -215,7 +278,7 @@ export const Wages :React.FC = ()=>{
                                   {
 
                                       return (
-                                    <TouchableOpacity key={item.id}  onPress={()=>{onPress(item, pressedBox)}}  style={{ width:reponsivewidth(370) ,flexDirection:'row',borderColor:'#c1bbbb', borderWidth:0.6, marginTop:15, marginLeft:10, height:reponsiveheight(85), justifyContent:'center', alignItems:'center' ,borderRadius:4}}>
+                                    <TouchableOpacity key={item.id}  onPress={()=>{onPress(item, pressedBox);}}  style={{ width:reponsivewidth(370) ,flexDirection:'row',borderColor:'#c1bbbb', borderWidth:0.6, marginTop:15, marginLeft:10, height:reponsiveheight(85), justifyContent:'center', alignItems:'center' ,borderRadius:4}}>
                                             <CustomBox stylecontainet={{padding:10}} pressed={pressedBox} isAvatar={true} title={item.Name} subtitle={item.service} avatar={{uri:item.Avatar}}/>
                                     </TouchableOpacity>
                                 );
@@ -224,7 +287,7 @@ export const Wages :React.FC = ()=>{
                             else
                             {
                             return (
-                                <TouchableOpacity key={item.id}  onPress={()=>{onPress(item, pressedBox)}}  style={{ width:reponsivewidth(370) ,flexDirection:'row',borderColor:'#c1bbbb', borderWidth:0.6, marginTop:15, marginLeft:10, height:reponsiveheight(85), justifyContent:'center', alignItems:'center' ,borderRadius:4}}>
+                                <TouchableOpacity key={item.id}  onPress={()=>{onPress(item, pressedBox);}}  style={{ width:reponsivewidth(370) ,flexDirection:'row',borderColor:'#c1bbbb', borderWidth:0.6, marginTop:15, marginLeft:10, height:reponsiveheight(85), justifyContent:'center', alignItems:'center' ,borderRadius:4}}>
                                         <CustomBox stylecontainet={{padding:10}} pressed={pressedBox} isAvatar={true} title={item.Name} subtitle={item.service} avatar={{uri:item.Avatar}}/>
                                 </TouchableOpacity>
                             );
@@ -238,6 +301,7 @@ export const Wages :React.FC = ()=>{
                   <View style={{marginTop:15, justifyContent:'center', alignItems:'center'}} >
                   <TouchableOpacity onPress={
                  ()=>{
+
                      onFinishChoose();
                   }
                   } style={{ backgroundColor:'#226cb3',padding:5, width:reponsivewidth(100), justifyContent:'center', alignItems:'center',borderRadius:4}}>
@@ -252,7 +316,7 @@ export const Wages :React.FC = ()=>{
     const [Datauser,setDatauser] = useState<Userdata[]>([]);
     const [Hours,setHours] = useState<string>('');
     const [MoneyHour,setMoneyHours] = useState<number>(0);
-    const [totalsalary, settotalsalary]=useState<number>();
+    const [totalsalary, settotalsalary] = useState<number>();
     const tranferday = (d:string)=>{
         var month = new Date(d).getMonth() + 1;
         var date = new Date(d).getDate();
@@ -260,18 +324,15 @@ export const Wages :React.FC = ()=>{
        return   date + '/' + month + '/' + year;
     };
     const getLogAttendance = async()=>{
-        let dataArray= await DataService.Getdata_dtService<AttendanceMode>('LogAttendance');
+        let dataArray = await DataService.Getdata_dtService<AttendanceMode>('LogAttendance');
         setAttendanceLog(dataArray);
-    }
+    };
     useEffect(()=>{
-        getLogAttendance
-    },[])
+        getLogAttendance;
+    },[]);
 
-    const RenderEmployeeSelected=()=>
+    const RenderEmployeeSelected = ()=>
     {
-        if(chooosenMonth)
-        {
-        }
         if (EmployeeIDselected.length > 0)
         {
            return (
@@ -293,37 +354,46 @@ export const Wages :React.FC = ()=>{
                   }
                 {EmployeeIDselected.length > 1 && <Text>, ...</Text>}
                 </Pressable>
-                <Pressable style={{marginLeft:10,justifyContent:'flex-end', paddingRight:8}} onPress={()=>{setEmployeeIDselected([])}}>
+                <Pressable style={{marginLeft:10,justifyContent:'flex-end', paddingRight:8}} onPress={()=>{setEmployeeIDselected([]);}}>
                     <Text>x</Text>
                 </Pressable>
                 </View>
                </SafeAreaView>
            );
         }
-    }
+    };
     const DoWages = ()=>{
-        if (Hours.length>0 && MoneyHour >0 && EmployeeIDselected !== null )
+        if ( MoneyHour > 0 && ArrayWages)
         {
-            let total = Number(Hours) * Number(MoneyHour);
-            settotalsalary(total);
-            EmployeeIDselected.forEach( item=>{
-                data.PostWages(item.id, Number(MoneyHour),total,Number(Hours),new Date().toDateString()).then( res => {if ( res === true)
+            let total1=0;
+          Promise.all( ArrayWages.map(i=>{
+
+            let total = i.TimeWork * Number(MoneyHour);
+            total1+=total;
+                data.PostWages(i.id, Number(MoneyHour),total,i.TimeWork,new Date().toDateString());
+            }))
+            .then( () => {
                 {
+                    settotalsalary(total1);
                     console.log( 'Posted Data ');
                     setEmployeeIDselected([]);
-                    setHours('');
-                    setMoneyHours(0);
+                    SetArrayWages([]);
                     setAddSuccess(true);
+                    setMoneyHours(0);
+                    
                 }
-            });
             })
+            .catch(e=> console.log(e));
+
+
+
     }
     else
-    {
+    {  console.log(ArrayWages);
         setAddError(true);
     }
 
-}
+};
     return (
         <SafeAreaView style={styles.container}>
         <View style={[styles.shadowNames,{flexDirection:'row',alignItems:'center',marginBottom:15,borderColor:'#606060', borderWidth:1, width:reponsivewidth(150), backgroundColor:'#dbdada', borderRadius:10, marginLeft:5}]}>
@@ -337,8 +407,8 @@ export const Wages :React.FC = ()=>{
 
         {EmployeeIDselected.length > 0 ?  RenderEmployeeSelected() :
          <View style={{alignItems:'center', marginTop:35}}>
-            <TouchableOpacity onPress={()=>{
-                setvisibleModal(true)}} style={styles.btnStaff}>
+            <TouchableOpacity onPressOut={()=>{
+                setvisibleModal(true);}} style={styles.btnStaff}>
                <View style={{marginLeft:-40, marginRight:20}}>
                  <PersonIcon  width={reponsivewidth(33)}/>
                </View>
@@ -348,12 +418,15 @@ export const Wages :React.FC = ()=>{
         </View>
         }
             <View style={{alignItems:'center', marginTop:50,height:reponsiveheight(50)}}>
-            <Input containerStyle={{ width: reponsivewidth(350) }}
-                onChangeText={(text) => { setHours(text); } }
+            {
+               <Input containerStyle={{ width: reponsivewidth(350) }}
+               value={stringTime ? stringTime : ''}
+                // onChangeText={(text) => { setHours(text); } }
                 placeholder="Nhập số giờ"
-                keyboardType={"number-pad"}
+                keyboardType={'number-pad'}
                 leftIcon={<ClockIcon
                     width={reponsivewidth(32)} />} autoCompleteType={undefined} />
+                }
             </View>
             <View style={{height:reponsiveheight(50), marginTop:25, alignItems:'center'}}>
             <TextInput />
@@ -361,7 +434,7 @@ export const Wages :React.FC = ()=>{
                 onChange={(e) => { setMoneyHours(Number(isNaN(Number(e.nativeEvent.text))) ? Number(e.nativeEvent.text.replace(/,/g, '')) : Number(e.nativeEvent.text)); } }
                 placeholder="Nhập số tiền/giờ"
                 value={MoneyHour.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                keyboardType={"decimal-pad"}
+                keyboardType={'decimal-pad'}
                 leftIcon={<MoneyHourIcon
                     width={reponsivewidth(32)} />} autoCompleteType={undefined}/>
             </View>
@@ -369,22 +442,22 @@ export const Wages :React.FC = ()=>{
             <View style={{marginRight:5 }}>
                 <CoinIcon   width={reponsivewidth(32)} />
             </View>
-                <Text style={{marginRight:25 ,fontStyle:'italic', fontWeight:'700'}} >{totalsalary !== undefined ? totalsalary.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","): 0}</Text>
+                <Text style={{marginRight:25 ,fontStyle:'italic', fontWeight:'700'}} >{totalsalary !== undefined ? totalsalary.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : 0}</Text>
 
             <Text style={{fontWeight:'700'}}>VND</Text>
             </View>
             <View style={{width:reponsivewidth(150), alignSelf:'center', marginTop:50}}>
-                <TouchableOpacity onPress={()=>{DoWages()}} style={{backgroundColor:'#02569E', padding:15, alignItems:'center', borderRadius:5,}}>
+                <TouchableOpacity onPress={()=>{DoWages();}} style={{backgroundColor:'#02569E', padding:15, alignItems:'center', borderRadius:5,}}>
                     <Text style={{color:'#FFF'}}>Tính lương</Text>
                 </TouchableOpacity>
             </View>
             <ModalEmployee onClosed={()=>setvisibleModal(false)} Visible={visibleModal} />
-            <CustomNotification visible={AddSuccess} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} title="Thông báo"  onCancel={()=>setAddSuccess(false) } Content="Bạn đã thêm thành công !"/>
+            <CustomNotification visible={AddSuccess} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} title="Thông báo"  onCancel={()=>{setAddSuccess(false); settotalsalary(0)} } Content="Bạn đã thêm thành công !"/>
            <CustomNotification visible= {AddError}  iconTitle={<Warning width={reponsivewidth(30)} height={reponsiveheight(30)}/>} title="Thông báo"  onCancel={()=>setAddError(false) } Content="Xin vui lòng nhập lại" />
            {renderModalMonth()}
         </SafeAreaView>
     );
-}
+};
     const styles = StyleSheet.create({
         container:
         {
@@ -394,7 +467,7 @@ export const Wages :React.FC = ()=>{
         },
         btnStaff :
         {
-            
+
             flexDirection: 'row',
             backgroundColor:'#ededed',
             justifyContent:'center',
@@ -408,7 +481,7 @@ export const Wages :React.FC = ()=>{
             },
             shadowOpacity: 0.23,
             shadowRadius: 2.62,
-            elevation: 10, 
+            elevation: 10,
         },
         shadowWages:{
             shadowColor:'#000',

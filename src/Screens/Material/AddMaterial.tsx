@@ -53,17 +53,20 @@ const AddMaterial: React.FC<Props> = ({oncancel, onItemArray}: Props) => {
     if (nameproduct === '' || quantity < 1) {
       setshowError(true);
     } else {
-      let urlimg: string;
+      let urlimg: string = 'none';
       if (image === null) {
         urlimg = 'none';
-      } else {
-        const reference = storage().ref(image);
-        console.log(reference);
-        const pathToFile = pathimg;
-        await reference.putFile(pathToFile);
-        urlimg = await reference.getDownloadURL();
       }
-      let initaldata: Material = {
+      // else {
+      //   const reference = storage().ref(image);
+      //   console.log(reference);
+      //   const pathToFile = pathimg;
+      //   await reference.putFile(pathToFile);
+      //   urlimg = await reference.getDownloadURL();
+      // }
+      let initaldata: any = {
+        filename: image,
+        pathimg: pathimg,
         Name: nameproduct,
         Number: quantity,
         Total: quantity,

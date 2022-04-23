@@ -51,7 +51,7 @@ export const authSlice = createSlice({
     },
 });
 export const {updateStatus, checkStatus} = authSlice.actions;
-export const SigIn = (username: string , password: string): AppThunk => async (dispatch: AppDispatch)=>
+export const SigIn = (username: string , password: string): AppThunk => async (dispatch)=>
 {
     // var data_fetch: Userdata[] = [];
     // data.getdata('user').then(async data_f=>{ 
@@ -76,10 +76,25 @@ export const SigIn = (username: string , password: string): AppThunk => async (d
          console.log(e);
        }
     }
+    else
+    {
+        dispatch(
+            updateStatus({ isLogging:true  })
+        );
+    }
 //   });
 };
+export const UpdatePermission = ():AppThunk =>async(dispatch,selector)=>{
+    let  data_fetch = await DataService.Getdata_dtService<Userdata>('user');
+    let datauser = data_fetch.find((user)=>user.id === selector().auth.userToken);
+    console.log('type', datauser?.type)
+    if (datauser?.type !== selector().auth.typeUser)
+    {
+        dispatch(requestLogout());
+    }
+};
 export const requestLogout = ():AppThunk =>async(dispatch,selector)=>{
-    console.log(selector().auth.isLoggedGoogle);
+    // console.log(selector().auth.isLoggedGoogle);
     if (selector().auth.isLoggedGoogle === true)
     {
         await GoogleSignin.signOut();
@@ -105,11 +120,13 @@ export const checklogin =  ():AppThunk => async dispatch =>{
      else
      {
         dispatch(
-           checkStatus({isLoggedIn:false, isLogging:true})
+           checkStatus({isLoggedIn:false, isLogging:false})
         );
      }
     };
-
+export const intialIsLogging = () :AppThunk => async dispatch =>{
+    dispatch(updateStatus({isLogging: false}));
+};
 
 export const selectAuth = (state:Rootstate)=>state.auth;
 export default authSlice.reducer;

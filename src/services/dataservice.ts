@@ -5,7 +5,7 @@ class DataService  {
         var resultArray: any [] = [];
         let temp :any = [];
         temp = await data.getdata(name);
-         console.log('789456temp',temp);
+        //  console.log('789456temp',temp);
         for ( let key in  temp)
         {
             if ( key !== '0')

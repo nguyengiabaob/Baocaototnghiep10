@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
 import { RouteProp } from '@react-navigation/native';
@@ -22,13 +23,15 @@ import BellNofi from '../../asset/svg/bellnotification.svg';
 import { CustomNotification } from '../../Model/CustomNofication';
 import DataService from '../../services/dataservice';
 import ChooseMaterial from './ChooseMaterial';
+import ChoosenConfigMaterialOverplay from './SupportComponent/ChoosenConfigMaterialOverplay';
+import { ConfigMaterial } from '../../Model/ConfigMaterialModel';
 type Props={
     navigation: StackNavigationProp<ListproductNavigationPramaList,'UpdateProductScreen'>,
     route: RouteProp<ListproductNavigationPramaList,'UpdateProductScreen'>
 }
 const UpdateProductScreen: React.FC<Props> = ({navigation, route}: Props) =>{
     const {id} = route.params;
-    const [stringMaterial, setstringMaterial] = useState<string>('');
+    const [stringMaterial, setstringMaterial] = useState<any>();
     const [nameproduct, setnameproduct] = useState<string>('');
     const [priceproduct, setpriceproduct] = useState<number>(-1);
     const [quanity,setquanity] = useState<number>(-1);
@@ -48,16 +51,17 @@ const UpdateProductScreen: React.FC<Props> = ({navigation, route}: Props) =>{
     const [DataCate,setDataCate] = useState<any[]>([]);
     const [dataproduct,setdataproduct] = useState<any[]>([]);
     const [dataProduct,setdataProduct] = useState<Product>();
-    const getstringMaterialUpdate =  useCallback(()=>{
-        let a = '';
-        if (dataproduct && showMaterial == false)
-        {
-            dataproduct.forEach(item=>{
-               a += item.Name + ',';
-            });
-            setstringMaterial(a);
-        }
-    },[dataproduct, showMaterial]);
+    // const getstringMaterialUpdate =  useCallback(()=>{
+    //     let a = '';
+    //     if (dataproduct && showMaterial == false)
+    //     {
+    //         dataproduct.forEach(item=>{
+    //            a += item.Name + ',';
+    //         });
+    //         setstringMaterial(a);
+    //     }
+    // },[dataproduct, showMaterial]);
+
     const getProduct = useCallback(async()=>{
         // let arrayproduct:any[] = [];
         // data.getdata('Products').then(res=>{
@@ -79,6 +83,13 @@ const UpdateProductScreen: React.FC<Props> = ({navigation, route}: Props) =>{
         let dta = await DataService.Getdata_dtService<any>('Products');
         let i = dta.findIndex(Item => Item.id == id);
         console.log('1',dta[i]);
+        if(dta[i].ListMaterial)
+        {
+            let Material = await DataService.Getdata_dtServiceById<ConfigMaterial>('ConfigMaterial',dta[i].ListMaterial);
+            setstringMaterial(Material);
+        }
+        
+
         // let a = "";
         // dta[i].ListMaterial?.forEach((it:any) => {
         //     console.log(it.Name);
@@ -86,7 +97,7 @@ const UpdateProductScreen: React.FC<Props> = ({navigation, route}: Props) =>{
         // })
         // setstringMaterial(a);
         setdataProduct(dta[i]);
-        setdataproduct(dta[i].ListMaterial);
+        // setdataproduct(dta[i].ListMaterial);
 
     },[id]);
     useEffect(()=>{
@@ -110,7 +121,7 @@ const getNameCate = (id: string|undefined)=>{
             {   var dataArray: any[] = [];
                 for (let key in res)
                 {
-                    if (key != '0')
+                    if (key !== '0')
                     {
                         dataArray.push({
                             id:key,
@@ -121,9 +132,9 @@ const getNameCate = (id: string|undefined)=>{
                 setDataCate(dataArray);
             });
     };
-useEffect(()=>{
-    getstringMaterialUpdate(); 
-},[ getstringMaterialUpdate])
+// useEffect(()=>{
+//     getstringMaterialUpdate(); 
+// },[ getstringMaterialUpdate])
  useEffect(()=>{
     getCatergory();
  },[]);
@@ -139,10 +150,6 @@ useEffect(()=>{
         // }
        // {
         // //  uploadImg(image,pathimg);
-       
-        
-
-        
         let catergory = DataCate.filter(item=>item.id == dataProduct?.CatergoryID);
         console.log('0',catergory[0]);
         let urlimg;
@@ -156,22 +163,13 @@ useEffect(()=>{
         }
         if (dataProduct)
         {
-            if(dataproduct.length>0)
-            {
-                dataproduct.forEach(i=>{
-                    i.Total= i.Number * dataProduct?.Quanity;
-                })
-            }
-            let res= await data.updatedataproduct('Products',id,nameproduct == '' ? dataProduct?.name_product : nameproduct , priceproduct > 0 ? priceproduct : Number(dataProduct.Price_product)  , quanity > 0 ? quanity : Number(dataProduct.Quanity), urlimg ? urlimg : dataProduct.Image, ChooseCate ? ChooseCate.id : catergory[0].id, dataproduct.length > 0 ? dataproduct : [] )
+           
+            let res= await data.updatedataproduct('Products',id,nameproduct == '' ? dataProduct?.name_product : nameproduct , priceproduct > 0 ? priceproduct : Number(dataProduct.Price_product)  , quanity > 0 ? quanity : Number(dataProduct.Quanity), urlimg ? urlimg : dataProduct.Image, ChooseCate ? ChooseCate.id : catergory[0].id, stringMaterial ? stringMaterial.id : undefined )
         if(res==true )
         {
             showDialog();
         }
         }
-        
-         
-    
-
        // }
     }
     const type: MediaType = 'photo';
@@ -297,7 +295,7 @@ useEffect(()=>{
               editable={false}
               style={[style.textinput, {width: reponsivewidth(170)}]}
               placeholder="Chọn nguyên liệu">
-                   {stringMaterial ? stringMaterial : ''}
+                   {stringMaterial ? stringMaterial.title : ''}
             </TextInput>
             <EvilIcons name="chevron-right" size={32} color={'#777777'} />
           </TouchableOpacity>
@@ -343,8 +341,9 @@ useEffect(()=>{
                           </Dialog>
                           </Portal>
                           </Provider> */}
-                     <ChooseMaterial visible={showMaterial} cancel={setShowMaterial} getArrayItem={setdataproduct} dataMaterial={dataProduct && dataProduct?.ListMaterial}/>
-                    <Overlay isVisible={showChooseCate}>
+                     {/* <ChooseMaterial visible={showMaterial} cancel={setShowMaterial} getArrayItem={setdataproduct} dataMaterial={dataProduct && dataProduct?.ListMaterial}/> */}
+                    <ChoosenConfigMaterialOverplay visible={showMaterial} onExit={setShowMaterial} selectedItem={stringMaterial} getselectedItem={setstringMaterial}/>
+                    <Overlay  isVisible={showChooseCate}>
                         <View style={{width:reponsivewidth(300), height: reponsiveheight(350)}}>
                     <View style={style.TitleOverlAdd}>
                         <Text style={{fontSize:18, textAlign: 'center', color:'#000000',paddingBottom:2, fontWeight:'700'}}>Chọn nhóm sản phẩm</Text>

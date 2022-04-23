@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useState } from 'react';
-import { StyleProp, StyleSheet, TextStyle, View, ViewStyle, TouchableOpacity, Text } from 'react-native';
+import { StyleProp, StyleSheet, TextStyle, View, ViewStyle, TouchableOpacity, Text, SafeAreaView } from 'react-native';
 import { reponsiveheight, reponsivewidth } from '../theme/Metric';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Anticon from 'react-native-vector-icons/AntDesign';
@@ -19,6 +19,7 @@ type Props={
     price: number,
     quanity: number,
     checked: boolean,
+    onClickImage?:()=>void,
     oncheck?: (id:string , check: boolean)=> void
     setmodelDel: (value: any)=>void
     unitId?: string
@@ -37,7 +38,8 @@ const Customitemproduct: React.FC<Props> = ({
     price,
     quanity,
     checked,
-    unitId
+    unitId,
+    onClickImage,
 }:Props) =>{
     const [nameunit, setNameUnit]= useState<string>();
     console.log('56456456',unitId)
@@ -55,20 +57,23 @@ const Customitemproduct: React.FC<Props> = ({
     },[getNameUnit]);
     
     return (
-        <View style={style.container}>
+        <SafeAreaView style={style.container}>
             <View style={[style.button, viewstyle]}>
                 <View style={{flexDirection: 'row', alignItems: 'center', justifyContent:'center'}}>
                     <View style={{marginRight:4, marginLeft:15}}>
-                        <Checkbox onPress={()=>{setmodelDel(true); oncheck && oncheck(item.id,checked)}} color="#02569E" status={checked === true ? 'checked' : 'unchecked' }/>
+                        <Checkbox onPress={()=>{setmodelDel(true); oncheck && oncheck(item,checked)}} color="#02569E" status={checked === true ? 'checked' : 'unchecked' }/>
                     </View>
                    <View style={{marginHorizontal:0.3, flex:0.2}}>
-                       {icon}
+                       <TouchableOpacity onPress={()=> onClickImage && onClickImage()}>
+                            {icon}
+                       </TouchableOpacity>
+                      
                    </View>
                    <View style={{flexDirection: 'column',  alignItems: 'center', justifyContent:'center',flex:0.7}}>
                    <Text style={[style.title, textStyle,{fontWeight:'bold',fontSize:16, width:reponsivewidth(210),textAlign:'center'}]}>{title}</Text>
                    <View style={{marginTop:15}}>
                    <Text style={[style.title2, textStyle, {fontStyle:'italic'}]}>Giá  : {Number(price).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
-                    <Text style={[style.title2, textStyle,{fontStyle:'italic'}]}>KL / SL: {quanity} {unitId && nameunit}</Text>
+                    <Text style={[style.title2, textStyle,{fontStyle:'italic'}]}>Số Lượng: {quanity} {unitId && nameunit}</Text>
                    </View>
                     </View>
                     <View style={{flex:0.2, flexDirection: 'column',marginRight:10 }}>
@@ -81,7 +86,7 @@ const Customitemproduct: React.FC<Props> = ({
                     </View>
                 </View>
             </View>
-        </View>
+        </SafeAreaView>
     );
 
 };

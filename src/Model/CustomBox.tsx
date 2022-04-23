@@ -31,8 +31,8 @@ const CustomBox: React.FC <props> =  ({avatar, title, subtitle, isAvatar, presse
             : undefined
              }
             <View style={[style.containerTitle, stylecontainet]}>
-                <Text style={style.title}>{title}</Text>
-                <Text style={style.subtitle}>{subtitle}</Text>
+                <Text style={style.title}>{title== 'none' ? '' :title }</Text>
+                <Text style={style.subtitle}>{subtitle == 'none' ? '' : subtitle}</Text>
             </View>
 
             {pressed === true && <View style={{width:reponsivewidth(65), alignItems:'center'}}><Entypo style={ {alignSelf:'center'}} name="check" color="#1b9d2f" size={30}/></View> }

@@ -20,7 +20,7 @@ import {RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {Userdata} from '../../Model/User';
 import {useAppDispatch, useAppSelector} from '../../redux/hook';
-import {requestLogout, selectAuth} from '../../redux/reducer/authslice';
+import {requestLogout, selectAuth, UpdatePermission} from '../../redux/reducer/authslice';
 import AuthService from '../../services/authService';
 import Feather from 'react-native-vector-icons/Feather';
 import {Overlay} from 'react-native-elements/dist/overlay/Overlay';
@@ -82,11 +82,10 @@ const AccountScreen: React.FC<Props> = () => {
   function onLogOut() {
     dispatch(requestLogout());
   }
-
   const [arrayuser, setarrayuser] = useState<Userdata[]>([]);
   useEffect(()=>{
-    database().ref("/user").on('child_changed',()=>{
-      setReload(prev=> !prev)
+    database().ref('/user').on('value',()=>{
+      setReload(prev=> !prev);
     })
   },[])
   const getUserData= async()=>{
@@ -116,6 +115,7 @@ const AccountScreen: React.FC<Props> = () => {
     }
   }, [visibleEflag, visiblechangePass, Reload]);
   useEffect(() => {
+    getUserData();
     // var data_fetch: any[] = [];
     // data.getdata('user').then(res => {
     //   for (let key in res) {
@@ -127,7 +127,7 @@ const AccountScreen: React.FC<Props> = () => {
     //   setarrayuser(data_fetch);
     // });
     fetchid();
-  }, []);
+  }, [Reload]);
   // useEffect(()=>{
   //     if (isLoggedGoogle === true)
   //     {
@@ -175,16 +175,13 @@ const AccountScreen: React.FC<Props> = () => {
         data
           .updateuser(
             'user',
-            user.username,
-            user.password,
+           
             phone !== '' ? phone : user.phone,
             email !== '' ? email : user.Email,
             user.Gender,
             user.Avatar,
             name !== '' ? name : user.Name,
-            user.type,
             user.dateofbirth,
-            service !== '' ? service : user.service,
             user.id,
           )
           .then(res => {
@@ -240,16 +237,12 @@ const AccountScreen: React.FC<Props> = () => {
           data
             .updateuser(
               'user',
-              user.username,
-              newpassword,
               user.phone,
               user.Email,
               user.Gender,
               user.Avatar,
               user.Name,
-              user.type,
               user.dateofbirth,
-              user.service,
               user.id,
             )
             .then(res => {
@@ -287,6 +280,7 @@ const AccountScreen: React.FC<Props> = () => {
 
   arrayuser.forEach(res => {
     if (res.id === username) {
+      console.log('123456',username);
       username1 = res.username;
       name1 = res.Name;
       email1 = res.Email;
@@ -317,7 +311,8 @@ const AccountScreen: React.FC<Props> = () => {
           </View>
           <View style={style.container_item_list}>
             <Text style={style.info}>
-              {name1 != 'none' && name1 !== '' ? name1 : 'Không có'}
+              {console.log('78486',name1)}
+              {name1 !== 'none' && name1 !== '' ? name1 : 'Không có'}
             </Text>
           </View>
         </View>
@@ -397,12 +392,11 @@ const AccountScreen: React.FC<Props> = () => {
               style={style.btn_action}>
               <Text style={{marginLeft: 25, fontSize: 16}}>Đổi mật khẩu</Text>
             </TouchableOpacity>
-            { typeUser == 0 &&
-               <TouchableOpacity onPress={()=>{
-                setvisiblePermission(true);
-              }}><Text>Phân quyền</Text></TouchableOpacity>
-            }
-           
+            <TouchableOpacity style={style.btn_action} onPress={()=>{
+              setvisiblePermission(true);
+            }}>
+                <Text style={{marginLeft: 25, fontSize: 16}}>Phân quyền</Text>
+            </TouchableOpacity>
           </View>
           <Overlay isVisible={visibleEditinfo}>
             <View style={style.container_visbleSetting}>
@@ -608,7 +602,7 @@ const AccountScreen: React.FC<Props> = () => {
             />
           </Overlay>
           <Overlay isVisible={visiblePermission}>
-              <View>
+              <View style={style.container_visbleSetting}>
               <View style={style.style_other}>
                 <View
                   style={{
@@ -617,7 +611,7 @@ const AccountScreen: React.FC<Props> = () => {
                   }}>
                   <TouchableOpacity
                     onPress={() => {
-                      setvisiblechangePass(false);
+                      setvisiblePermission(false);
                     }}>
                     <MaterialIcons name="clear" size={28} color="#efefef" />
                   </TouchableOpacity>
@@ -625,9 +619,8 @@ const AccountScreen: React.FC<Props> = () => {
                 <View style={style.container_MainSetting}>
                   <Text style={style.text_Setting}>Phân quyền</Text>
                 </View>
-                <TableComponent columns={col} data={arrayuser}/>
               </View>
-              
+               <TableComponent columns={col} dataFields={arrayuser}/>
               </View>
           </Overlay>
         </View>

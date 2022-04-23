@@ -144,7 +144,7 @@ const DashboardScreen: React.FC<Props> = ({navigation, route}: Props) => {
               />
             )}
 
-            <CustomButton
+            {/* <CustomButton
               textStyle={{color: '#02569E'}}
               onpress={() => {
                 navigation.navigate('MaterialManager');
@@ -154,7 +154,7 @@ const DashboardScreen: React.FC<Props> = ({navigation, route}: Props) => {
               icon={
                 <FontAwesome5 name="box-open" size={65} color={'#02569E'} />
               }
-            />
+            /> */}
           </View>
         </ScrollView>
       </View>

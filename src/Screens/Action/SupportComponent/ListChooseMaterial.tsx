@@ -96,7 +96,8 @@ const ListChooseMutiple: React.FC<props> = ({
             flexDirection: 'row',
             alignSelf: 'center',
           }}>
-          <TouchableOpacity disabled={listCheck.length > 0 ? false : true}
+          <TouchableOpacity
+            disabled={listCheck.length > 0 ? false : true}
             style={[
               styles.btnExit,
               {

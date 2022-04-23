@@ -2,7 +2,7 @@
 import {Dimensions} from 'react-native';
 const DESIGN_WIDTH = 393;
 const DESIGN_HEIGHT = 830;
-const {width,height}= Dimensions.get('window');
+const {width,height} = Dimensions.get('window');
 export function reponsivewidth(value = 0)
 {
     return (width * value) / DESIGN_WIDTH;

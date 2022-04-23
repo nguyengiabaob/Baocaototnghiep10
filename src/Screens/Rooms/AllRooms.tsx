@@ -184,8 +184,12 @@ type propsedit= {
     visible: boolean,
     id: string,
 }
+type dataOption= {
+    title: string, 
+    onPress: ()=> void
+}
 const EditTable:React.FC<propsedit> = ({visible, id}: propsedit  )=>{
-    const listData = [
+    const listData: dataOption[] = [
         {
             title: 'Gọi Nước',
             onPress: ()=>{
@@ -274,6 +278,17 @@ useEffect(()=>{
     }
   
 },[isFocused,]);
+const editTable = useCallback(()=>{
+    if (visibleEdit === true)
+    {
+        return (
+
+                <EditTable id={TableSelected}  visible={visibleEdit} />
+
+        )
+    }
+    
+},[visibleEdit,TableSelected])
 // const [changeArea, setchangeArea] = useState<Table[]>([]);
 // function filterArea (id: string)
 // {
@@ -452,7 +467,8 @@ useEffect(()=>{
         renderItem={({item})=>
         {
         return (
-           <TouchableOpacity onPress={()=>{  
+           <TouchableOpacity onPressOut={()=>{
+        
             setAreaFilter(item);
 
            }} style={[styles.ButtonArea,{backgroundColor: AreaFilter.id === item.id ? '#02569E' : '#FFFF'}]}>
@@ -461,9 +477,6 @@ useEffect(()=>{
 
            }
         }/>
-         { visibleEdit === true &&
-                    <EditTable id={TableSelected}  visible={visibleEdit} />
-            }
         </View>
         <View style={styles.ContainerRooms}>
             <FlatList 
@@ -473,9 +486,9 @@ useEffect(()=>{
             renderItem={({item})=>{
                 return (
                 <>
-                <TouchableOpacity onPress={()=>{
+                <TouchableOpacity onPressOut={()=>{
+                    setTableSelected(item.id);
                     setvisibleEdit(true);
-                    setTableSelected(item.id)
                     }} style={[styles.styleRooms , item.Status === 0 ? undefined : {backgroundColor:'#02569E'}  ]}>
                      <Text style={[styles.TitleRooms , item.Status === 0 ? {color:'#000000'} : {color:'#FFFF'}]}>{item.Name}</Text>
                 </TouchableOpacity>
@@ -485,6 +498,7 @@ useEffect(()=>{
             }
             numColumns={3}
             />
+            {editTable()}
         </View>
         {/* <SpeedDial
       color="#02569E"

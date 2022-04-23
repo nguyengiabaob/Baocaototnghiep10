@@ -7,6 +7,8 @@ import { Units } from '../Model/Unit';
 import { AttendanceMode } from '../Model/AttendanceModel';
 import database from '@react-native-firebase/database';
 import firebase from 'firebase';
+import { Userdata } from '../Model/User';
+import { ConfigMaterial } from '../Model/ConfigMaterialModel';
 // import axios, {AxiosResponse} from 'axios';
 class data{
 static getRealTimeData (name: string)  {
@@ -22,7 +24,7 @@ static getRealTimeData (name: string)  {
                 resultArray.push({
                     id: key ,
                     ...temp[key],
-                })
+                });
             }
            // console.log('789',resultArray);
         }
@@ -70,6 +72,26 @@ static async getuser(name:string , id: string) :Promise<any>
         }).catch(error=>{
             console.log(error);
         });
+}
+//Create Account
+static async postAccount( data : Userdata)
+{
+    return await
+    instance.post('/user.json',{
+       username:data.username,
+       password: data.password,
+       phone: data.phone,
+       service :data.service,
+       type: data.type,
+       Email:data.Email,
+       Gender: data.Gender,
+       Avatar: data.Avatar,
+       Name: data.Name,
+       dateofbirth: data.dateofbirth,
+    }).then(response=>{
+        console.log(response.data);
+        return true;
+    }).catch((e)=>{console.log(e);});
 }
  static  async postdatauser(name: string, username: string, password: string, phone: string, Email:string, Gender:string, Avatar: string, Name: string, type:Number, dateofbirth: string, service:string )
 {
@@ -121,7 +143,18 @@ static async updateuser (nametable : string, phone: string , Email:string, Gende
         return true;
     }).catch((e)=>{console.log(e);});
 }
-
+// Update Permission
+static async updatePermission (id: string, _type: number) {
+    return await
+    instance.patch(`user/${id}.json`,{
+        type: _type,
+    }).then((response)=>{
+        return true;
+    })
+    .catch((e)=>{
+        console.log(e);
+    });
+}
 
 
 
@@ -584,7 +617,7 @@ static async UpdateMaterial (value: Material, id : string){
         return await
         instance.post('LogAttendance.json',{
            userId: value.userId,
-           time: value.Time,
+           time: value.time,
            date: value.date,
            type: value.type,
         })
@@ -601,7 +634,7 @@ static async UpdateMaterial (value: Material, id : string){
         return await
         instance.put(`LogAttendance/${id}.json`,{
            userId: value.userId,
-           time: value.Time,
+           time: value.time,
            date: value.date,
            type: value.type,
         })
@@ -614,6 +647,51 @@ static async UpdateMaterial (value: Material, id : string){
         })
         .catch(e=>{console.log(e);});
     }
+    static async PostConfigMaterial (data : ConfigMaterial )
+    {
+        return await 
+        instance.post('ConfigMaterial.json',{
+            title: data.title,
+            ListMaterial: data.ListMaterial
+        })
+        .then(response=>{
+            if (response.data)
+            {
+                return true;
+            }
+        })
+        .catch(e=>{console.log(e);})
+    }
+    static async PutConfigMaterial (data : ConfigMaterial, id: string )
+    {
+        return await 
+        instance.patch(`ConfigMaterial/${id}.json`,{
+            title: data.title,
+            ListMaterial: data.ListMaterial
+        })
+        .then(response=>{
+            if (response.data)
+            {
+                return true;
+            }
+        })
+        .catch(e=>{console.log(e);})
+    }
+    static async PutProductMaterial ( id: string, val: any)
+    {
+        return await 
+        instance.patch(`Products/${id}.json`,{
+           ListMaterial: val
+        })
+        .then(response=>{
+            if (response.data)
+            {
+                return true;
+            }
+        })
+        .catch(e=>{console.log(e);})
+    }
+
 }
 
 

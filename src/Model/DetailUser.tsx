@@ -25,7 +25,7 @@ type props ={
     navigation : StackNavigationProp<EmployeeInformationParamList,'UserInformation'>
 }
 export const DetailUser: React.FC<props> = ({user, navigation}:props)=>{
-const {type} =useAppSelector(selectAuth);
+const {typeUser} = useAppSelector(selectAuth);
 const [Name, setName] = useState<string>('');
 const [Service, setService] = useState<string>('');
 const [errorphone, seterrorphone]= useState<string>('');
@@ -47,6 +47,10 @@ const onChange = (event: Event, selectdate: any) => {
     setshodatepickervalue(currentDate);
   };
 function transferday (currentDate:any){
+    if (isNaN(Number(currentDate)) === true)
+    {
+        return '';
+    }
     let pickdate = new Date(currentDate);
     let textdate = pickdate.getDate() + '/' + (pickdate.getMonth() + 1) + '/' + pickdate.getFullYear();
     return textdate;
@@ -55,10 +59,9 @@ console.log(user.id);
 async function UpdateStaff (){
     let gen = '';
     let img ='';
-    let name ='';
-    let phonepick  ='';
-    let emailpick  ='';
-    let service="";
+    let name = '';
+    let phonepick  = '';
+    let emailpick  = '';
     //let service='';
    if (male === true)
     {
@@ -70,7 +73,7 @@ async function UpdateStaff (){
     }
     if (Name ==='')
     {
-        name =user.Name;
+        name = user.Name;
     }
     else
     {
@@ -91,15 +94,6 @@ async function UpdateStaff (){
     else
     {
         emailpick= Email;
-    }
-    if(Service === '')
-    {
-        service = user.service;
-
-    }
-    else
-    {
-        service = Service
     }
     if ( pickImg.length > 0)
     {
@@ -150,18 +144,18 @@ async function UpdateStaff (){
              source={pickImg[0].img}
                  >
             
-         <Avatar.Accessory onPress={()=>Handlechoosephoto()} style={{height:reponsiveheight(30), width:reponsivewidth(30)}} {...{size:25}} />
+         {typeUser==0 &&<Avatar.Accessory onPress={()=>Handlechoosephoto()} style={{height:reponsiveheight(30), width:reponsivewidth(30)}} {...{size:25}} />}
          </Avatar>
          </>
          :
            <>
            <Avatar containerStyle={{height:reponsiveheight(120), width:reponsivewidth(120),borderRadius:50}} avatarStyle={{width:reponsivewidth(120), height:reponsiveheight(120),borderRadius:50}}
             source={{
-                 uri:user.Avatar!== "none" ? user.Avatar :'none',
+                 uri:user.Avatar !== 'none' ? user.Avatar : 'none',
             }}
                 >
            
-        <Avatar.Accessory onPress={()=>Handlechoosephoto()} style={{height:reponsiveheight(30), width:reponsivewidth(30)}} {...{size:25}} />
+        {typeUser==0 && <Avatar.Accessory onPress={()=>Handlechoosephoto()} style={{height:reponsiveheight(30), width:reponsivewidth(30)}} {...{size:25}} />}
         </Avatar>
         </>
             }
@@ -185,8 +179,8 @@ async function UpdateStaff (){
                </View>
                <View style={{flex:0.8, justifyContent:'center'}}>
                     <Input onChangeText={(text)=>{setName(text)}}
-                      
-                    inputStyle={{fontSize:16,marginBottom:-10}}>{user.Name}</Input>
+
+                    inputStyle={{fontSize:16,marginBottom:-10}}>{user.Name  == 'none' ? 'Không có' : user.Name }</Input>
                </View>
             </View>
             <View style={style.fieldinfo}>
@@ -195,7 +189,7 @@ async function UpdateStaff (){
                    <Text style={{marginHorizontal:8}}>Ngày sinh</Text>
                </View>
                <View style={{flex:0.7, flexDirection:'row', alignItems:'center'}}>
-                  <Text style={{flex:0.8}}>{transferday(showdatepickervalue)}</Text>
+                  <Text style={{flex:0.8}}>{transferday(showdatepickervalue ) ? transferday(showdatepickervalue )  : '' }</Text>
                    <Pressable style={{justifyContent:'flex-end',flex:0.2}} onPress={()=>setshodatepicker(true)}>
                         <MaterialCommunityIcons name="calendar-today" size={30}/>
                    </Pressable>
@@ -247,7 +241,7 @@ async function UpdateStaff (){
                    <Text style={{marginHorizontal:8}}>Chức vụ</Text>
                </View>
                <View style={{flex:0.8, justifyContent:'center'}}>
-                    <Input onChangeText={(text)=>{setService(text)}} inputStyle={{fontSize:16,marginBottom:-10}}>{user.service}</Input>
+                    <Input onChangeText={(text)=>{setService(text)}} inputStyle={{fontSize:16,marginBottom:-10}}>{user.service =='none' ? 'Không có' : user.service }</Input>
                </View>
             </View>
             <View style={style.fieldinfo}>
@@ -269,7 +263,7 @@ async function UpdateStaff (){
                         }
                         setphone(e.nativeEvent.text);
                        }
-                   }} inputStyle={{fontSize:16,marginBottom:-10}}>{user.phone}</Input>
+                   }} inputStyle={{fontSize:16,marginBottom:-10}}>{user.phone === 'none' ? 'không có' : user.phone }</Input>
                </View>
             </View>
             <View style={style.fieldinfo}>
@@ -293,11 +287,11 @@ async function UpdateStaff (){
                       {
                             seterroremail('Email không hợp lệ !');
                       }
-                   }}  inputStyle={{fontSize:16,marginBottom:-10}}>{user.Email}</Input>
+                   }}  inputStyle={{fontSize:16,marginBottom:-10}}>{user.Email == 'none' ? 'không có' : user.Email }</Input>
                </View>
             </View>
             </ScrollView>
-            { type == 0  &&
+            { typeUser == 0  &&
             <View style={{justifyContent:'center',alignItems:'center'}}>
             <TouchableOpacity onPress={()=>UpdateStaff()} style={style.button}>
                 {/* <Fethericon name="log-out" size={20} color="#FFF"/> */}

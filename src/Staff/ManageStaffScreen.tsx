@@ -7,6 +7,7 @@ import CustomBoxItem from '../Model/CustomBoxItem';
 // import ManageRequest from '../asset/svg/signing.svg';
 import CalculateWages from '../asset/svg/employee.svg';
 import AssignmentSchedule from '../asset/svg/calendar.svg';
+import CreateAccount from '../asset/svg/CreaAccount.svg';
 // import Assign from '../asset/svg/rotation.svg';
 import EmployeeList from '../asset/svg/test.svg';
 import Attendance from '../asset/svg/attendance.svg';
@@ -45,7 +46,20 @@ const ManageStaffScreen: React.FC<props> = ({navigation}: props) => {
          
           {
             // Phân quyền admin
-          typeUser ==0 && 
+          typeUser ==0 && <>
+          <CustomBoxItem
+            Style={{marginTop: 25}}
+            onPress={() => {
+              navigation.navigate('CreateAccount');
+            }}
+            Avatarimg={
+              <CreateAccount
+                width={reponsivewidth(50)}
+                height={reponsiveheight(50)}
+              />
+            }
+            title="Tạo tài khoản"
+          />
           <CustomBoxItem
             Style={{marginTop: 25}}
             onPress={() => {
@@ -59,12 +73,13 @@ const ManageStaffScreen: React.FC<props> = ({navigation}: props) => {
             }
             title="Chấm công"
           />
+          </>
           }
-          {
+          
           <CustomBoxItem
             Style={{marginTop: 25}}
             onPress={() => {
-              navigation.navigate('Assignment');
+              navigation.navigate('AssignmentParamaList');
             }}
             Avatarimg={
               <AssignmentSchedule
@@ -74,7 +89,7 @@ const ManageStaffScreen: React.FC<props> = ({navigation}: props) => {
             }
             title="Lịch công trong tuần "
           />
-        }
+        
           {/* <CustomBoxItem Avatarimg={<Assign  width={reponsivewidth(50)} height={reponsiveheight(50)} />} title="Phân công"/> */}
           <CustomBoxItem
             Style={{marginTop: 25}}

@@ -70,6 +70,10 @@ const UpdateMaterial: React.FC<props> = ({
     setnameproduct(arrayData[id].Name);
     setquantity(arrayData[id].Number);
     setChooseunit(arrayData[id].Unit);
+    if (arrayData[id].pathimg) {
+      setpathimg(arrayData[id].pathimg);
+      setimage(arrayData[id].filename);
+    }
   }, [arrayData, id]);
   // const getMaterialById = useCallback(async () => {
   //   let item: Material = await DataService.Getdata_dtServiceById<Material>(
@@ -132,35 +136,39 @@ const UpdateMaterial: React.FC<props> = ({
     // getCatergory();
     // getUnits();
   }, [GetData]);
-  const updateProduct = async () => {
+  const updateProduct = () => {
     if (nameproduct === '' || quantity < 1) {
       setshowError(true);
     } else {
-      if (ItemEdit) {
-        let urlimg;
+      if (ItemEdit !== undefined) {
+        let urlimg: string = 'none';
         if (ItemEdit?.Img === 'none' && image === null) {
           urlimg = 'none';
-        } else {
-          if (ItemEdit?.Img === 'none' && image !== null) {
-            const reference = storage().ref(image);
-            console.log(reference);
-            const pathToFile = pathimg;
-            await reference.putFile(pathToFile);
-            urlimg = await reference.getDownloadURL();
-          } else {
-            if (ItemEdit?.Img !== 'none') {
-              urlimg = ItemEdit?.Img;
-            }
-          }
         }
+       
+        // else {
+        //   if (ItemEdit?.Img === 'none' && image !== null) {
+        //     const reference = storage().ref(image);
+        //     console.log(reference);
+        //     const pathToFile = pathimg;
+        //     await reference.putFile(pathToFile);
+        //     urlimg = await reference.getDownloadURL();
+        //   } else {
+        //     if (ItemEdit?.Img !== 'none') {
+        //       urlimg = ItemEdit?.Img;
+        //     }
+        //   }
+        // }
 
-        let initaldata = ItemEdit;
-
-        initaldata.Name = nameproduct;
-        initaldata.Number = quantity;
-        // initaldata.MaterialGroup = ChooseCate.id;
-        initaldata.Img = urlimg ? urlimg : 'none';
-        initaldata.Unit = ChooseUnit;
+        let initaldata = {
+          filname: image,
+          pathimg: pathimg,
+          Name: nameproduct,
+          Number: quantity,
+          // initaldata.MaterialGroup = ChooseCate.id;
+          Img: urlimg,
+          Unit: ChooseUnit,
+        };
         // initaldata.BuyingPrice = priceproduct;
         // data.UpdateMaterial(initaldata, ItemEdit?.id).then(result => {
         //   if (result === true) {
@@ -168,6 +176,7 @@ const UpdateMaterial: React.FC<props> = ({
         //   }
         // });
         arrayData[id] = initaldata;
+        console.log(arrayData[id]);
         onArrayData(arrayData);
         onCancel(false);
       }
@@ -202,7 +211,8 @@ const UpdateMaterial: React.FC<props> = ({
     });
   };
   return (
-    <SafeAreaView style={{width: reponsivewidth(330), height: reponsiveheight(600)}}>
+    <SafeAreaView
+      style={{width: reponsivewidth(330), height: reponsiveheight(600)}}>
       <View>
         <View style={style.TitleOverlAdd}>
           <Text
@@ -233,7 +243,7 @@ const UpdateMaterial: React.FC<props> = ({
               <Image
                 style={[
                   style.img,
-                  {width: reponsivewidth(150), height: reponsiveheight(150)},
+                  {width: reponsivewidth(150), height: reponsiveheight(140)},
                 ]}
                 source={imgopick}
               />
@@ -241,9 +251,17 @@ const UpdateMaterial: React.FC<props> = ({
               <Image
                 style={[
                   style.img,
-                  {width: reponsivewidth(150), height: reponsiveheight(150)},
+                  {width: reponsivewidth(150), height: reponsiveheight(140)},
                 ]}
                 source={{uri: arrayData[id]?.Img}}
+              />
+            ) : arrayData[id]?.pathimg ? (
+              <Image
+                style={[
+                  style.img,
+                  {width: reponsivewidth(150), height: reponsiveheight(140)},
+                ]}
+                source={{uri: arrayData[id]?.pathimg}}
               />
             ) : (
               <MaterialIcon name="add-a-photo" size={50} color="#FFFF" />

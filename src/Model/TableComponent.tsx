@@ -1,88 +1,135 @@
-import React, { useEffect, useState } from 'react'
-import {StyleSheet,View, Text, TextStyle, ViewStyle} from'react-native',
+/* eslint-disable no-lone-blocks */
+/* eslint-disable react-native/no-inline-styles */
+/* eslint-disable no-shadow */
+import React, {useEffect, useState} from 'react';
+import {StyleSheet, View, Text, TextStyle, ViewStyle} from 'react-native';
+import {Switch} from 'react-native-elements';
+import { useAppDispatch } from '../redux/hook';
+import { UpdatePermission } from '../redux/reducer/authslice';
+import data from '../services/data';
 import DataService from '../services/dataservice';
-import {Userdata} from './User'
-type  Col ={
-    name:string,
-    key: string| number,
-    width: string| number
+import {reponsiveheight, reponsivewidth} from '../theme/Metric';
+import {Userdata} from './User';
+type Col = {
+  name: string;
+  key: string;
+  width: string | number;
+};
+type props = {
+  columns: Col[];
+  dataFields: any[];
+  textStyle?: TextStyle;
+  ViewStyle?: ViewStyle;
+};
+const TableComponent: React.FC<props> = ({columns, dataFields}) => {
+  const dispatch = useAppDispatch();
+  const [ListCheck, setListCheck] = useState<any[]>([]);
+  const getUser = (data: any[]) => {
+    let b: any[] = [];
+    data.forEach(i => {
+      if (i.type === 0 && i.Name !== 'none') {
+        b.push(i);
+      }
+    });
+    console.log('b', data);
+    setListCheck(b);
+    
+  };
+  useEffect(() => {
+    getUser(dataFields);
+  }, [dataFields]);
+  function changePermission() {
+    dispatch(UpdatePermission());
+  }
 
-}
-type props={
-    columns: Col [],
-    data: any [],
-    textStyle?: TextStyle,
-    ViewStyle?: ViewStyle,
-}
-const TableComponent: React.FC<props> =({columns,data})=>{
-    const [ListCheck,setListCheck]= useState<any[]> (); 
-    const [ListUser,setListUser]= useState<any[]>();
-    const getUser = async()=>{
-        let a = await DataService.Getdata_dtService<Userdata>('user');
-        let b : any[];
-        a.forEach(i=>{
-            if(i.type==0)
-            {
-                b.push(i);
-            }
-        })
-        setListCheck(b);
-        setListUser(a);
+  // eslint-disable-next-line no-shadow
+  const updateType = (val: any, type: number) => {
+    data.updatePermission(val.id, type).then(res => {
+      if (res === true) {
+        console.log('update');
+      }
+    });
+  };
+  const changeSwitch = (data: any, check: boolean) => {
+    console.log(check);
+    if (check === false) {
+      updateType(data, 1);
+      setListCheck(ListCheck.filter(i => i !== data));
+    } else {
+      updateType(data, 0);
+      setListCheck([data, ...ListCheck]);
     }
-    useEffect(()=>{
-        getUser();
-    },[])
-    const changeSwitch=(data: any, check:boolean)=>{
-        if(check== true)
-        {
-            setListCheck(ListCheck.filter(i=>i != data))
-        }
-        else
-        {
-            setListCheck([data,...ListCheck])
-        }
-    }
-    return (
-        <View style={[styles.header_column]}>
-          {columns.map( i=> {
-              <View  style={{width: i.width}}>
-                <Text >{i.name}</Text>
-              </View>
-          })}
-          <View>
-              {
-                  columns.map(i=>{
-                      data.map(data=>{
-                          let check = ListCheck.includes(data);
-                       return (
-                           <View>
-                               {
-                                   data[i.key]== '2' ?
-                                   <View style={{width:i.width}}>
-                                         <Switch
-                                                value={check}
-                                                onValueChange={(value) =>changeSwitch(data,value) }
-                                            />
-                                    </View>
-                                   :
-                                   <View style={{width:i.width}}>
-                                        <Text>{data[i.key]}</Text>
-                                 </View>
-                                  
-                               }
-                           </View>
-                       )
-                        
-                      })
-                  })
-              }
-          </View>
-        </View>
-    )
-}
-export default TableComponent
+    changePermission();
+  };
+  return (
+    <View>
+      <View style={[styles.header_column]}>
+        {columns.map(i => {
+          return (
+            <View style={{width: i.width}}>
+              <Text style={{textAlign: 'center', color: '#FFFF'}}>
+                {i.name}
+              </Text>
+            </View>
+          );
+        })}
+      </View>
+      <View style={{marginTop: 15}}>
+        {dataFields &&
+          dataFields
+            .filter(x => x.Name !== 'none')
+            .map(data => {
+              return (
+                <View
+                  style={{flexDirection: 'row', height: reponsiveheight(75)}}>
+                  {columns.map(col => {
+                    let check = ListCheck.includes(data);
+                    return (
+                      <>
+                        {col.key == '2' ? (
+                          <View
+                            style={{
+                              alignItems: 'center',
+                              width: col.width,
+                            }}>
+                            <Switch
+                              style={{
+                                transform: [{scaleX: 1.5}, {scaleY: 1.5}],
+                              }}
+                              value={check}
+                              onValueChange={value => changeSwitch(data, value)}
+                            />
+                          </View>
+                        ) : (
+                          <View
+                            style={{
+                              width: col.width,
+
+                              alignItems: 'center',
+                            }}>
+                            <Text>{data[col.key]}</Text>
+                          </View>
+                        )}
+                      </>
+                    );
+                  })}
+                </View>
+              );
+            })}
+      </View>
+    </View>
+  );
+};
+export default TableComponent;
 const styles = StyleSheet.create({
-    header_column: {
-        flexDirection: 'row', 
-    }
-})
+  header_column: {
+    flexDirection: 'row',
+    marginTop: 15,
+    marginBottom: 15,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#000000',
+    backgroundColor: '#02569E',
+    paddingTop: 15,
+    paddingBottom: 15,
+  },
+});

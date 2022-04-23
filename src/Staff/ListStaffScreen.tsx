@@ -5,11 +5,11 @@ import {
   StackNavigationProp,
 } from '@react-navigation/stack';
 import React, {useCallback, useEffect, useState} from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, View} from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {CheckBox, Text} from 'react-native-elements';
 import {
 //   TouchableHighlight,
-  TouchableOpacity,
+  // TouchableOpacity,
 } from 'react-native-gesture-handler';
 import {Searchbar} from 'react-native-paper';
 // import Feather from 'react-native-vector-icons/Feather';
@@ -27,6 +27,7 @@ import {useAppSelector} from '../redux/hook';
 import {selectAuth} from '../redux/reducer/authslice';
 import database from '@react-native-firebase/database';
 import storage from '@react-native-firebase/storage';
+import Loading from '../Helper/Loader/Loading';
 type props = {
   navigation: StackNavigationProp<
     EmployeeInformationParamList,
@@ -43,6 +44,7 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
   const [staffArraysearch, setstaffArraysearch] = useState<Userdata[]>([]);
   const [Reload, setReload] = useState<boolean>(false);
   const {typeUser} = useAppSelector(selectAuth);
+  const [loading,setLoading] = useState<boolean>(false);
   var isFocused = useIsFocused();
   const getuser = async () => {
     var datarray = await DataService.Getdata_dtService<Userdata>('user');
@@ -67,11 +69,12 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
     })
    },[])
   useEffect(() => {
-    if (isFocused === true || Reload === false || Reload === true ) {
-      getuser();
-    }
-    if (flag == true) {
-      getuser();
+    if (isFocused === true || Reload === false || Reload === true  || flag == true) {
+      setLoading(true);
+      Promise.resolve( getuser()).then(()=>{
+        setLoading(false);
+      });
+
     }
   }, [isFocused, flag, Reload]);
   const getsearch = useCallback(
@@ -224,7 +227,8 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
                 </TouchableHighlight> */}
       </View>
       <View>
-        {typeUser == 0 && (
+    
+       { typeUser == 0 &&
           <TouchableOpacity
             onPress={() => navigation.navigate('AddstaffScreen')}
             style={{
@@ -236,7 +240,8 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
             <Entypo name="add-user" size={23} />
             <Text style={{marginLeft: 5}}>Thêm</Text>
           </TouchableOpacity>
-        )}
+          }
+        
         <ScrollView  style={{height: reponsiveheight(590)}}>
           {staffArraysearch.length > 0
             ? staffArraysearch.map(item => {
@@ -300,8 +305,12 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
                 const checked = datadel.includes(item);
                 return (
                   <View key={item.id} style={styles.stylecontainer}>
-                    {typeUser === 0 ? (
-                      <TouchableOpacity style={{width: reponsivewidth(350)}}>
+                    {typeUser === 1 ? (
+                      <TouchableOpacity onPress={() => {
+                            navigation.navigate('UserInformation', {
+                              id: item.id,
+                            });
+                          }} style={{width: reponsivewidth(350)}}>
                         <CustomBox
                           isAvatar={true}
                           title={item.Name}
@@ -309,7 +318,8 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
                           avatar={{uri: item.Avatar}}
                         />
                       </TouchableOpacity>
-                    ) : ischeckbox ? (
+                    ) :
+                    ischeckbox ? (
                       <>
                         <CheckBox
                           checked={checked}
@@ -338,7 +348,7 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
                       </>
                     ) : (
                       <TouchableOpacity
-                        onPress={() => {
+                      onPress={() => {
                           navigation.navigate('UserInformation', {id: item.id});
                         }}
                         onLongPress={() => {
@@ -368,7 +378,8 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
               })}
         </ScrollView>
       </View>
-    </SafeAreaView>
+      <Loading visible={loading}/>
+      </SafeAreaView>
   );
 };
 export default ListStaffScreen;

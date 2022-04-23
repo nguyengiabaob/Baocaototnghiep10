@@ -1,20 +1,21 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
-import { useIsFocused } from "@react-navigation/native";
+import { useIsFocused } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { Pressable, SafeAreaView, StyleSheet, TouchableOpacity, View } from  'react-native';
 import { Text } from 'react-native-elements';
-import { Overlay } from "react-native-elements/dist/overlay/Overlay";
-import { ScrollView } from 'react-native-gesture-handler';
-import CustomHyperLink from "../../Model/CustomHyperLink";
+import { Overlay } from 'react-native-elements';
+import { ScrollView, TextInput } from 'react-native-gesture-handler';
+import CustomHyperLink from '../../Model/CustomHyperLink';
 import { Userdata } from '../../Model/User';
 import { Wages } from '../../Model/Wages';
 import data from '../../services/data';
-import { getheight, getwidth, reponsiveheight, reponsivewidth } from "../../theme/Metric";
+import { getheight, getwidth, reponsiveheight, reponsivewidth } from '../../theme/Metric';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { Item } from "react-native-paper/lib/typescript/components/List/List";
-import DataService from "../../services/dataservice";
+import { Item } from 'react-native-paper/lib/typescript/components/List/List';
+import DataService from '../../services/dataservice';
 import database from '@react-native-firebase/database'
+import { Modal, Portal, Provider } from 'react-native-paper';
 type props = {
     visible: boolean
 }
@@ -25,6 +26,7 @@ export const WagesHistory:React.FC<props> = ({visible}) =>{
     const [DetailStaff, setDetailstaff]=useState<Userdata>();
     const [detailSelected,setSelected]= useState<Wages>(); 
     const [reload, setReload]= useState<boolean>(false);
+    const [testState, setTestState]= useState<boolean>(false);
     const isFocused= useIsFocused();
     const tranferday = (d:string)=>{
         var month = new Date(d).getMonth() + 1;
@@ -94,14 +96,15 @@ useEffect(()=>{
         })
     }
     },[detailSelected,Datauser]);
-    return (
+  return (
         <SafeAreaView>
+          
             <ScrollView style={{height:reponsiveheight(620)}}>
                 {DataWages.length > 0 ? DataWages.map(item =>{
                     let user = Datauser.filter(i=> i.id == item.EmployeeID );
                     console.log(DataWages);
                     return (
-                        <View style={[ styles.Shadowbox ,{justifyContent:'center',alignItems:'center',width: reponsivewidth(350),alignSelf:'center', paddingRight:25, marginLeft:15, paddingTop:15, paddingBottom:20, marginTop:15, height:reponsiveheight(180),borderLeftColor: user[0]?.service == "Quản lý" ? 'red' : '#098f11', borderLeftWidth:10, borderRadius:5, }]}>
+                        <View style={[ styles.Shadowbox ,{justifyContent:'center',alignItems:'center',width: reponsivewidth(350),alignSelf:'center', paddingRight:25, marginLeft:15, paddingTop:15, paddingBottom:20, marginTop:15, height:reponsiveheight(180),borderLeftColor: user[0]?.service == 'Quản lý' ? 'red' : '#098f11', borderLeftWidth:10, borderRadius:5, }]}>
                         <View  style={{justifyContent:'center', alignItems:'center', marginLeft:70, width:reponsivewidth(380)}}>
                          <View style={[{justifyContent:'flex-end',alignItems:'flex-start', width:reponsivewidth(380),marginBottom:10, marginLeft:5 }]}>
                              <Text style={{fontWeight:'700'}}>{tranferday(item.Day)}</Text>
@@ -126,6 +129,10 @@ useEffect(()=>{
                        </View>
                 }
             </ScrollView>
+           
+          
+  
+           
     { detailSelected  && DetailStaff &&
             <Overlay isVisible={DetailWages}>
         <View style={{width:getwidth(), height:getheight(),flex:1, marginTop:-10.5}}>
@@ -178,7 +185,6 @@ useEffect(()=>{
 </View>
 </View>
 </View> 
-    
 </Overlay>
 }
         </SafeAreaView>

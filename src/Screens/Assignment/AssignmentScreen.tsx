@@ -18,7 +18,7 @@ import {Overlay, SearchBar, Text} from 'react-native-elements';
 import CustomBoxItem from '../../Model/CustomBoxItem';
 import Materiallcons from 'react-native-vector-icons/MaterialIcons';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {ManageEmployeePramaList} from '../../navigation/types';
+import {AssignmentParamaList, ManageEmployeePramaList} from '../../navigation/types';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import CustomInput from '../../Model/CustomInput';
 import {Modalize} from 'react-native-modalize';
@@ -31,10 +31,14 @@ import {timeWork} from '../../Model/TimeWork';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useAppSelector} from '../../redux/hook';
 import {selectAuth} from '../../redux/reducer/authslice';
+import database from '@react-native-firebase/database';
+import Loading from '../../Helper/Loader/Loading';
+import OptionModal from './OptionModal';
 type props = {
-  navigation: StackNavigationProp<ManageEmployeePramaList, 'Assignment'>;
+  // navigation: StackNavigationProp<ManageEmployeePramaList, 'AssignmentParamaList'>;
+  navigation : StackNavigationProp<AssignmentParamaList,'Assignment'>
 };
-export const AssignmentScreen: React.FC<props> = ({navigation}: props) => {
+export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: props) => {
   const [visible, setvisible] = useState<boolean>(false);
   const [visiblelist, setvisiblelist] = useState<boolean>(false);
   const [TimeworkSelected, setTimeWorkSeleted] = useState<timeWork>();
@@ -49,8 +53,36 @@ export const AssignmentScreen: React.FC<props> = ({navigation}: props) => {
   const [dataSelected2, setdataSelected2] = useState<string[]>([]);
   const [isrerender, setisrerender] = useState<boolean>(false);
   const [dayChoosen, setdayChoosen] = useState<Date>(new Date());
+  const [loading,setLoading]= useState<boolean>(false);
   var isFocused = useIsFocused();
   const {typeUser} = useAppSelector(selectAuth);
+  const [Reload, setReload] = useState<boolean>(false);
+  const [visibleOption,setVisibleOption]= useState<boolean>(false);
+  const [visibleListTimeWork,setVisibleListTimeWork]= useState<boolean>(false);
+  const ModelOption = [
+    {
+      key : 1,
+      title: 'Danh sách ca chung',
+      Action : ()=> {
+        setVisibleOption(false);
+        navigation.navigate('ListGeneralTimeWork');
+      },
+    },
+    {
+      key : 2,
+      title: 'Thêm ca riêng',
+      Action : ()=> {setvisible(true)},
+    }
+  ]
+  const realTime = ()=>{
+      database().ref().on('value', snapshot=>{
+        setReload(prev=> !prev);
+      });
+  }
+  useEffect(()=>{
+    realTime();
+  },[]);
+
   const getalluser = () => {
     let datarray: any[] = [];
     data.getdata('user').then(res => {
@@ -190,11 +222,11 @@ export const AssignmentScreen: React.FC<props> = ({navigation}: props) => {
     });
   };
   const getTimeWork = (day: string) => {
-    console.log('chạy timework');
     let datarray: any[] = [];
     data.getdata('TimeWork').then(res => {
       for (let key in res) {
         if (res[key] != null) {
+          console.log(res);
           if (res[key].Day === day) {
             datarray.push({
               id: key,
@@ -203,11 +235,12 @@ export const AssignmentScreen: React.FC<props> = ({navigation}: props) => {
           }
         }
       }
+      console.log('chạy timework',datarray );
       setTimeWork(datarray);
     });
   };
   useEffect(() => {
-    if (isFocused) {
+    if (isFocused ) {
       getalluser();
       getallAssignment();
     }
@@ -219,9 +252,16 @@ export const AssignmentScreen: React.FC<props> = ({navigation}: props) => {
     // }
   }, [isFocused]);
   useEffect(() => {
-    getTimeWork(new Date().toLocaleString());
-    getuserAssignment(new Date().toLocaleString(), 'all');
-  }, []);
+    if (Reload  == false || Reload == true)
+    {
+    setLoading(true);
+    Promise.all([getTimeWork(dayChoosen.toDateString()),
+      getuserAssignment(dayChoosen.toDateString(), 'all')]).then(
+        (res)=> { setLoading(false)}
+      )
+
+    }
+  }, [Reload]);
   // console.log(DataAssignment);
   const DayVN = (day: string) => {
     if (day === 'Mon') {
@@ -265,6 +305,18 @@ export const AssignmentScreen: React.FC<props> = ({navigation}: props) => {
   const pickday = (day: any) => {
     setchangeday(tranferday(day.dateString));
   };
+  // const RenderNoficatioNoData = useCallback (()=>{
+  //      return (
+  //       <Overlay
+  //       overlayStyle={{
+  //         height: reponsiveheight(450),
+  //         width: reponsivewidth(350),
+  //       }}
+  //       isVisible={visiblelist}>
+  //       <ModalListimeWork Timework={[]} />
+  //     </Overlay>
+  //      ) 
+  // },[])
   LocaleConfig.locales.vn = {
     monthNames: [
       'Tháng 1 ',
@@ -312,6 +364,7 @@ export const AssignmentScreen: React.FC<props> = ({navigation}: props) => {
     const [ModalEdit, setModalEdit] = useState<boolean>(false);
     const [ChoosenEdit, setChoosenEdit] = useState<any>();
     const [flag, setflag] = useState<boolean>(false);
+    // const [TimeWork, setTimeWork]= useState<timeWork[]>();
     const EditTimeWork = (item: any) => {
       if (Name !== '') {
         data.UpdateTimeWork('TimeWork', Name, item.Day, item.id).then(res => {
@@ -328,7 +381,7 @@ export const AssignmentScreen: React.FC<props> = ({navigation}: props) => {
       data.getdata('Assignment').then(res => {
         let datararray: any[] = [];
         for (let key in res) {
-          if (key != '0') {
+          if (key !== '0') {
             datararray.push({
               id: key,
               ...res[key],
@@ -361,8 +414,9 @@ export const AssignmentScreen: React.FC<props> = ({navigation}: props) => {
             Danh sách ca
           </Text>
         </View>
-        <ScrollView style={{borderColor: '#787878', borderTopWidth: 0.75}}>
-          {Timework.length > 0 &&
+        <ScrollView style={{borderColor: '#787878', borderTopWidth: 0.75 }}>
+          { console.log('123456789', new Date().toDateString())}
+          {Timework.length > 0 ?
             Timework.map(item => {
               return (
                 <View
@@ -416,7 +470,7 @@ export const AssignmentScreen: React.FC<props> = ({navigation}: props) => {
                   )}
                 </View>
               );
-            })}
+            }) : <Text style={{textAlign:'center', height:reponsiveheight(300), textAlignVertical:'center', opacity:0.4}}>Chưa có thông tin ca</Text>}
         </ScrollView>
         <View
           style={{
@@ -1002,7 +1056,7 @@ export const AssignmentScreen: React.FC<props> = ({navigation}: props) => {
     data.deletedatAssignment('Assignment', id);
   };
   return (
-    <SafeAreaView>
+    <SafeAreaView style= {{flex:1}}>
       <View style={styles.container}>
         <CustomHeader
           title="Lịch thi công trong tuần"
@@ -1042,7 +1096,7 @@ export const AssignmentScreen: React.FC<props> = ({navigation}: props) => {
             </Text>
             {typeUser == 0 && (
               <Pressable
-                onPress={() => setvisible(true)}
+                onPress={() => setVisibleOption(true)}
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'center',
@@ -1197,7 +1251,7 @@ export const AssignmentScreen: React.FC<props> = ({navigation}: props) => {
             width: reponsivewidth(350),
           }}
           isVisible={visiblelist}>
-          <ModalListimeWork />
+          <ModalListimeWork  Timework={Timework}/>
         </Overlay>
       </View>
       <ModalMutipleSelected
@@ -1210,6 +1264,8 @@ export const AssignmentScreen: React.FC<props> = ({navigation}: props) => {
           setVisibleModal(false);
         }}
       />
+      <OptionModal visible={visibleOption} onCancel={setVisibleOption} options={ModelOption} navigation2={navigation2}/>
+      <Loading visible={loading}/>
     </SafeAreaView>
   );
 };

@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable prettier/prettier */
 /**
  * Sample React Native App
@@ -10,7 +11,7 @@
  */
 
  import { NavigationContainer } from '@react-navigation/native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View } from 'react-native';
 
 //  import {
@@ -34,10 +35,22 @@ import LoginNavigator from './src/navigation/LoginNavigation';
 import RootNavigator from './src/navigation/MainNavigation';
 import { AuthContext } from './src/redux/reducer/authslice';
 import { store } from './src/redux/store';
+import RNBootSplash from 'react-native-bootsplash';
 
 
 
  const App = () => {
+  useEffect(() => {
+    const init = async () => {
+      // …do multiple sync or async tasks
+    };
+
+    init().finally(async () => {
+      await RNBootSplash.hide({ fade: true });
+      console.log("Bootsplash has been hidden successfully");
+    });
+  }, []);
+
   //  useEffect(()=>{
   //   Toast.show({
   //     type:'error',
@@ -47,7 +60,7 @@ import { store } from './src/redux/store';
   //  },[])
    return (
      <Provider store={store}>
-    <NavigationContainer>
+    <NavigationContainer onReady={() => RNBootSplash.hide()}>
       <RootNavigator/>
      <Toast style={{zIndex: 1, elevation:1}} ref={ref=>{Toast.setRef(ref)}}/>
      </NavigationContainer>
