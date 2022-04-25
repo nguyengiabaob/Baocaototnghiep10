@@ -104,15 +104,15 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
     imgref.delete().then(()=>{console.log('del Success')}).catch(e=> console.log(e));
   }
   useEffect(()=>{
-    database().ref('/Products').on('child_changed', snapshot=>{
-      setReload(prev => !prev);
+    database().ref('/Products').on('value', snapshot=>{
+      getDataProduct()
     })
-    database().ref('/ConfigMaterial').on('child_changed', snapshot=>{
-      setReload(prev => !prev);
+    database().ref('/ConfigMaterial').on('value', snapshot=>{
+      getMaterial()
     })
   },[])
   useEffect(() => {
-    if (isFocused === true && ModalDelete == false || Reload === false || Reload === true) {
+    if (isFocused === true && ModalDelete == false) {
       setLoading(true);
      Promise.all([getDataProduct(), getMaterial()])
       .then(()=> setLoading(false) );
@@ -131,7 +131,7 @@ const ListproductScreen: React.FC<Props> = ({navigation}: Props) => {
       // });
      
     }
-  }, [isFocused, ModalDelete, Reload]);
+  }, [isFocused, ModalDelete]);
   useEffect(() => {
     if (ListCheckProduct.length === 0) {
       setModelDel(false);

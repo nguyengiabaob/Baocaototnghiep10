@@ -63,16 +63,15 @@ const ListMaterialView: React.FC<props> = ({navigation}) => {
   };
   useEffect(() => {
     database()
-      .ref()
+      .ref('/Material')
       .on('value', snapshot => {
-        setReload(prev => !prev);
+        getListMaterial();
       });
   }, []);
   useEffect(() => {
-    getListMaterial().then(() => {
-      setReload(false);
-    });
-  }, [reload]);
+    getListMaterial();
+
+  }, []);
   const DelImage = (url: string) => {
     const imgref = storage().refFromURL(url);
     imgref

@@ -25,7 +25,7 @@ export const WagesHistory:React.FC<props> = ({visible}) =>{
     const [DetailWages, setDetailWages]=useState<boolean>(false);
     const [DetailStaff, setDetailstaff]=useState<Userdata>();
     const [detailSelected,setSelected]= useState<Wages>(); 
-    const [reload, setReload]= useState<boolean>(false);
+    // const [reload, setReload]= useState<boolean>(false);
     const [testState, setTestState]= useState<boolean>(false);
     const isFocused= useIsFocused();
     const tranferday = (d:string)=>{
@@ -71,8 +71,11 @@ export const WagesHistory:React.FC<props> = ({visible}) =>{
     // });
 }
 useEffect(()=>{
-    database().ref('/Wages').on('child_changed', ()=>{
-        setReload(prev=> !prev)
+    database().ref('/Wages').on('value', ()=>{
+        getallwages();
+    })
+    database().ref('/user').on('value',()=>{
+        getalluser();
     })
 },[])
     useEffect(()=>{
@@ -85,7 +88,7 @@ useEffect(()=>{
        getalluser();
        getallwages();
     //}
-    },[reload]);
+    },[]);
     useEffect(()=>{
         if (detailSelected != undefined)
     {

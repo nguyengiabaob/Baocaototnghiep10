@@ -7,11 +7,14 @@ import { Overlay, Text } from "react-native-elements";
 import { Input } from "react-native-elements/dist/input/Input";
 import { Area } from "../../Model/Area";
 import CustomBoxItem from "../../Model/CustomBoxItem";
+import { CustomNotification } from "../../Model/CustomNofication";
 import { Table } from "../../Model/Table";
 import { RoomParamList } from "../../navigation/types";
 import data from "../../services/data";
 import DataService from "../../services/dataservice";
 import { reponsiveheight, reponsivewidth } from "../../theme/Metric";
+import WarningIcon from '../../asset/svg/Warning.svg';
+import BellNofi from '../../asset/svg/bellnotification.svg';
 type props ={
     route: RouteProp<RoomParamList,'RoomEdit'>
 }
@@ -25,6 +28,8 @@ export const EditRooms: React.FC<props> = ({route}:props)=>{
     const [StatusSelected, setStatusSelected]= useState<Table>();
     const [Name, setName]= useState<string>('');
     const [Slots, setSlots]= useState<number>(0);
+    const [VisibleUpdate, setvisibleUpdate]= useState<boolean>(false);
+    const [VisibleError, setvisibleError]= useState<boolean>(false);
     const DataArea1 =async ()=>{
         let datarray = await DataService.Getdata_dtService<any>('Area');
         // data.getdata('Area').then(res=> {for ( let key in res)
@@ -105,8 +110,13 @@ const  SaveData =()=>{
     {
         data.UpdateTable(Name ==='' ? StatusSelected.Name : Name ,id,AreaSelected.id, Slots === 0 ? StatusSelected.Slots : Slots,StatusSelected?.Status).then(res=> {if ( res === true)
         {
+            setvisibleUpdate(true);
             console.log( 'Update Table');
         }})
+    }
+    else
+    {
+        setv
     }
 }
     return ( 
@@ -207,6 +217,8 @@ const  SaveData =()=>{
       </View>
       </View>
       </Overlay>
+      <CustomNotification visible={VisibleUpdate} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} Content={'Bạn cập nhật thông tin thành công !'} onCancel={()=>setvisibleUpdate(false)} /> 
+      <CustomNotification visible={VisibleError}  iconTitle ={<WarningIcon  width={reponsivewidth(30)} height={reponsiveheight(30)}/> }  Content={'Vui lòng nhập đầy đủ thông tin !'} onCancel={()=>{setvisibleError(false)}}/>
     </SafeAreaView>
      
     )

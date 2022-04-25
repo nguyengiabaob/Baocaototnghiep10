@@ -65,18 +65,18 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
   };
    useEffect(()=>{
     database().ref('/user').on('value', snapshot=>{
-      setReload(prev=> !prev);
+      getuser();
     })
    },[])
   useEffect(() => {
-    if (isFocused === true || Reload === false || Reload === true  || flag == true) {
+    if (isFocused === true|| flag == true) {
       setLoading(true);
       Promise.resolve( getuser()).then(()=>{
         setLoading(false);
       });
 
     }
-  }, [isFocused, flag, Reload]);
+  }, [isFocused, flag]);
   const getsearch = useCallback(
     (value: string) => {
       if (search != '') {

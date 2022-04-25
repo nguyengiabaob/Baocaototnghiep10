@@ -99,8 +99,8 @@ export const ExpenseManagerScreen: React.FC<props> = ({navigation}: props) => {
   };
   useEffect(() => {
     database()
-      .ref()
-      .on('child_changed', () => setReload(prev => !prev));
+      .ref('/Expense')
+      .on('value', () => getDataExpense());
   }, []);
   const oncheck = (id: string, check: boolean) => {
     if (check) {
@@ -120,8 +120,6 @@ export const ExpenseManagerScreen: React.FC<props> = ({navigation}: props) => {
   useEffect(() => {
     if (
       isFocused === true ||
-      Reload === false ||
-      Reload === true ||
       flag === true
     ) {
       setLoading(true);
@@ -130,7 +128,7 @@ export const ExpenseManagerScreen: React.FC<props> = ({navigation}: props) => {
     // if (flag == true) {
     //   getDataExpense();
     // }
-  }, [isFocused, flag, Reload]);
+  }, [isFocused, flag]);
   const oncheckAll = (check: boolean) => {
     if (check) {
       setCheckAll(false);

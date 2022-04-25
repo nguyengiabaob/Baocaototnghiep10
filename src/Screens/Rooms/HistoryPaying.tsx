@@ -34,8 +34,8 @@ export const HistoryPaying: React.FC<props>= ({getvisible})=> {
        return date + '/' + month + '/' + year;
     };
     useEffect(()=>{
-        database().ref().on('child_changed', ()=>{
-            setReload(prev=>!prev);
+        database().ref('/Bill').on('value', ()=>{
+            getPaying();
         });
     });
     const getPaying= useCallback(async()=>{
@@ -106,7 +106,7 @@ useEffect(()=>{
         }
     );
 
-},[getPaying, reload]);
+},[getPaying]);
 const onDelPaying= async()=>{
     data.deletedData('Bill',itemSelected.id);
     let dataArray = await DataService.Getdata_dtService<any>('ListProduct') ;
