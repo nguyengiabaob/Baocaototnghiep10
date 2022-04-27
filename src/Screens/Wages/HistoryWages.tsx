@@ -27,6 +27,7 @@ export const WagesHistory:React.FC<props> = ({visible}) =>{
     const [detailSelected,setSelected]= useState<Wages>(); 
     // const [reload, setReload]= useState<boolean>(false);
     const [testState, setTestState]= useState<boolean>(false);
+    const [loading,setloading]= useState<boolean>(false);
     const isFocused= useIsFocused();
     const tranferday = (d:string)=>{
         var month = new Date(d).getMonth() + 1;
@@ -85,8 +86,19 @@ useEffect(()=>{
     // )=>{ getallwages();
     //     getalluser();
     // },5000)
-       getalluser();
-       getallwages();
+    if(isFocused== true)
+    {
+        setloading(true);
+        Promise.all(
+            [getallwages(),getalluser()]
+        ).then(
+            ()=>{
+                setloading(false);
+            }   
+        )
+        .catch(e=>console.log(e))
+    }
+     
     //}
     },[]);
     useEffect(()=>{

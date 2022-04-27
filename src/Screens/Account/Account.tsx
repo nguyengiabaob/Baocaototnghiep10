@@ -56,8 +56,8 @@ const AccountScreen: React.FC<Props> = () => {
   const {isLoggedGoogle} = useAppSelector(selectAuth);
   const [erroremail, seterroremail] = useState<string>('');
   const [newpassword, setNewPassword] = useState<string>('');
+  const [loading, setloading]= useState<boolean>(false);
   const [confirm, setconfirm] = useState<string>('');
-  const [Reload, setReload] = useState<boolean>(false);
   const [visiblePermission, setvisiblePermission]= useState<boolean>(false);
   const {typeUser} =useAppSelector(selectAuth);
   const col= [
@@ -85,7 +85,7 @@ const AccountScreen: React.FC<Props> = () => {
   const [arrayuser, setarrayuser] = useState<Userdata[]>([]);
   useEffect(()=>{
     database().ref('/user').on('value',()=>{
-      setReload(prev=> !prev);
+      getUserData();
     })
   },[])
   const getUserData= async()=>{
@@ -113,9 +113,17 @@ const AccountScreen: React.FC<Props> = () => {
       setNewPassword('');
       setconfirm('');
     }
-  }, [visibleEflag, visiblechangePass, Reload]);
+  }, [visibleEflag, visiblechangePass]);
   useEffect(() => {
-    getUserData();
+    setloading(true)
+    Promise.all(
+      [getUserData(),
+       fetchid()
+      ]
+    ).then(()=>{
+      setloading(false);
+    })
+   
     // var data_fetch: any[] = [];
     // data.getdata('user').then(res => {
     //   for (let key in res) {
@@ -126,8 +134,8 @@ const AccountScreen: React.FC<Props> = () => {
     //   }
     //   setarrayuser(data_fetch);
     // });
-    fetchid();
-  }, [Reload]);
+   
+  }, []);
   // useEffect(()=>{
   //     if (isLoggedGoogle === true)
   //     {

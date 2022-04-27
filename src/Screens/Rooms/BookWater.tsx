@@ -1870,7 +1870,8 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
                   </View>
                 );
               })
-            : undefined}
+            : undefined
+            }
         </ScrollView>
         <ListMaterialView
           List={clickItem?.ListMaterial}
