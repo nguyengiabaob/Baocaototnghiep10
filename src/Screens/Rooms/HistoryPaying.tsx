@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useEffect, useState } from 'react';
 import { TouchableOpacity, View,ScrollView, StyleSheet, SafeAreaView, TextInput } from 'react-native';
-import { Overlay, Text } from 'react-native-elements';
+import { Overlay, SearchBar, Text } from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import data from '../../services/data';
 import { getheight, getwidth, reponsiveheight, reponsivewidth } from '../../theme/Metric';
@@ -14,6 +14,7 @@ import database from '@react-native-firebase/database';
 import CustomHyperLink from '../../Model/CustomHyperLink';
 import HistoryPayingDetail from './HistoryPayingDetail';
 import Loading from '../../Helper/Loader/Loading';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 type props ={
     getvisible: (data: any)=>void
 }
@@ -26,7 +27,7 @@ export const HistoryPaying: React.FC<props>= ({getvisible})=> {
     const [detail, setDetail]= useState<boolean>(false);
     const [idclick, setidclick]= useState<any>();
     const [loading,setLoading]= useState<boolean>(false);
-  
+    const [showSearch,setShowSearch]= useState<boolean>(false);
     const tranferday = (d:string)=>{
         var month = new Date(d).getMonth() + 1;
         var date = new Date(d).getDate();
@@ -131,7 +132,7 @@ const onDelPaying= async()=>{
 
     return (
             <SafeAreaView style={{width:getwidth(), height:getheight(),flex:1, marginTop:-9.5}}>
-            
+                
                 <View style={[{flexDirection:'row', justifyContent:'flex-start',padding:18, backgroundColor:'#67bff3', borderColor:'#e5e5e5', borderWidth:2}]}>
                 <View style={{alignSelf:'flex-start', justifyContent:'flex-start', width:reponsivewidth(50)}}>
                 <TouchableOpacity onPress={()=>getvisible(false)}>
@@ -140,6 +141,32 @@ const onDelPaying= async()=>{
                 </View>
                 <Text style={{alignSelf:'center',fontSize:17, width:reponsivewidth(300), textAlign:'left', color:'#FFFF', fontWeight:'700'}}>Lịch sử thanh toán</Text>
                 </View>
+                <View style={[styles.Shadowbox]}>
+                {
+                    showSearch == false ?  
+                    <TouchableOpacity onPress={()=>{
+                        setShowSearch(true);
+                    }}>
+                        <Ionicons size={32} name="search"/>
+                    
+                    </TouchableOpacity>
+                    : 
+                    <View style={{flexDirection:'row', justifyContent:'flex-end'}}>
+                        <SearchBar 
+                            style={{width:reponsivewidth(280)}}
+                            placeholder='Nhập mã hóa đơn'                  
+                        />
+                    <TouchableOpacity onPress={()=>{
+                        setShowSearch(false);
+                    }} style={{marginLeft: 8}}>
+                        <Text >
+                            Hủy
+                        </Text>
+                    </TouchableOpacity>
+                    </View>
+                }
+                
+            </View>
                 <ScrollView>
                 {/* {console.log(datapaying.length > 0)} */}
                 {datapaying.length > 0 && datapaying.map(item=>{

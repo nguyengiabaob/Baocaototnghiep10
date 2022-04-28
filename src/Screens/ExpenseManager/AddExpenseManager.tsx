@@ -27,6 +27,7 @@ export const AddExpenseManager: React.FC<props> = ({navigation}) => {
   const [ExpenseTotal, setExpenseTotal] = useState<number>(0);
   const [AddSuccess, setAddSuccess] = useState<boolean>(false);
   const [AddError, setAddError] = useState<boolean>(false);
+  
   const tranferday = (d: string) => {
     var month = new Date(d).getMonth() + 1;
     var date = new Date(d).getDate();
