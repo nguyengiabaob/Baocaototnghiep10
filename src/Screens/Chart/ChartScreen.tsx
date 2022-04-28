@@ -43,6 +43,7 @@ export const ChartScreen: React.FC = () => {
   const [ModeYearclick, setYearclick] = useState<any>(new Date().getFullYear());
   const [showmodelyear, setshowmodelyear] = useState<boolean>(false);
   const [reload,setReload] =useState<boolean>(false);
+  const [Loading,setLoading]= useState<boolean>(false);
   const RealTime = ()=>{
     database().ref().on('child_changed', ()=>{
       setReload(prev=> !prev);
@@ -412,9 +413,17 @@ export const ChartScreen: React.FC = () => {
     
   }, [reload]);
   useEffect(() => {
-    DataChart(optionDay);
-    getinventory();
-    getTopSeller();
+    setLoading(true);
+    Promise.all([
+      DataChart(optionDay),
+      getinventory(),
+      getTopSeller(),
+    ]).then(()=>{
+
+    }).then(
+      ()=> setLoading(false)
+    )
+  
   }, [DataChart, optionDay, getinventory, getTopSeller]);
   return (
     <SafeAreaView style={{flex: 1}}>

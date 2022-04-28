@@ -3,7 +3,7 @@
 import { useIsFocused } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { Pressable, SafeAreaView, StyleSheet, TouchableOpacity, View } from  'react-native';
-import { Text } from 'react-native-elements';
+import { SearchBar, Text } from 'react-native-elements';
 import { Overlay } from 'react-native-elements';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
 import CustomHyperLink from '../../Model/CustomHyperLink';
@@ -16,6 +16,7 @@ import { Item } from 'react-native-paper/lib/typescript/components/List/List';
 import DataService from '../../services/dataservice';
 import database from '@react-native-firebase/database'
 import { Modal, Portal, Provider } from 'react-native-paper';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 type props = {
     visible: boolean
 }
@@ -25,8 +26,10 @@ export const WagesHistory:React.FC<props> = ({visible}) =>{
     const [DetailWages, setDetailWages]=useState<boolean>(false);
     const [DetailStaff, setDetailstaff]=useState<Userdata>();
     const [detailSelected,setSelected]= useState<Wages>(); 
-    const [reload, setReload]= useState<boolean>(false);
+    // const [reload, setReload]= useState<boolean>(false);
     const [testState, setTestState]= useState<boolean>(false);
+    const [loading,setloading]= useState<boolean>(false);
+    const [showSearch,setShowSearch]= useState<boolean>(false);
     const isFocused= useIsFocused();
     const tranferday = (d:string)=>{
         var month = new Date(d).getMonth() + 1;
@@ -71,8 +74,11 @@ export const WagesHistory:React.FC<props> = ({visible}) =>{
     // });
 }
 useEffect(()=>{
-    database().ref('/Wages').on('child_changed', ()=>{
-        setReload(prev=> !prev)
+    database().ref('/Wages').on('value', ()=>{
+        getallwages();
+    })
+    database().ref('/user').on('value',()=>{
+        getalluser();
     })
 },[])
     useEffect(()=>{
@@ -82,10 +88,21 @@ useEffect(()=>{
     // )=>{ getallwages();
     //     getalluser();
     // },5000)
-       getalluser();
-       getallwages();
+    if(isFocused== true)
+    {
+        setloading(true);
+        Promise.all(
+            [getallwages(),getalluser()]
+        ).then(
+            ()=>{
+                setloading(false);
+            }   
+        )
+        .catch(e=>console.log(e))
+    }
+     
     //}
-    },[reload]);
+    },[]);
     useEffect(()=>{
         if (detailSelected != undefined)
     {
@@ -98,7 +115,32 @@ useEffect(()=>{
     },[detailSelected,Datauser]);
   return (
         <SafeAreaView>
-          
+            <View style={[styles.Shadowbox]}>
+                {
+                    showSearch == false ?  
+                    <TouchableOpacity onPress={()=>{
+                        setShowSearch(true);
+                    }}>
+                        <Ionicons size={32} name="search"/>
+                    
+                    </TouchableOpacity>
+                : 
+                    <View style={{flexDirection:'row', justifyContent:'flex-end'}}>
+                        <SearchBar 
+                            style={{width:reponsivewidth(280)}}
+                            placeholder='Nhập tên nhân viên, chưc vụ'                  
+                        />
+                    <TouchableOpacity onPress={()=>{
+                        setShowSearch(false);
+                    }} style={{marginLeft: 8}}>
+                        <Text >
+                            Hủy
+                        </Text>
+                    </TouchableOpacity>
+                    </View>
+                }
+                
+            </View>
             <ScrollView style={{height:reponsiveheight(620)}}>
                 {DataWages.length > 0 ? DataWages.map(item =>{
                     let user = Datauser.filter(i=> i.id == item.EmployeeID );

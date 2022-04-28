@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, useIsFocused } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, TouchableOpacity, View } from 'react-native';
 import { Overlay, Text } from 'react-native-elements';
@@ -30,7 +30,9 @@ const [BillTable,setBillTable]= useState<any[]>([]);
 const [BookTable,setBookTable]= useState<any[]>([]);
 const [VisibleNotifi, setVisibleNotifi]= useState<boolean>(false);
 const [VisibleNotifiSuccess, setVisibleNotifiSuccess]= useState<boolean>(false);
-const [reload,setReload]= useState<boolean>(false);
+const [loading,setLoaing]= useState<boolean>(false);
+
+const isFocused = useIsFocused();
 const getTable= useCallback(async()=>{
       // let datarray :any[] = [];
       // data.getdata('Table').then(res=> {for ( let key in res)
@@ -92,14 +94,27 @@ const checkBookTable =async() =>{
   // })
 }
 useEffect(()=>{
-  database().ref('/Table').on('child_changed',()=>{
-      setReload(prev=> !prev);
+  database().ref('/Table').on('value',()=>{ 
+    checkBookTable();
   })
-})
+  database().ref('Table').on('value',()=>{
+    checkExistBill();
+  })
+},[])
 useEffect(()=>{
-  checkExistBill();
-  checkBookTable();
-},[reload])
+  if(isFocused == true)
+  {
+    setLoaing(true);
+    Promise.all(
+      [ checkExistBill(),
+        checkBookTable()]
+    ).then(
+     ()=> {setLoaing(false)} 
+    )
+  
+  }
+ 
+},[])
 const TransferTable =() =>{
    if (table?.Status === 0 )
    {

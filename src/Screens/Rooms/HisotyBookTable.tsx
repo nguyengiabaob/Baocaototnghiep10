@@ -34,7 +34,15 @@ export const HistoryBookTable: React.FC<props> = ({getvisible}) => {
   const [datatable, setdataTable] = useState<any[]>([]);
   const [visibleModal, setvisibleModal] = useState<boolean>(false);
   const [visibleModalDel, setvisibleModalDel] = useState<boolean>(false);
-  const [reload,setReload]= useState<boolean>(false);
+  const [Loading,setLoading]= useState<boolean>(false);
+  useEffect(()=>{
+    database().ref('/BookTable').on('value',()=>{
+        getBookTable();
+    })
+    database().ref('/Table').on('value',()=>{
+      gettable();
+    })
+  },[])
   const tranferday = (d: string) => {
     var month = new Date(d).getMonth() + 1;
     var date = new Date(d).getDate();
@@ -112,11 +120,11 @@ export const HistoryBookTable: React.FC<props> = ({getvisible}) => {
     // })
   };
   useEffect(() => {
-    if (visibleModal === false|| reload == false || reload == true) {
+    if (visibleModal === false) {
       getBookTable();
       gettable();
     }
-  }, [visibleModal,reload]);
+  }, [visibleModal]);
   type propsedit = {
     visible: boolean;
   };

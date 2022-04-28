@@ -59,8 +59,8 @@ const Addproductscreen: React.FC<Props> = ({navigation}: Props) => {
       {
         const textMaterial = ListMaterial.reduce((previous,current)=> previous + current.Name + ', '
         ,a);
-        console.log('78465',textMaterial);
-        console.log('78465789',ListMaterial);
+        // console.log('78465',textMaterial);
+        // console.log('78465789',ListMaterial);
         setStringMaterial(textMaterial);
       }
   },[ListMaterial])

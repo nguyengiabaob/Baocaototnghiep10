@@ -30,6 +30,7 @@ import Warning from '../../asset/svg/Warning.svg';
 import DataService from '../../services/dataservice';
 import database from '@react-native-firebase/database';
 import Loading from '../../Helper/Loader/Loading';
+import BellNofi from '../asset/svg/bellnotification.svg';
 type props ={
     navigation: StackNavigationProp<RoomParamList,'RoomScreen'>
 }
@@ -58,10 +59,14 @@ type propsModal={
   Visible: boolean,
 }
 useEffect(()=>{
-  database().ref().on('value',()=>{
-    setReload(prev => !prev);
+  database().ref('/Table').on('value',()=>{
+    // setReload(prev => !prev);
+    DataTable();
 
   });
+  database().ref('/Area').on('value',()=>{
+   DataArea1();
+  })
 },[]);
 const DataArea1 =async ()=>{
 //     let datarray :any[] = [];
@@ -130,15 +135,15 @@ const DataTable =async()=>{
 //   let time =setTimeout(DataTable(),9000);
 //   clearTimeout(time);
 // })
+// useEffect(()=>{
+//     if (visible === false)
+//     {
+//      DataArea1();
+//      DataTable();
+//     }
+// },[visible]);
 useEffect(()=>{
-    if (visible === false)
-    {
-     DataArea1();
-     DataTable();
-    }
-},[visible]);
-useEffect(()=>{
-  if (isFocused === true || Reload == false || Reload == true)
+  if (isFocused === true )
   {
     setloading(true);
     Promise.all<any>(
@@ -150,7 +155,7 @@ useEffect(()=>{
     );
 
   }
-},[isFocused,Reload]);
+},[isFocused]);
 
 const ModalAreaDeleted: React.FC = ()=>{
   const [visiblenotification, setvisiblenotification] = useState(false);
@@ -285,15 +290,15 @@ const NotificationDel: React.FC <props> = ({Visible}: props)=>{
 const DelTable: React.FC =()=>{
   const [visiblenotification, setvisiblenotification] = useState(false);
   const [TableDeleted, setTableDeleted]= useState<Table[]>([]);
-  const onPress = async( item: Table ,pressed:boolean)=>{
+  const onPress = ( item: Table ,pressed:boolean)=>{
     if (pressed)
     {
-       await  setTableDeleted(TableDeleted.filter(i=>i !== item));
+        setTableDeleted(TableDeleted.filter(i=>i !== item));
     }
     else
     {
-      console.log('array', [...TableDeleted, item]);
-        await setTableDeleted([...TableDeleted, item]);
+      // console.log('array', [...TableDeleted, item]);
+        setTableDeleted([...TableDeleted, item]);
     }
 
 };
@@ -302,8 +307,10 @@ const Deletetable = ()=>{
   if (TableDeleted.length>0)
   {
 
-   TableDeleted.forEach(item=>{
+   Promise.all(TableDeleted.map(item=>{
      data.deletedData('Table',item.id);
+   })).catch(e=>{
+     console.log(e);
    });
 }
 };
@@ -329,7 +336,7 @@ return (
        dataTable. map(item=>{
         const pressedbox = TableDeleted.includes(item);
          return (
-          <TouchableOpacity  key={item.id} onPress={async()=>{await onPress(item,pressedbox);}}    style={{ width:reponsivewidth(315) ,flexDirection:'row',borderColor:'#c1bbbb', borderWidth:0.6, marginTop:15, marginLeft:10, height:reponsiveheight(90), justifyContent:'center', alignItems:'center' ,borderRadius:4}}>
+          <TouchableOpacity  key={item.id} onPress={()=>{ onPress(item,pressedbox);}}    style={{ width:reponsivewidth(315) ,flexDirection:'row',borderColor:'#c1bbbb', borderWidth:0.6, marginTop:15, marginLeft:10, height:reponsiveheight(90), justifyContent:'center', alignItems:'center' ,borderRadius:4}}>
           <CustomBox  stylecontainet={{padding:5, width:reponsiveheight(240)}} pressed={pressedbox}  isAvatar={false} title={item.Name}  />
          </TouchableOpacity>
          );
@@ -407,23 +414,24 @@ return (
 const ModalTable:React.FC = ()=>{
   const [dataArea, setdataArea]= useState<Area[]>([]);
   const [AreaSelected, setAreaSelected]= useState<Area>();
-  const DataArea = ()=>{
-    let datarray :any[] = [];
-    data.getdata('Area').then(res=> {for ( let key in res)
-    {
-        if (key !== '0')
-        {
-        datarray.push(
-            {
-                id: key,
-                ...res[key],
-            }
-        );
-        }
-    }
+  const DataArea = async ()=>{
+    let datarray = await  DataService.Getdata_dtService<Area>('Area');
+    
+    // data.getdata('Area').then(res=> {for ( let key in res)
+    // {
+    //     if (key !== '0')
+    //     {
+    //     datarray.push(
+    //         {
+    //             id: key,
+    //             ...res[key],
+    //         }
+    //     );
+    //     }
+    // }
+
     setdataArea(datarray);
-});
-};
+}
 useEffect(()=>{
     DataArea();
 },[]);
@@ -520,15 +528,25 @@ useEffect(()=>{
   );
 };
 const ModalArea: React.FC = ()=>{
+ const [visibleSuccess,setVisibleSuccess]= useState<boolean>(false);
+ const [visibleError,setVisibleError]= useState<boolean>(false);
  const [nameArea, setnameArea] = useState<string>('');
  const AddArea= ()=>{
   if ( nameArea !== '')
   {
   data.postArea(nameArea).then(res=> {
     if (res === true)
-    { console.log('posted Area');}
+    { console.log('posted Area');
+  
+      setVisibleSuccess(true);
+    }
   });
   }
+  else
+  {
+    setVisibleError(true);
+  }
+
 };
   return (
     <SafeAreaView style={{width:reponsivewidth(320), height: reponsiveheight(300)}}>
@@ -556,11 +574,15 @@ const ModalArea: React.FC = ()=>{
             </Text>
           </TouchableOpacity>
         </View>
+        <CustomNotification  title='Thông báo' visible={visibleSuccess} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} Content={'Bạn đã thêm thành công !'} onCancel={()=>setVisibleSuccess(false)}/>
+        <CustomNotification  title='Thông báo' visible={visibleError} iconTitle={<Warning width={reponsivewidth(30)} height={reponsiveheight(30)}/>} Content={'vui lòng nhập đầy đủ thông tin !'} onCancel={()=>setVisibleError(false)}/>
     </SafeAreaView>
   );
 };
 const ModalEditArea:React.FC =()=>{
   const ModalDetalEdit:React.FC= ()=>{
+    const [visibleUpdate,setVisibleUpdate]= useState<boolean>(false);
+    const [visibleError,setVisibleError]= useState<boolean>(false);
     const SaveArea= (id :string)=>{
       if ( IDArea !== undefined)
       {
@@ -571,8 +593,12 @@ const ModalEditArea:React.FC =()=>{
         let area : Area = IDArea;
         if ( valueAreaName !== '')
         {
-        area.Name = valueAreaName;
-        setIDArea(area);
+          area.Name = valueAreaName;
+          setIDArea(area);
+        }
+        else
+        {
+          
         }
       }
     };
@@ -605,6 +631,8 @@ const ModalEditArea:React.FC =()=>{
                   </Text>
                </TouchableOpacity>
               </View>
+        <CustomNotification visible={visibleUpdate} title={'Thông báo'} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} Content={'Bạn đã cập nhật thành công !'} onCancel={()=>setVisibleUpdate(false)} />
+        <CustomNotification visible={visibleError} title= {"Thông báo"} iconTitle ={<Warning width={reponsivewidth(30)} height={reponsiveheight(30)}/> }  Content={'Vui lòng nhập đầy đủ thông tin !'} onCancel={()=>setVisibleError(false)}/>
   </SafeAreaView>
     );
   };
