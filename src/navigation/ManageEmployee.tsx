@@ -9,8 +9,10 @@ import CreatAccount from '../Staff/CreatAccountScreen';
 import ManageStaffScreen from '../Staff/ManageStaffScreen';
 import {reponsiveheight} from '../theme/Metric';
 import AssigmentNavigation from './AssignmentNavigation';
+import AttendanceNavigator from './AttendanceNavigation';
 import EmployeeInformationNavigator from './EmployeeInformation';
 import {ManageEmployeePramaList} from './types';
+import WagesNavigator from './WagesNavigation';
 // import Dashboard from '../Dashboard/DashboardScreen';
 const ManageEmployeeStack = createStackNavigator<ManageEmployeePramaList>();
 const ManageEmployeeNavigator: React.FC = () => {
@@ -60,25 +62,25 @@ const ManageEmployeeNavigator: React.FC = () => {
         component={AssigmentNavigation}
       />
       <Screen
-        name="Wages"
-        options={{
-          headerShown: true,
-          headerStyle: {
-            backgroundColor: '#67bff3',
-            borderBottomLeftRadius: 15,
-            borderBottomRightRadius: 15,
-            height: reponsiveheight(55),
-          },
-          headerTitle: 'Chấm công',
-          headerTitleStyle: {color: '#FFF'},
-          headerTintColor: '#FFF',
-          headerTitleAlign: 'center',
-        }}
-        component={TimeKeeping}
+        name="WagesParamaList"
+        // options={{
+        //   headerShown: true,
+        //   headerStyle: {
+        //     backgroundColor: '#67bff3',
+        //     borderBottomLeftRadius: 15,
+        //     borderBottomRightRadius: 15,
+        //     height: reponsiveheight(55),
+        //   },
+        //   headerTitle: 'Chấm công',
+        //   headerTitleStyle: {color: '#FFF'},
+        //   headerTintColor: '#FFF',
+        //   headerTitleAlign: 'center',
+        // }}
+        component={WagesNavigator}
       />
-      <Screen name="AttendanceScreen"
+      <Screen name="AttendanceParamaList"
         options={{
-          headerShown: true,
+          headerShown: false,
           headerStyle: {
             backgroundColor: '#67bff3',
             borderBottomLeftRadius: 15,
@@ -90,7 +92,7 @@ const ManageEmployeeNavigator: React.FC = () => {
           headerTintColor: '#FFF',
           headerTitleAlign: 'center',
         }}
-        component={Attendance}/>
+        component={AttendanceNavigator}/>
     </Navigator>
   );
 };

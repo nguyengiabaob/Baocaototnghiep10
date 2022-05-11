@@ -241,7 +241,7 @@ async function UpdateStaff (){
                    <Text style={{marginHorizontal:8}}>Chức vụ</Text>
                </View>
                <View style={{flex:0.8, justifyContent:'center'}}>
-                    <Input onChangeText={(text)=>{setService(text)}} inputStyle={{fontSize:16,marginBottom:-10}}>{user.service =='none' ? 'Không có' : user.service }</Input>
+                    <Input disabled={true} onChangeText={(text)=>{setService(text)}} inputStyle={{fontSize:16,marginBottom:-10}}>{user.type ==1 ? 'Nhân viên' : user.type ==0 ? 'Quản lý' : 'Không có' }</Input>
                </View>
             </View>
             <View style={style.fieldinfo}>

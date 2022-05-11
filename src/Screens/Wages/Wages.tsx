@@ -47,31 +47,48 @@ export const Wages :React.FC = ()=>{
     {
         let a = await DataService.Getdata_dtService<AttendanceMode>('LogAttendance');
         EmployeeIDselected.forEach(item=>{
-            let countStart = 0;
-            let countEnd = 0;
+            // let countStart = 0;
+            let totalTime = 0;
            a.forEach(i=> {
                 if (i.userId === item.id && new Date(i.date).getMonth() + 1 == new Date( DayCheck).getMonth() + 1 && new Date(i.date).getFullYear() === new Date( DayCheck).getFullYear() )
                 {
-                    if (i.type == 'Bắt đầu')
+                   if (i.type == 'Bắt đầu')
                     {
-                        countStart +=   Number(Number(new Date(i.time).getMinutes() / 60).toFixed(2));
-                        // console.log('TimeArray',  new Date(i.time).geHours());
-                    }
-                    else
-                    {
-                        if (i.type == 'Kết thúc')
+                        let time= 0;
+                        // countStart +=   Number(Number(new Date(i.time).getMinutes() / 60).toFixed(2));
+                        let b =a.find(x=> 
+                            new Date(x.time).getDate() ==  new Date(i.time).getDate() &&  new Date(x.time).getMonth()+1 ==  new Date(i.time).getMonth()+ 1 &&  new Date(x.time).getFullYear() ==  new Date(i.time).getFullYear() && x.type =='Kết thúc'
+                        )
+                        if(b)
                         {
-                            countEnd += Number(Number(new Date(i.time).getMinutes() / 60).toFixed(2));
-                            // console.log('TimeArray',  i);
+                            let hours = (new Date(b.time).getHours() - new Date(i.time).getHours()) * 60 ;
+                            let minutes = new Date(b.time).getMinutes() - new Date(i.time).getMinutes() ;
+                            time = Number(((hours + minutes)/ 60).toFixed(2)) ;
+                            totalTime += time;
                         }
                     }
+                        // console.log('TimeArray',  new Date(i.time).geHours());
+                    // } 
+                    // if (i.type == 'Bắt đầu')
+                    // {
+                    //     countStart +=   Number(Number(new Date(i.time).getMinutes() / 60).toFixed(2));
+                    //     // console.log('TimeArray',  new Date(i.time).geHours());
+                    // }
+                    // else
+                    // {
+                    //     if (i.type == 'Kết thúc')
+                    //     {
+                    //         countEnd += Number(Number(new Date(i.time).getMinutes() / 60).toFixed(2));
+                    //         // console.log('TimeArray',  i);
+                    //     }
+                    // }
                 }
            });
-           console.log('countEnd',   countEnd );
-           console.log('countStart',  countStart );
+        //    console.log('countEnd',   countEnd );
+           console.log('countStart',  totalTime );
            arr.push({
                ...item,
-               TimeWork: countEnd === 0 || countStart === 0 ? 0 :  countEnd - countStart,
+               TimeWork: totalTime === 0  ? 0 : totalTime ,
                DateLog: new Date(DayCheck).toDateString(),
 
            });
@@ -370,7 +387,7 @@ export const Wages :React.FC = ()=>{
 
             let total = i.TimeWork * Number(MoneyHour);
             total1+=total;
-                data.PostWages(i.id, Number(MoneyHour),total,i.TimeWork,new Date().toDateString());
+                data.PostWages(i.id, Number(MoneyHour),total,i.TimeWork,new Date().toDateString(), chooosenMonth);
             }))
             .then( () => {
                 {

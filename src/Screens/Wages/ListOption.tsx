@@ -14,9 +14,8 @@ import {Overlay} from 'react-native-elements';
 import {ScrollView} from 'react-native-gesture-handler';
 import {reponsiveheight, reponsivewidth} from '../../theme/Metric';
 type option = {
-  id: number | string;
-  title: string;
-  Action: (val) => void;
+  item: any;
+  Action: (val: any) => void;
   viewStyle?: ViewStyle;
   textStyle?: TextStyle;
 };
@@ -25,17 +24,19 @@ type props = {
   options: option[];
   onCancel: (val: any) => void;
   title: string;
-  Selected: any;
+  Selected?: any;
 };
-const OptionModal: React.FC<props> = ({
+const ListOptionModal: React.FC<props> = ({
   visible,
   options,
   onCancel,
   title,
   Selected,
 }) => {
+ 
   return (
     <Overlay isVisible={visible}>
+      {console.log('options', options)}
       <SafeAreaView
         style={{
           width: reponsivewidth(300),
@@ -66,7 +67,7 @@ const OptionModal: React.FC<props> = ({
                       marginVertical: 10,
                       padding: 15,
                       backgroundColor: Selected
-                        ? Selected.id === x.id
+                        ? Selected.id === x.item?.id
                           ? '#02569E'
                           : '#FFFF'
                         : '#FFFF',
@@ -77,13 +78,13 @@ const OptionModal: React.FC<props> = ({
                       x.textStyle,
                       {
                         color: Selected
-                          ? Selected.id === x.id
+                          ? Selected.id === x.item?.id
                             ? '#FFFF'
                             : '#000000'
                           : '#000000',
                       },
                     ]}>
-                    {x.title}
+                    {x.item.name}
                   </Text>
                 </TouchableOpacity>
               );
@@ -99,7 +100,7 @@ const OptionModal: React.FC<props> = ({
     </Overlay>
   );
 };
-export default OptionModal;
+export default ListOptionModal;
 const styles = StyleSheet.create({
   TitleOverlAdd: {
     borderBottomColor: '#02569E',

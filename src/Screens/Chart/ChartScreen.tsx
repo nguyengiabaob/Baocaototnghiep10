@@ -91,10 +91,10 @@ export const ChartScreen: React.FC = () => {
       count++;
     }
     console.log(count);
-    if (count === 4 || count === 5) {return 'ng';}
-    // else
-    //   if (count === 5)
-    //     return "trm";
+    if (count === 4  ) {return 'ng';}
+    else
+      if (count === 5)
+        return "t";
     else if (count === 6) {return 'tr';}
     else if (count === 9) {return 'tỷ';}
     return '';
@@ -375,17 +375,17 @@ export const ChartScreen: React.FC = () => {
           dataArray[i] = dataArray[i] / 1000;
         }
       }
-      // if(unit=="trm")
-      // {
-      //   for(let i= 0 ;i< dataArray.length;i++)
-      //   {
-      //       dataArray[i]= dataArray[i]/1000
-      //   }
+      if(unit=="t")
+      {
+        for(let i= 0 ;i< dataArray.length;i++)
+        {
+            dataArray[i]= Number(dataArray[i]/1000).toFixed(1);
+        }
 
-      // }
+      }
       if (unit == 'tr') {
         for (let i = 0; i < dataArray.length; i++) {
-          dataArray[i] = dataArray[i] / 1000000;
+          dataArray[i] = Number(dataArray[i] / 1000000).toFixed(3);
         }
       }
       if (unit == 'tỷ') {
@@ -504,7 +504,7 @@ export const ChartScreen: React.FC = () => {
               backgroundColor: '#ffffff',
               backgroundGradientFrom: '#ffffff',
               backgroundGradientTo: '#ffffff',
-              decimalPlaces: 2, // optional, defaults to 2dp
+              decimalPlaces: 1, // optional, defaults to 2dp
               color: (opacity = 1) => `rgba(2, 86, 185, ${opacity})`,
               labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
               style: {

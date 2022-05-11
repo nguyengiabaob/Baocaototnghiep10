@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   Image,
   SafeAreaView,
@@ -10,12 +10,13 @@ import {
   ViewStyle,
 } from 'react-native';
 import {Overlay} from 'react-native-elements';
+import Loading from '../../Helper/Loader/Loading';
 import DataService from '../../services/dataservice';
 import {reponsiveheight, reponsivewidth} from '../../theme/Metric';
 type props = {
   visible: boolean;
   viewStyle?: ViewStyle;
-  idBill: string;
+  idBill: any;
   onCancel: (value: any) => void;
 };
 const HistoryPayingDetail: React.FC<props> = ({
@@ -26,24 +27,43 @@ const HistoryPayingDetail: React.FC<props> = ({
 }) => {
   const [Bill, setBill] = useState<any>();
   const [ListProduct, setListProduct] = useState<any[]>();
-  const getBill = async () => {
-    let bill = await DataService.Getdata_dtServiceById('Bill', idBill);
-    let listProduct = await DataService.Getdata_dtService('listProduct');
+  const [loading, setloading] = useState<boolean>(false);
+  const getBill = useCallback(async () => {
+    let bill = await DataService.Getdata_dtServiceById<any>('Bill', idBill.id);
+    let listProduct = await DataService.Getdata_dtService<any>('ListProduct');
+    let Products = await DataService.Getdata_dtService<any>('Products');
+    let newListProduct = listProduct.filter(x => x.billID === bill?.id);
+    if (newListProduct.length > 0) {
+      newListProduct.forEach(x => {
+        let a = Products.find(i => i.id === x.productID);
+        console.log('a', a);
+        if (a) {
+          x.product = {...a};
+        }
+      });
+    }
     setBill(bill);
-    setListProduct(listProduct);
-  };
+    setListProduct(newListProduct);
+  }, [idBill]);
   useEffect(() => {
-    getBill();
-  }, []);
+    setloading(true);
+    Promise.resolve(getBill()).then(() => {
+      setloading(false);
+    });
+  }, [getBill]);
   return (
     <Overlay isVisible={visible}>
       <SafeAreaView style={[viewStyle]}>
         <View style={[styles.title_Header]}>
-          <Text style={styles.title_Font}>{Bill.BillId}</Text>
+          <Text style={styles.title_Font}>{Bill?.billID}</Text>
+        </View>
+        <View style={{flexDirection: 'row', marginBottom: 25, marginTop: 15}}>
+          <Text style={{fontWeight: '700', marginRight: 10}}>Người lập :</Text>
+          <Text>{idBill ? idBill.createrID.Name : ''}</Text>
         </View>
         <View>
           {ListProduct &&
-            ListProduct.filter(x => x.BillId == Bill.id).map(x => {
+            ListProduct.filter(x => x.billID === Bill?.id).map(x => {
               return (
                 <View
                   style={{
@@ -63,7 +83,7 @@ const HistoryPayingDetail: React.FC<props> = ({
                         width: reponsivewidth(80),
                         height: reponsiveheight(80),
                       }}
-                      source={{uri: x.Image}}
+                      source={{uri: x.product?.Image}}
                     />
                   </TouchableOpacity>
                   <View style={{marginLeft: 15, width: reponsivewidth(150)}}>
@@ -78,15 +98,15 @@ const HistoryPayingDetail: React.FC<props> = ({
                     <View style={{flexDirection: 'row'}}>
                       <Text style={{marginRight: 15}}>
                         {' '}
-                        Số lượng {x.Quanity}
+                        Số lượng {x.Number}
                       </Text>
                       <Text>
                         {' '}
                         Giá :{' '}
-                        {x.Price_product.toString().replace(
-                          /\B(?=(\d{3})+(?!\d))/g,
-                          ',',
-                        )}
+                        {Number(x.product?.Price_product)
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                        {''} VND
                       </Text>
                     </View>
                   </View>
@@ -94,18 +114,25 @@ const HistoryPayingDetail: React.FC<props> = ({
               );
             })}
         </View>
-        <View style={{justifyContent: 'flex-end'}}>
-          <Text style={{fontWeight: '700'}}>Tổng cộng {Bill.Total}</Text>
+        <View style={{alignItems: 'flex-end', marginTop: 15}}>
+          <Text style={{fontWeight: '700', fontSize: 15}}>
+            Tổng cộng{' '}
+            {Number(Bill?.Total)
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+            {''} VND
+          </Text>
         </View>
-        <View>
+        <View style={{alignItems: 'center', marginTop: 25}}>
           <TouchableOpacity
             style={styles.btnExit}
             onPress={() => {
               onCancel(false);
             }}>
-            <Text>thoát</Text>
+            <Text style={{color: '#FFFF'}}>Thoát</Text>
           </TouchableOpacity>
         </View>
+        <Loading visible={loading}/>
       </SafeAreaView>
     </Overlay>
   );
@@ -115,9 +142,13 @@ const styles = StyleSheet.create({
   title_Header: {
     backgroundColor: '#02569E',
     textAlign: 'center',
+    paddingBottom: 5,
+    paddingTop: 5,
   },
   title_Font: {
     fontSize: 18,
+    textAlign: 'center',
+    color: '#FFFF',
   },
   btnExit: {
     backgroundColor: '#226cb3',

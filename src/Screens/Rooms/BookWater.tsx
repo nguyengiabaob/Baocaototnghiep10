@@ -43,6 +43,7 @@ import AuthService from '../../services/authService';
 import DataService from '../../services/dataservice';
 import ListMaterialView from '../Action/SupportComponent/ListMaterialView';
 import database from '@react-native-firebase/database';
+import ListProductMaterial from '../Action/SupportComponent/ListProductMaterial';
 
 type props = {
   navigation: StackNavigationProp<RoomParamList, 'callingWater'>;
@@ -69,6 +70,7 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
   const [clickItem, setclickItem] = useState<any>();
   const [itemsaved, setitemsaved] = useState<any[]>([]);
   const [Reload, setReload]= useState<boolean>(false);
+  const [ListConfig,SetListConfig]= useState<any>();
   const fetchId = async () => {
     let a = await AuthService.getuserid();
     if (a != null) {
@@ -133,6 +135,10 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
     let dataarrayBill = await DataService.Getdata_dtService<any>('ListProduct');
     setlistproductArr( dataarrayBill);
   }
+  const getListMaterial=async() =>{
+    let newdata = await DataService.Getdata_dtService<any>('ConfigMaterial');
+    SetListConfig( newdata);
+  }
   useEffect(()=>{
     database().ref("/ListProduct").on('value', snapshot=>{
       setReload(prev=> !prev);
@@ -145,6 +151,7 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
         // getBillRealTime();
         getProductRealTime();
         getListProductRealTime();
+        getListMaterial();
       }
   }, [getTable,Reload]);
   const checktableBill = useCallback(async () => {
@@ -1873,10 +1880,10 @@ export const BookWater: React.FC<props> = ({route, navigation}: props) => {
             : undefined
             }
         </ScrollView>
-        <ListMaterialView
-          List={clickItem?.ListMaterial}
+        <ListProductMaterial
+          List={clickItem && clickItem.ListMaterial? ListConfig ? ListConfig.find(x =>x.id == clickItem.ListMaterial) ?  ListConfig.find(x =>x.id == clickItem.ListMaterial).ListMaterial: [] : [] : []}
           visible={visibleTurial}
-          onCancel={setVisibleTurial}
+          onExit={setVisibleTurial}
         />
         <View>
           <TouchableOpacity

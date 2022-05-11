@@ -1,40 +1,40 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState }  from "react";
+import React, { useState }  from 'react';
 import { KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { CustomNotification } from "../../Model/CustomNofication";
+import { CustomNotification } from '../../Model/CustomNofication';
 import { getheight, getwidth, reponsiveheight, reponsivewidth } from '../../theme/Metric';
 import BellNofi from '../../asset/svg/bellnotification.svg';
 import Logoimg from '../../asset/svg/logo.svg';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import CustomInput from "../../Model/CustomInput";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { LoginstackParamList } from "../../navigation/types";
-import RNSmtpMailer from "react-native-smtp-mailer";
+import CustomInput from '../../Model/CustomInput';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { LoginstackParamList } from '../../navigation/types';
+import RNSmtpMailer from 'react-native-smtp-mailer';
 import Fontisto from 'react-native-vector-icons/Fontisto';
-import RNFS  from 'react-native-fs'
-import data from "../../services/data";
-import { Userdata } from "../../Model/User";
+import RNFS  from 'react-native-fs';
+import data from '../../services/data';
+import { Userdata } from '../../Model/User';
 type Props= {
     navigation: StackNavigationProp<LoginstackParamList, 'ForgotPasswordSceen'>
   }
-export const ForgotPassword:React.FC<Props> =({navigation})=>{
+export const ForgotPassword:React.FC<Props> = ({navigation})=>{
 
     const [Email, setemail] = useState<string>('');
     const [ErrorEmail, setErroremail] = useState<string>('');
     const [visible, setvisible] = useState<boolean>(false);
-   
-    const sendMail= (pass:string)=>{
+
+    const sendMail = (pass:string)=>{
         RNSmtpMailer.sendMail({
-            mailhost: "smtp.gmail.com",
-            port: "465",
+            mailhost: 'smtp.gmail.com',
+            port: '465',
             ssl: true, // optional. if false, then TLS is enabled. Its true by default in android. In iOS TLS/SSL is determined automatically, and this field doesn't affect anything
-            username: "choigamesss000@gmail.com",
-            password: "nmzx1593tmb",
-            fromName: "choigamesss000@gmail.com", // optional
-            replyTo: "choigamesss000@gmail.com", // optional
+            username: 'choigamesss000@gmail.com',
+            password: 'nmzx1593tmb',
+            fromName: 'choigamesss000@gmail.com', // optional
+            replyTo: 'choigamesss000@gmail.com', // optional
             recipients: Email,
-            subject: "Lấy lại mật khẩu",
+            subject: 'Lấy lại mật khẩu',
             htmlBody: `Mật khẩu của bạn đã được đổi thành ${pass}`,
             // attachmentPaths: [
             //   RNFS.ExternalDirectoryPath + "/image.jpg",
@@ -55,43 +55,55 @@ export const ForgotPassword:React.FC<Props> =({navigation})=>{
           })
             .then(success => console.log(success))
             .catch(err => console.log(err));
-    }
-    const ForgotPassword=(Email:string)=>{
+    };
+    const ForgotPassword = (Email:string)=>{
       let mk = (Math.random() + 1).toString(36).substring(8);
       let Item: Userdata;
         const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         if (re.test(Email))
         {
-          let dataarray:any[]=[];
+          let dataarray:any[] = [];
           data.getdata('user').then(res=>{
-            for(let key in res)
+            for (let key in res)
             {
-              if(key !="0")
+              if (key != '0')
               {
                 dataarray.push({
                   id: key,
                   ...res[key],
-                })
+                });
               }
             }
             dataarray.forEach(item=>{
-              if(item.Email=== Email)
+              if (item.Email === Email)
               {
-                Item=item;
+                Item = item;
               }
-            })
-            data.updateuser("user", Item.username,mk,Item.phone,Item.Email,Item.Gender,Item.Avatar,Item.Name,1,Item.dateofbirth,Item.service,Item.id)
-          })
+            });
+           if (Item)
+           {
+             let {password,id,...rest} = Item;
+             let newData = {
+               ...rest,
+               password : mk,
+             };
+            data.Patchuser( newData,id );
             sendMail(mk);
-           
+
             setvisible(true);
+           }
+           else
+           {
+            setErroremail('Email không hợp lệ');
+           }
+          });
         }
         else
         {
-            setErroremail("Email không hợp lệ");
+            setErroremail('Email không hợp lệ');
         }
-    }
-    return(
+    };
+    return (
         <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{flex: 1}}>
@@ -103,12 +115,12 @@ export const ForgotPassword:React.FC<Props> =({navigation})=>{
              <CustomInput errormes={ErrorEmail}  title="Email" icon={<Fontisto size={20} name="email"/>} onchange={text=>setemail(text)}/>
              </View>
              <View style={style.view_btndangky}>
-               <TouchableOpacity onPress={()=>{ForgotPassword(Email)}} ><Text style={{fontSize:18,color:'#000000',backgroundColor:'#d0d0d0'}}>{'Lấy lại mật khẩu'}</Text></TouchableOpacity>
+               <TouchableOpacity onPress={()=>{ForgotPassword(Email);}} ><Text style={{fontSize:18,color:'#000000',backgroundColor:'#d0d0d0'}}>{'Lấy lại mật khẩu'}</Text></TouchableOpacity>
              </View>
              <View style={style.view_btndangnhap}>
                <TouchableOpacity onPress={()=>navigation.goBack()} ><Text style={{fontSize:18,color:'#FFFFFFFF',backgroundColor:'#3c72c3'}}>{'Đăng nhập'}</Text></TouchableOpacity>
              </View>
-            
+
              {/* <Text style={{alignSelf:'center',marginTop:20,fontSize:16}}>Hoặc đăng nhập bằng</Text> */}
               {/* <View style={{marginTop:22,flexDirection:'row'}}>
                <ButtonFacebook style={{marginRight:15}}/>
@@ -116,10 +128,10 @@ export const ForgotPassword:React.FC<Props> =({navigation})=>{
              </View> */}
              {/* <CustomHyperLink style={{marginTop:10}} title="Đăng ký tài khoản mới"/> */}
              </SafeAreaView>
-             <CustomNotification visible={visible} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} title="Thông báo"  onCancel={()=>{setvisible(false);navigation.goBack();}} Content="Mật khẩu được gửi tới mail của bạn !"/>
+             <CustomNotification visible={visible} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} title="Thông báo"  onCancel={()=>{setvisible(false); navigation.goBack();}} Content="Mật khẩu được gửi tới mail của bạn !"/>
         </KeyboardAvoidingView>
-    )
-}
+    );
+};
 const style = StyleSheet.create({
     logo:
     {
@@ -135,12 +147,12 @@ const style = StyleSheet.create({
     },
     container_logo:
     {
-     
+
         //alignItems: 'center',
         justifyContent: 'center',
         marginBottom:10,
         marginTop: -80,
-       
+
     },
     background_img:
     {

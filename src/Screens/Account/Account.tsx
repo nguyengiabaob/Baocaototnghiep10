@@ -167,7 +167,6 @@ const AccountScreen: React.FC<Props> = () => {
     if (
       (phone != '' && formatphone.test(phone)) ||
       name != '' ||
-      service != '' ||
       (email != '' && format.test(email))
     ) {
       // var data_fetch: any[] = [];
@@ -284,16 +283,16 @@ const AccountScreen: React.FC<Props> = () => {
       seterropass('Mật khẩu mới không được trống');
     }
   };
-  let name1, email1, phone1, service1, username1, password1: string;
+  let name1, email1, phone1, username1, password1: string, type;
 
   arrayuser.forEach(res => {
     if (res.id === username) {
-      console.log('123456',username);
+      console.log('123456',res);
       username1 = res.username;
       name1 = res.Name;
       email1 = res.Email;
       phone1 = res.phone;
-      service1 = res.service;
+      type = res.type;
       password1 = res.password;
     }
   });
@@ -335,7 +334,7 @@ const AccountScreen: React.FC<Props> = () => {
           </View>
           <View style={style.container_item_list}>
             <Text style={style.info}>
-              {service1 !== 'none' && service1 !== '' ? service1 : 'Không có'}
+              {type == 1 ? 'Nhân viên ': type ==0  ? 'Quản lý' :'Không có'}
             </Text>
           </View>
         </View>
@@ -440,7 +439,7 @@ const AccountScreen: React.FC<Props> = () => {
                     }
                   />
                 </View>
-                <View style={style.container_main2}>
+                {/* <View style={style.container_main2}>
                   <Text style={style.titlefiled}>Chức vụ </Text>
                   <CustomInput
                     onchange={text => {
@@ -448,14 +447,14 @@ const AccountScreen: React.FC<Props> = () => {
                     }}
                     style={{width: reponsivewidth(210)}}
                     text={
-                      service1 != 'none' && service1 != ''
-                        ? service1
-                        : service1 == 'none'
-                        ? ''
-                        : ''
+                      // service1 != 'none' && service1 != ''
+                      //   ? service1
+                      //   : service1 == 'none'
+                      //   ? ''
+                      //   : ''
                     }
                   />
-                </View>
+                </View> */}
                 <View style={style.container_main2}>
                   <Text style={style.titlefiled}>Điện thoại </Text>
                   <CustomInput

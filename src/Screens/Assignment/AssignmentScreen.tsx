@@ -34,6 +34,8 @@ import {selectAuth} from '../../redux/reducer/authslice';
 import database from '@react-native-firebase/database';
 import Loading from '../../Helper/Loader/Loading';
 import OptionModal from './OptionModal';
+import DataService from '../../services/dataservice';
+import AddUpdateTimeWork from './AddUpdateTimeWork';
 type props = {
   // navigation: StackNavigationProp<ManageEmployeePramaList, 'AssignmentParamaList'>;
   navigation : StackNavigationProp<AssignmentParamaList,'Assignment'>
@@ -49,7 +51,7 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
   const [valueSearching, setvaluesearching] = useState<string>('');
   // const [staffArrayselected, setstaffArrayselected] = useState<Userdata[]>([]);
   const [AssignmentData, setAssginmentData] = useState<Assigment[]>([]);
-  const [DataAssignment, setDataAssignment] = useState<Userdata[]>([]);
+  const [DataAssignment, setDataAssignment] = useState<any[]>([]);
   const [dataSelected2, setdataSelected2] = useState<string[]>([]);
   const [isrerender, setisrerender] = useState<boolean>(false);
   const [dayChoosen, setdayChoosen] = useState<Date>(new Date());
@@ -75,14 +77,27 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
     }
   ]
   const realTime = ()=>{
-      database().ref().on('value', snapshot=>{
-        setReload(prev=> !prev);
+      database().ref('/user').on('value', snapshot=>{
+        getalluser();
+        getallAssignment();
+      });
+      database().ref('/Assignment').on('value', snapshot=>{
+        getallAssignment();
       });
   }
   useEffect(()=>{
     realTime();
   },[]);
+  const renderListUser= (listuser, listChoosing)=>{
+    if(listChoosing.length > 0)
+    {
+      listChoosing.forEach(x=>{
+        listuser = listuser.filter(i=> i.id !== x);
+       })
+    }
 
+      return listuser;
+  }
   const getalluser = () => {
     let datarray: any[] = [];
     data.getdata('user').then(res => {
@@ -117,9 +132,22 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
   };
   const getuserAssignment1 = (dataassignment: any[]) => {
     let array: any[] = [];
+    let olduser: any [] = [];
+    if(dataassignment.length>0)
+    {
     dataassignment.forEach(item => {
-      array.push(...Datauser(item.EmployeeID));
+      array.push(...Datauser(item.EmployeeID),);
     });
+    }
+    if (dataSelected2.length>0)
+    {
+      dataSelected2.forEach(x=>
+        {
+          olduser.push(...Datauser(x))
+        })
+      console.log('dataSelected2',olduser)
+      array = array.concat(...olduser)
+    }
     console.log('Array', array);
     setDataAssignment(array);
   };
@@ -137,7 +165,8 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
       }
       if (Time === 'all') {
         let check = datarray.filter(item => item.Day === day);
-        if (check.length > 0) {
+        console.log('check',check)
+        if (check.length >0 || dataSelected2.length > 0) {
           getuserAssignment1(check);
         }
         //     let datauser :any[] = [];
@@ -174,9 +203,9 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
         let check = datarray.filter(
           item => item.Day === day && item.Time == Time,
         );
-        //console.log('check',check);
+        console.log('check123',day);
         //console.log('datarray',datarray );
-        if (check.length > 0) {
+        if (check.length > 0 || dataSelected2.length >0) {
           getuserAssignment1(check);
           // //console.log(check);
           // check.forEach( item =>{
@@ -221,23 +250,29 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
       }
     });
   };
-  const getTimeWork = (day: string) => {
-    let datarray: any[] = [];
-    data.getdata('TimeWork').then(res => {
-      for (let key in res) {
-        if (res[key] != null) {
-          console.log(res);
-          if (res[key].Day === day) {
-            datarray.push({
-              id: key,
-              ...res[key],
-            });
-          }
-        }
-      }
-      console.log('chạy timework',datarray );
-      setTimeWork(datarray);
-    });
+  const getTimeWork =async(day: string) => {
+    // let datarray: any[] = [];
+    // data.getdata('TimeWork').then(res => {
+    //   for (let key in res) {
+    //     if (res[key] != null) {
+    //       console.log(res);
+    //       if (res[key].Day === day) {
+    //         datarray.push({
+    //           id: key,
+    //           ...res[key],
+    //         });
+    //       }
+    //     }
+    //   }
+    //   console.log('chạy timework',datarray );
+    //   setTimeWork(datarray);
+    // });
+   let newData= await DataService.Getdata_dtService<timeWork>('TimeWork');
+   if(newData.length > 0)
+   {
+      let d= newData.filter(x=> x.Day === day || x.Type === 1)
+      setTimeWork(d);
+   }
   };
   useEffect(() => {
     if (isFocused ) {
@@ -252,16 +287,15 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
     // }
   }, [isFocused]);
   useEffect(() => {
-    if (Reload  == false || Reload == true)
-    {
+
     setLoading(true);
     Promise.all([getTimeWork(dayChoosen.toDateString()),
       getuserAssignment(dayChoosen.toDateString(), 'all')]).then(
         (res)=> { setLoading(false)}
       )
 
-    }
-  }, [Reload]);
+
+  },[]);
   // console.log(DataAssignment);
   const DayVN = (day: string) => {
     if (day === 'Mon') {
@@ -315,7 +349,7 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
   //       isVisible={visiblelist}>
   //       <ModalListimeWork Timework={[]} />
   //     </Overlay>
-  //      ) 
+  //      )
   // },[])
   LocaleConfig.locales.vn = {
     monthNames: [
@@ -358,44 +392,47 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
     dayNamesShort: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
     today: 'Hôm nay',
   };
+  type props_ListTimeWork={
+    Timework: any
+  }
   LocaleConfig.defaultLocale = 'vn';
-  const ModalListimeWork: React.FC = () => {
+  const ModalListimeWork: React.FC<props_ListTimeWork> = ({Timework}) => {
     const [Name, SetName] = useState<string>('');
-    const [ModalEdit, setModalEdit] = useState<boolean>(false);
+    const [ModalDetail, setModalDetail] = useState<boolean>(false);
     const [ChoosenEdit, setChoosenEdit] = useState<any>();
     const [flag, setflag] = useState<boolean>(false);
     // const [TimeWork, setTimeWork]= useState<timeWork[]>();
-    const EditTimeWork = (item: any) => {
-      if (Name !== '') {
-        data.UpdateTimeWork('TimeWork', Name, item.Day, item.id).then(res => {
-          if (res == true) {
-            setflag(true);
-          }
-        });
-        setModalEdit(false);
-        console.log('Name', Name);
-      }
-    };
-    const DelTimeWork = (id: string) => {
-      data.deletedData('TimeWork', id);
-      data.getdata('Assignment').then(res => {
-        let datararray: any[] = [];
-        for (let key in res) {
-          if (key !== '0') {
-            datararray.push({
-              id: key,
-              ...res[key],
-            });
-          }
-        }
-        datararray.forEach(item => {
-          if (item.Time === id) {
-            data.deletedData('Assignment', item.id);
-          }
-        });
-        setflag(true);
-      });
-    };
+    // const EditTimeWork = (item: any) => {
+    //   if (Name !== '') {
+    //     data.UpdateTimeWork('TimeWork', Name, item.Day, item.id).then(res => {
+    //       if (res == true) {
+    //         setflag(true);
+    //       }
+    //     });
+    //     setModalEdit(false);
+    //     console.log('Name', Name);
+    //   }
+    // };
+    // const DelTimeWork = (id: string) => {
+    //   data.deletedData('TimeWork', id);
+    //   data.getdata('Assignment').then(res => {
+    //     let datararray: any[] = [];
+    //     for (let key in res) {
+    //       if (key !== '0') {
+    //         datararray.push({
+    //           id: key,
+    //           ...res[key],
+    //         });
+    //       }
+    //     }
+    //     datararray.forEach(item => {
+    //       if (item.Time === id) {
+    //         data.deletedData('Assignment', item.id);
+    //       }
+    //     });
+    //     setflag(true);
+    //   });
+    // };
     useEffect(() => {
       if (flag == true) {
         getTimeWork(dayChoosen.toDateString());
@@ -415,7 +452,7 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
           </Text>
         </View>
         <ScrollView style={{borderColor: '#787878', borderTopWidth: 0.75 }}>
-          { console.log('123456789', new Date().toDateString())}
+          {/* { console.log('123456789', new Date().toDateString())} */}
           {Timework.length > 0 ?
             Timework.map(item => {
               return (
@@ -431,8 +468,8 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
                     onPress={async () => {
                       await setTimeWorkSeleted(item);
                       await setvisiblelist(false);
-                      await getuserAssignment(item.Day, item.id);
-                      setChoosenEdit(item);
+                      await getuserAssignment(dayChoosen.toDateString(), item.id);
+
                     }}
                     style={[
                       styles.Shadowbox,
@@ -440,7 +477,21 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
                     ]}>
                     <Text style={{padding: 10}}>{item.Name}</Text>
                   </TouchableOpacity>
-                  {new Date(dayChoosen).getDay() >= new Date().getDay() && (
+                  <>
+                  <TouchableOpacity
+                        onPress={async () => {
+                          setChoosenEdit(item);
+                          setModalDetail(true);
+                        }}
+                        style={{marginLeft: 10, justifyContent: 'center'}}>
+                        <MaterialCommunityIcons
+                          name="calendar-search"
+                          size={26}
+                          color={'#c6c6c6'}
+                        />
+                      </TouchableOpacity>
+                    </>
+                  {/* {new Date(dayChoosen).getDay() >= new Date().getDay() && (
                     <>
                       <TouchableOpacity
                         onPress={async () => {
@@ -467,7 +518,7 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
                         />
                       </TouchableOpacity>
                     </>
-                  )}
+                  )} */}
                 </View>
               );
             }) : <Text style={{textAlign:'center', height:reponsiveheight(300), textAlignVertical:'center', opacity:0.4}}>Chưa có thông tin ca</Text>}
@@ -498,7 +549,8 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
             </Text>
           </Pressable>
         </View>
-        <Overlay isVisible={ModalEdit}>
+        <AddUpdateTimeWork visible={ModalDetail} Item={ChoosenEdit} ReadOnly ={true} onCancel={setModalDetail}/>
+        {/* <Overlay isVisible={ModalDetail}>
           <View style={{borderBottomColor: '', borderBottomWidth: 1}}>
             <Text
               style={{
@@ -557,7 +609,7 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
               </Text>
             </Pressable>
           </View>
-        </Overlay>
+        </Overlay> */}
       </>
     );
   };
@@ -654,7 +706,7 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
       (valuesearch: string) => {
         if (valuesearch.length > 0) {
           var user = Data.filter(item =>
-            item.Name.toLowerCase().includes(valuesearch),
+            item.Name.toLowerCase().includes(valuesearch) && item.isDelete==false,
           );
           if (user.length > 0) {
             setdataquery(user);
@@ -741,7 +793,7 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
         modalHeight={reponsiveheight(750)}
         onClosed={onClosed}
         rootStyle={{height: reponsiveheight(800)}}>
-        <View>
+        <View style={{marginBottom:80}}>
           <View
             style={{
               borderBottomColor: '#b7b7b7',
@@ -1060,30 +1112,34 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
       <View style={styles.container}>
         <CustomHeader
           title="Lịch thi công trong tuần"
-          onpress={() => navigation.navigate('MainScreen')}
+          onpress={() => navigation.goBack()}
         />
         <View
           style={{
-            flex: 0.45,
+            
             borderColor: '#ebe9e9',
             borderWidth: 2,
-            marginBottom: 25,
+         
           }}>
           <Calendar
-            headerStyle={{height: reponsiveheight(55)}}
+           hideDayNames={true}
             onDayPress={async day => {
               await onPressDay(day);
+
             }}
+            style={{height: reponsiveheight(380)}}
             firstDay={1}
           />
         </View>
-        <View style={{flex: 0.12, marginTop: 5}}>
+        <View style={{ marginTop: reponsiveheight(8)}}>
           <View
             style={{
               backgroundColor: '#67bff3',
               height: reponsiveheight(35),
               borderRadius: 2,
               flexDirection: 'row',
+            
+
             }}>
             <Text
               style={{
@@ -1096,18 +1152,18 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
             </Text>
             {typeUser == 0 && (
               <Pressable
-                onPress={() => setVisibleOption(true)}
+                onPress={() => navigation.navigate('ListGeneralTimeWork')}
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}>
-                <Ionicons name="add-circle" size={26} />
-                <Text style={{fontWeight: '700', marginLeft: 5}}>Thêm ca</Text>
+                <Materiallcons name="list-alt" size={26} />
+                <Text style={{fontWeight: '700', marginLeft: 5}}>Danh sách ca</Text>
               </Pressable>
             )}
           </View>
-
+          <View>
           <Pressable
             onPress={() => {
               setvisiblelist(true);
@@ -1118,6 +1174,7 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
               borderColor: '#c1c0c0',
               borderWidth: 1,
               marginTop: 2,
+
             }}>
             {/* <Text style={{padding:7, fontSize: 16, marginLeft:10, fontWeight:'700'}}>Ca : <Text style={{padding:7, fontSize: 15, marginLeft:18}}> Cả ngày</Text></Text> */}
             <Text
@@ -1132,20 +1189,14 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
                 : TimeworkSelected?.Name}
             </Text>
           </Pressable>
-          {/* <ScrollView style={{marginBottom:5}}>
-           <CustomBoxItem IsnotButton={true} title=" Nguyễn văn A" Style={{width:'98%', height:reponsiveheight(55),marginTop:reponsiveheight(10)}} newButton={<Pressable style={{alignSelf:'center', marginLeft:reponsivewidth(120)}}><Materiallcons  name="delete"  size={30} color="#454444"/></Pressable>}/>
-           <CustomBoxItem IsnotButton={true} title=" Nguyễn văn A" Style={{width:'98%', height:reponsiveheight(55),marginTop:reponsiveheight(10)}} newButton={<Pressable style={{alignSelf:'center', marginLeft:reponsivewidth(120)}}><Materiallcons  name="delete"  size={30} color="#454444"/></Pressable>}/>
-           <CustomBoxItem IsnotButton={true} title=" Nguyễn văn A" Style={{width:'98%', height:reponsiveheight(55),marginTop:reponsiveheight(10)}} newButton={<Pressable style={{alignSelf:'center', marginLeft:reponsivewidth(120)}}><Materiallcons  name="delete"  size={30} color="#454444"/></Pressable>}/>
-           <CustomBoxItem IsnotButton={true} title=" Nguyễn văn A" Style={{width:'98%', height:reponsiveheight(55),marginTop:reponsiveheight(10)}} newButton={<Pressable style={{alignSelf:'center', marginLeft:reponsivewidth(120)}}><Materiallcons  name="delete"  size={30} color="#454444"/></Pressable>}/>
-            <CustomBoxItem IsnotButton={true} title=" Nguyễn văn A" Style={{width:'98%', height:reponsiveheight(55),marginTop:reponsiveheight(10)}} newButton={<Pressable style={{alignSelf:'center', marginLeft:reponsivewidth(120)}}><Materiallcons  name="delete"  size={30} color="#454444"/></Pressable>}/>
-        </ScrollView> */}
-        </View>
-
-        {TimeworkSelected !== undefined &&
-        new Date(dayChoosen).getDay() >= new Date().getDay() ? (
+          </View>
           <View style={{justifyContent: 'flex-end', flexDirection: 'row'}}>
-            <Pressable
+          { typeUser == 0 && TimeworkSelected !== undefined &&
+        new Date(dayChoosen).getDate() >= new Date().getDate() && new Date(dayChoosen).getMonth() +1  >= new Date().getMonth() + 1 && new Date(dayChoosen).getFullYear() >= new Date().getFullYear() && (
+
+            <TouchableOpacity
               onPress={() => {
+                //
                 setVisibleModal(true);
               }}
               style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -1153,24 +1204,53 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
               <Text style={{padding: 8, fontWeight: '700'}}>
                 Chọn Nhân viên
               </Text>
-            </Pressable>
-          </View>
-        ) : undefined}
-        <View style={{flex: 0.4}}>
-          <ScrollView style={{height: reponsiveheight(300)}}>
+            </TouchableOpacity>
+        ) }
+        </View>
+          {/* <ScrollView style={{marginBottom:5}}>
+           <CustomBoxItem IsnotButton={true} title=" Nguyễn văn A" Style={{width:'98%', height:reponsiveheight(55),marginTop:reponsiveheight(10)}} newButton={<Pressable style={{alignSelf:'center', marginLeft:reponsivewidth(120)}}><Materiallcons  name="delete"  size={30} color="#454444"/></Pressable>}/>
+           <CustomBoxItem IsnotButton={true} title=" Nguyễn văn A" Style={{width:'98%', height:reponsiveheight(55),marginTop:reponsiveheight(10)}} newButton={<Pressable style={{alignSelf:'center', marginLeft:reponsivewidth(120)}}><Materiallcons  name="delete"  size={30} color="#454444"/></Pressable>}/>
+           <CustomBoxItem IsnotButton={true} title=" Nguyễn văn A" Style={{width:'98%', height:reponsiveheight(55),marginTop:reponsiveheight(10)}} newButton={<Pressable style={{alignSelf:'center', marginLeft:reponsivewidth(120)}}><Materiallcons  name="delete"  size={30} color="#454444"/></Pressable>}/>
+           <CustomBoxItem IsnotButton={true} title=" Nguyễn văn A" Style={{width:'98%', height:reponsiveheight(55),marginTop:reponsiveheight(10)}} newButton={<Pressable style={{alignSelf:'center', marginLeft:reponsivewidth(120)}}><Materiallcons  name="delete"  size={30} color="#454444"/></Pressable>}/>
+            <CustomBoxItem IsnotButton={true} title=" Nguyễn văn A" Style={{width:'98%', height:reponsiveheight(55),marginTop:reponsiveheight(10)}} newButton={<Pressable style={{alignSelf:'center', marginLeft:reponsivewidth(120)}}><Materiallcons  name="delete"  size={30} color="#454444"/></Pressable>}/>
+        </ScrollView> */}
+
+        </View>
+        {/* <View style={{justifyContent: 'flex-end', flexDirection: 'row', marginTop:10}}>
+          {TimeworkSelected !== undefined &&
+        new Date(dayChoosen).getDay() >= new Date().getDay() && (
+
+            <TouchableOpacity
+              onPress={() => {
+                //
+                console.log('123456');
+              }}
+              style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Ionicons name="add" size={26} />
+              <Text style={{padding: 8, fontWeight: '700'}}>
+                Chọn Nhân viên
+              </Text>
+            </TouchableOpacity>
+        ) }
+        </View> */}
+        <View >
+          <ScrollView style={{height: typeUser == 0 && TimeworkSelected !== undefined &&
+        new Date(dayChoosen).getDate() >= new Date().getDate() && new Date(dayChoosen).getMonth() +1  >= new Date().getMonth() + 1 && new Date(dayChoosen).getFullYear() >= new Date().getFullYear() ? reponsiveheight(160) : reponsiveheight(180)}}>
             {/* { console.log(DataAssignment)}  */}
             {DataAssignment.length > 0 &&
               DataAssignment.map(item => (
                 <CustomBoxItem
+                  Avatarimg={{uri:item.Avatar}}
                   key={item.id}
                   IsnotButton={true}
-                  title={item.Name}
+                  title={item.isDelete == true ? `${item.Name} (Đã nghỉ việc)` :item.Name }
                   Style={{
                     width: '98%',
                     height: reponsiveheight(70),
                     marginTop: reponsiveheight(10),
                   }}
                   newButton={
+                    typeUser == 0 ?
                     <Pressable
                       onPress={async () => {
                         var user;
@@ -1181,22 +1261,37 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
                               items.Time == TimeworkSelected.id &&
                               items.Day === new Date(Changeday).toDateString(),
                           );
-                          console.log(user);
-                          user.forEach(assignment => {
-                            onDeletedAssignment(assignment.id);
-                          });
-                          setisrerender(true);
+                            if (user.length>0)
+                            {
+                              user.forEach(assignment => {
+                                onDeletedAssignment(assignment.id);
+                              });
+                              setisrerender(true);
+                            }
+                            else
+                            {
+                              setdataSelected2(dataSelected2.filter(x=> x !== item.id))
+                             
+                            }
+                            setisrerender(true);
+
                         } else {
                           user = AssignmentData.filter(
                             items =>
                               items.EmployeeID === item.id &&
                               items.Day === new Date(dayChoosen).toDateString(),
                           );
-                          console.log(user);
+                         if (user.length > 0)
+                         {
                           user.forEach(assignment => {
                             onDeletedAssignment(assignment.id);
                           });
-                          setisrerender(true);
+                         }
+                         else
+                         {
+                           setdataSelected2(dataSelected2.filter(x=> x !== item.id));
+                         }
+                         setisrerender(true);
                         }
                       }}
                       style={{
@@ -1204,16 +1299,18 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
                         marginLeft: reponsivewidth(120),
                       }}>
                       <Materiallcons name="delete" size={30} color="#454444" />
-                    </Pressable>
+                    </Pressable>: undefined
                   }
                 />
               ))}
           </ScrollView>
         </View>
         <View
-          style={{flex: 0.1, justifyContent: 'center', alignItems: 'center'}}>
+          style={{ justifyContent: 'center', alignItems: 'center'}}>
           {typeUser == 0 && (
             <TouchableOpacity
+              disabled={dataSelected2.length >0 ? false : true}
+
               onPress={() => {
                 if (TimeworkSelected !== undefined) {
                   onsaveAssignment(
@@ -1223,14 +1320,15 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
                 }
               }}
               style={{
-                backgroundColor: '#226cb3',
+                backgroundColor: dataSelected2.length > 0 ? '#226cb3':  '#c3c3c3',
                 padding: 5,
                 width: reponsivewidth(100),
                 justifyContent: 'center',
                 alignItems: 'center',
                 borderRadius: 4,
+                marginTop:5
               }}>
-              <Text style={{fontSize: 16, color: '#FFF', fontWeight: '700'}}>
+              <Text style={{fontSize: 16, color: dataSelected2.length > 0 ? '#FFFF' : '#FFFF', fontWeight: '700'}}>
                 {' '}
                 Lưu
               </Text>
@@ -1257,14 +1355,14 @@ export const AssignmentScreen: React.FC<props> = ({navigation2,navigation}: prop
       <ModalMutipleSelected
         valueSearch={valueSearching}
         placeHolder="Nhập tên nhân viên"
-        Data={staffArray}
+        Data={renderListUser(staffArray.filter(x=>x.isDelete === false),dataSelected2)}
         title=" Danh sách Nhân viên"
         Visible={visibleModal}
         onClosed={() => {
           setVisibleModal(false);
         }}
       />
-      <OptionModal visible={visibleOption} onCancel={setVisibleOption} options={ModelOption} navigation2={navigation2}/>
+      {/* <OptionModal visible={visibleOption} onCancel={setVisibleOption} options={ModelOption} navigation2={navigation2}/> */}
       <Loading visible={loading}/>
     </SafeAreaView>
   );

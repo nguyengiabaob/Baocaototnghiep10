@@ -19,24 +19,24 @@ import RNSmtpMailer from 'react-native-smtp-mailer';
 import data from '../services/data';
 const CreatAccount: React.FC = () => {
   const [ModalOption, setModalOption] = useState<boolean>(false);
-  const [Option, setlOption] = useState<number>(1);
+  const [Option, setlOption] = useState<number>(0);
   const [ModalInputVisible, setlModalInput] = useState<boolean>(false);
   const [InputEmail, setlInputEmail] = useState<string>('');
   const [ArrayEmail, setArrayEmail] = useState<string[]>([]);
   const [visibleSucces, setvisibleSucces] = useState<boolean>(false);
   const ArrOption = [
     {
-      key: 1,
-      nameTitle: 'Tạo tài khoản',
+      key: 0,
+      nameTitle: 'Tạo tài khoản cho quản lý',
       Action: () => {
-        setlOption(1);
+        setlOption(0);
       },
     },
     {
-      key: 2,
+      key: 1,
       nameTitle: 'Tạo tài khoản cho nhân viên',
       Action: () => {
-        setlOption(2);
+        setlOption(1);
       },
     },
   ];
@@ -110,14 +110,9 @@ const CreatAccount: React.FC = () => {
       let intialAccount: Userdata = {
         username: 'none',
         password: 'none',
-        phone: 'none',
-        service: 'none',
-        type: 1,
+        type: Option,
         Email: 'none',
-        Gender: 'none',
         Avatar: 'none',
-        Name: 'none',
-        dateofbirth: 'none',
       };
       Promise.all(
         ArrayEmail.map(i => {
@@ -126,7 +121,7 @@ const CreatAccount: React.FC = () => {
           intialAccount.password = (
             Math.floor(Math.random() * 99999) + 12345
           ).toString();
-          data.postAccount(intialAccount).then(res => {
+          data.postAccountnew(intialAccount).then(res => {
             if (res == true) {
               sendMail(
                 intialAccount.password,
@@ -173,7 +168,7 @@ const CreatAccount: React.FC = () => {
               width: '50%',
             },
           ]}>
-          {Option === 1 ? (
+          {Option === 0 ? (
             <TouchableOpacity
               onPress={() => {
                 setlModalInput(true);
@@ -189,7 +184,7 @@ const CreatAccount: React.FC = () => {
         </View>
       </View>
       <View style={{marginTop: 15}}>
-        {Option === 1 ? (
+        {Option === 0 || Option == 1  ? (
           <ScrollView style={{height: reponsiveheight(560)}}>
             {ArrayEmail.length > 0 ? (
               ArrayEmail.map(i => {
@@ -260,6 +255,7 @@ const CreatAccount: React.FC = () => {
         title="Nhập thông tin"
         onExit={setlModalInput}
         ArrayField={ArrInput}
+        havingEmail={ArrayEmail}
         titleError="Email đã tôn tại hoặc không hợp lệ"
       />
       <CustomNotification

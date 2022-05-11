@@ -39,6 +39,7 @@ const ListProductMaterial: React.FC<props> = ({visible, List, onExit}) => {
             </Text>
           </View>
           <View style={styles.TitleOverlAdd_content}>
+            {console.log(List.length)}
             {List.length > 0 ? (
               <ScrollView>
                 {List.map(x => {
@@ -82,13 +83,15 @@ const ListProductMaterial: React.FC<props> = ({visible, List, onExit}) => {
                 })}
               </ScrollView>
             ) : (
-              <View style={{flex: 0.7}}>
+              <View
+                style={{
+                  height: reponsiveheight(250),
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
                 <Text
                   style={{
-                    justifyContent: 'center',
-                    alignItems: 'center',
                     opacity: 0.4,
-                    fontSize: 18,
                   }}>
                   Chưa có nguyên liệu
                 </Text>

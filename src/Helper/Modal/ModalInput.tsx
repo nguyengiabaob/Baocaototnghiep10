@@ -26,6 +26,7 @@ type props = {
   height: number;
   width: number;
   titleError: string;
+  havingEmail: any[];
 };
 const ModalInput: React.FC<props> = ({
   title,
@@ -35,6 +36,7 @@ const ModalInput: React.FC<props> = ({
   width,
   onExit,
   titleError,
+  havingEmail,
 }) => {
   const Reset = () => {
     ArrayField.forEach(i => i.getValue(''));
@@ -60,6 +62,13 @@ const ModalInput: React.FC<props> = ({
     if (ListUser) {
       ListUser.forEach(i => {
         if (i.Email === Email) {
+          t = 1;
+        }
+      });
+    }
+    if (havingEmail.length > 0) {
+      havingEmail.forEach(x => {
+        if (x == Email) {
           t = 1;
         }
       });

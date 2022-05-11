@@ -7,5 +7,6 @@ export interface Wages
     TotalSalary: number,
     Time: number,
     Day: string,
+    Content: string
 }
 

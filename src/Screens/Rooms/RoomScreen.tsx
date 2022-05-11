@@ -30,7 +30,7 @@ import Warning from '../../asset/svg/Warning.svg';
 import DataService from '../../services/dataservice';
 import database from '@react-native-firebase/database';
 import Loading from '../../Helper/Loader/Loading';
-import BellNofi from '../asset/svg/bellnotification.svg';
+import BellNofi from '../../asset/svg/bellnotification.svg';
 type props ={
     navigation: StackNavigationProp<RoomParamList,'RoomScreen'>
 }

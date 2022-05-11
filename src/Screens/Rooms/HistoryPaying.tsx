@@ -14,20 +14,24 @@ import database from '@react-native-firebase/database';
 import CustomHyperLink from '../../Model/CustomHyperLink';
 import HistoryPayingDetail from './HistoryPayingDetail';
 import Loading from '../../Helper/Loader/Loading';
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { CustomNotification } from '../../Model/CustomNofication';
 type props ={
     getvisible: (data: any)=>void
 }
-export const HistoryPaying: React.FC<props>= ({getvisible})=> {
+export const HistoryPaying: React.FC<props> = ({getvisible})=> {
 
-    const [datapaying,setdatapaying]=useState<any[]>([]);
-    const [visbleModalDel,setvisibleModalDel]=useState<boolean>(false);
-    const [itemSelected,setitemSelectedl]=useState<any>();
-    const [reload,setReload]= useState<boolean>(false);
-    const [detail, setDetail]= useState<boolean>(false);
-    const [idclick, setidclick]= useState<any>();
-    const [loading,setLoading]= useState<boolean>(false);
-    const [showSearch,setShowSearch]= useState<boolean>(false);
+    const [datapaying,setdatapaying] = useState<any[]>([]);
+    const [visbleModalDel,setvisibleModalDel] = useState<boolean>(false);
+    const [itemSelected,setitemSelectedl] = useState<any>();
+    const [reload,setReload] = useState<boolean>(false);
+    const [detail, setDetail] = useState<boolean>(false);
+    const [idclick, setidclick] = useState<any>();
+    const [loading,setLoading] = useState<boolean>(false);
+    const [showSearch,setShowSearch] = useState<boolean>(false);
+    const [valueSearch,setValueSearch]= useState<string>('');
+    const [dataSearch,setDataSearch]= useState<any>([])
+    const [Suscces,setSuccess] = useState<boolean>(false);
     const tranferday = (d:string)=>{
         var month = new Date(d).getMonth() + 1;
         var date = new Date(d).getDate();
@@ -39,8 +43,8 @@ export const HistoryPaying: React.FC<props>= ({getvisible})=> {
             getPaying();
         });
     });
-    const getPaying= useCallback(async()=>{
-        var dataArray1= await DataService.Getdata_dtService<any>('Bill');
+    const getPaying = useCallback(async()=>{
+        var dataArray1 = await DataService.Getdata_dtService<any>('Bill');
         // data.getdata('Bill').then(res=> {
         //     var dataArray1: any[]= [];
         //     for ( let key in res)
@@ -89,7 +93,7 @@ export const HistoryPaying: React.FC<props>= ({getvisible})=> {
                     dataArray3.forEach(i=>{
                         if (item.createrID == i.id)
                         {
-                            item.createrID = i.Name;
+                            item.createrID = i;
                         }
                     });
                 });
@@ -98,6 +102,36 @@ export const HistoryPaying: React.FC<props>= ({getvisible})=> {
         // })
         // })
     },[]);
+useEffect(()=>{
+    if(valueSearch !=='' && valueSearch !== undefined)
+        {
+           
+            if(datapaying)
+            {
+                let a =datapaying.filter(x=> x.createrID.Name.toLowerCase().includes(valueSearch.toLowerCase())|| x.
+                billID.toLowerCase().includes(valueSearch.toLowerCase())|| x.TableID.toLowerCase().includes(valueSearch.toLowerCase()));
+                if(a)
+                {
+                     setDataSearch(a);
+                }
+                else
+                {
+                    setDataSearch([])
+                }
+               
+            }
+            else
+            {
+                setDataSearch([]);
+            }
+            
+        }
+        
+    else
+    {
+        setDataSearch(datapaying ? datapaying : []);
+    }
+},[valueSearch,datapaying])
 useEffect(()=>{
 
     setLoading(true);
@@ -108,9 +142,13 @@ useEffect(()=>{
     );
 
 },[getPaying]);
-const onDelPaying= async()=>{
+// const onDelPaying= async()=>{
+// },[getPaying, reload]);
+const onDelPaying = async()=>{
+    setLoading(true);
+
     data.deletedData('Bill',itemSelected.id);
-    let dataArray = await DataService.Getdata_dtService<any>('ListProduct') ;
+    let dataArray = await DataService.Getdata_dtService<any>('ListProduct');
     // data.getdata('ListProduct').then(res=>{
     //     let dataArray: any[]= [];
     //     for( let key in res)
@@ -123,41 +161,59 @@ const onDelPaying= async()=>{
     //             })
     //         }
     //     }
-        var listitem= dataArray.filter(item=> item.billID === itemSelected.billID);
-        listitem.forEach(item=>{
+        var listitem = dataArray.filter(item=> item.billID === itemSelected.billID);
+        Promise.all(listitem.map(item=>{
             data.deletedData('ListProduct',item.id);
-        });
+        })).then(
+            ()=>{
+                setLoading(false);
+
+            }
+        );
     // })
 };
 
     return (
             <SafeAreaView style={{width:getwidth(), height:getheight(),flex:1, marginTop:-9.5}}>
-                
+
                 <View style={[{flexDirection:'row', justifyContent:'flex-start',padding:18, backgroundColor:'#67bff3', borderColor:'#e5e5e5', borderWidth:2}]}>
                 <View style={{alignSelf:'flex-start', justifyContent:'flex-start', width:reponsivewidth(50)}}>
                 <TouchableOpacity onPress={()=>getvisible(false)}>
-                <MaterialIcons name="arrow-back" size={28} color='#efefef'/>
+                <MaterialIcons name="arrow-back" size={28} color="#efefef"/>
                 </TouchableOpacity>
                 </View>
                 <Text style={{alignSelf:'center',fontSize:17, width:reponsivewidth(300), textAlign:'left', color:'#FFFF', fontWeight:'700'}}>Lịch sử thanh toán</Text>
                 </View>
-                <View style={[styles.Shadowbox]}>
+                <View style={[styles.Shadowbox,{paddingTop: 8, paddingBottom :8, alignItems:'center'}]}>
                 {
-                    showSearch == false ?  
-                    <TouchableOpacity onPress={()=>{
+                    showSearch == false ?
+                    <TouchableOpacity style={{justifyContent:'flex-end'}} onPress={()=>{
                         setShowSearch(true);
                     }}>
                         <Ionicons size={32} name="search"/>
-                    
+
                     </TouchableOpacity>
-                    : 
-                    <View style={{flexDirection:'row', justifyContent:'flex-end'}}>
-                        <SearchBar 
+                    :
+                    <View style={{flexDirection:'row', alignItems:'center' , justifyContent:'center'}}>
+                        <SearchBar
                             style={{width:reponsivewidth(280)}}
-                            placeholder='Nhập mã hóa đơn'                  
+                            placeholder="Nhập mã hóa đơn, tên nhân bàn, tên bàn"
+                            lightTheme={true}
+                            containerStyle={{
+                              width: reponsivewidth(300),
+                              height: reponsiveheight(50),
+                              borderRadius: 5,
+                            }}
+                            onClear={()=> setValueSearch('')}
+                            onChange={(e)=>{
+                                setValueSearch(e.nativeEvent.text);
+                            }}
+                            value={valueSearch}
+                            inputContainerStyle={{height: reponsiveheight(40)}}
                         />
                     <TouchableOpacity onPress={()=>{
-                        setShowSearch(false);
+                         setValueSearch('');
+                         setShowSearch(false);
                     }} style={{marginLeft: 8}}>
                         <Text >
                             Hủy
@@ -165,11 +221,11 @@ const onDelPaying= async()=>{
                     </TouchableOpacity>
                     </View>
                 }
-                
+
             </View>
                 <ScrollView>
                 {/* {console.log(datapaying.length > 0)} */}
-                {datapaying.length > 0 && datapaying.map(item=>{
+                {dataSearch.length > 0 ? dataSearch.map(item=>{
                     return (
                 <View style={[ styles.Shadowbox ,{justifyContent:'center',alignItems:'center',width: reponsivewidth(350),alignSelf:'center', paddingRight:25, marginLeft:15, paddingTop:15, paddingBottom:20, marginTop:15, height:reponsiveheight(180),borderLeftColor: item.Status === 1 ? '#3ca739' : '#eb792d', borderLeftWidth:10, borderRadius:5 }]}>
                 <View  style={{justifyContent:'center', alignItems:'center', marginLeft:70, width:reponsivewidth(380)}}>
@@ -191,30 +247,38 @@ const onDelPaying= async()=>{
                 </View>
                 <View style={{flexDirection:'row',marginTop:10}}>
                 <Text style={{ fontWeight:'700'}}>Người lập : </Text>
-                <Text style={{marginLeft:5}}>{item.createrID}</Text>
+                <Text style={{marginLeft:5}}>{item.createrID.Name} {item.createrID.isDelete == true && '(Đă nghỉ việc)'}</Text>
                 </View>
 
                  </View>
+                 <View>
                  <View style={{justifyContent:'center', alignItems:'flex-start', width:reponsivewidth(75)}}>
                      <TouchableOpacity onPress={()=>{setitemSelectedl(item); setvisibleModalDel(true);} }>
                         <MaterialCommunityIcons size={32} name="delete" color={'#999999'}/>
                      </TouchableOpacity>
                  </View>
-                 <View>
-                    <CustomHyperLink onPress={()=>{ setDetail(true); setidclick(item.id) }}/>
+                 <View style={{marginTop:10,justifyContent:'center', alignItems:'flex-start'}}>
+                 <TouchableOpacity onPress={()=>{  setidclick(item); setDetail(true); }}  >
+                        <MaterialCommunityIcons size={32} name="text-box-search-outline" color={'#999999'}/>
+                     </TouchableOpacity>
+                    {/* <CustomHyperLink onPress={()=>{ setDetail(true); setidclick(item.id) }} title={'Xem chi tiết'}/> */}
                 </View>
+                 </View>
                  </View>
                 </View>
 
                  </View>
                     );
                 })
-                    }
+                   : <View style={{height:reponsiveheight(550)}}>
+                       <Text style={{opacity:0.4}}>
+                           Không có thông tin thanh toán
+                       </Text>
+                   </View> }
                 </ScrollView>
-                
-                <CustomNotificationDel visible={visbleModalDel} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} Content={"Bạn có thực sự muốn xóa hóa đơn này không"} title="Thông báo"  onCancel={()=>setvisibleModalDel(false)} onAction={onDelPaying}/>
-                <HistoryPayingDetail  visible={detail} idBill={idclick} onCancel={setDetail}/>
-              
+                <CustomNotificationDel visible={visbleModalDel} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} Content={'Bạn có thực sự muốn xóa hóa đơn này không'} title="Thông báo"  onCancel={()=>setvisibleModalDel(false)} onAction={onDelPaying}/>
+                <HistoryPayingDetail  visible={detail} idBill={idclick} onCancel={setDetail} viewStyle={{width: reponsivewidth(330)}}/>
+                <CustomNotification visible={Suscces} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} Content={'Bạn đã xóa thành công'} title="Thông báo"  onCancel={()=>setSuccess(false)}/>
            <Loading visible={loading}/>
            </SafeAreaView>
         );

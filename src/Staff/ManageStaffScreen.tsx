@@ -63,7 +63,7 @@ const ManageStaffScreen: React.FC<props> = ({navigation}: props) => {
           <CustomBoxItem
             Style={{marginTop: 25}}
             onPress={() => {
-              navigation.navigate('Wages');
+              navigation.navigate('WagesParamaList');
             }}
             Avatarimg={
               <CalculateWages
@@ -114,7 +114,7 @@ const ManageStaffScreen: React.FC<props> = ({navigation}: props) => {
             }
             title="Điểm danh "
             onPress={() => {
-              navigation.navigate('AttendanceScreen');
+              navigation.navigate('AttendanceParamaList');
             }}
           />
         </ScrollView>

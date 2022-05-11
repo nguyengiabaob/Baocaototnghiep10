@@ -23,10 +23,12 @@ import BellNofi from '../asset/svg/bellnotification.svg';
 import DataService from '../services/dataservice';
 import {Userdata} from '../Model/User';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {ManageEmployeePramaList} from '../navigation/types';
+import {AttendanceParamaList} from '../navigation/types';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import {useSelector} from 'react-redux';
 type props = {
-  navigation: StackNavigationProp<ManageEmployeePramaList, 'AttendanceScreen'>;
+  navigation: StackNavigationProp<AttendanceParamaList, 'AttendanceScreen'>;
 };
 // const count = 5;
 // const duration = 4000;
@@ -36,6 +38,7 @@ type props = {
 const Attendance: React.FC<props> = ({navigation}) => {
   const [visibleAlert, setvisbleAlert] = useState<boolean>(false);
   const {userName} = useAppSelector(selectAuth);
+  const {typeUser} = useSelector(selectAuth);
   // const {stateAnimation, setAnimation} = useState<void>(constructAnimation);
   const animation = useRef(new Animated.Value(1.5));
   const [userId, setUserId] = useState<string | null>('');
@@ -125,22 +128,55 @@ const Attendance: React.FC<props> = ({navigation}) => {
     ).start();
   }, []);
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor:'#2596be1c'}}>
-      <View style={{flexDirection: 'row', marginTop: 25}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#2596be1c'}}>
+      <View
+        style={{
+          flexDirection: 'row',
+          marginTop: 25,
+          backgroundColor: '#FFFF',
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingBottom: 8,
+          paddingTop: 8,
+        }}>
         <EvilIcons name="calendar" style={{fontSize: 30}} />
-        <Text
-          style={{
-            borderRadius: 10,
-            backgroundColor: '#FFFF',
-            paddingLeft: 15,
-            paddingRight: 15,
-            fontSize: 15,
-          }}>
-          {moment(new Date()).format('DD/MM/YYYY')}
-        </Text>
-        {/* <TextInput style={{borderRadius: 10}}>
+        <View style={{flex: 0.8}}>
+          <Text
+            style={{
+              width: '40%',
+              borderColor: '#a3a0a0',
+              borderWidth: 0.5,
+              borderRadius: 5,
+              backgroundColor: '#FFFF',
+              paddingLeft: 15,
+              paddingRight: 15,
+              fontSize: 15,
+            }}>
+            {moment(new Date()).format('DD/MM/YYYY')}
+          </Text>
+          {/* <TextInput style={{borderRadius: 10}}>
           {moment(Date.now(), 'DD/MM/YYYY')}
         </TextInput> */}
+        </View>
+        {typeUser == 0 ? (
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('AttendanceSettingScreen');
+            }}
+            style={{flex: 0.2, alignItems: 'center'}}>
+            <MaterialIcon name="settings" size={32} />
+          </TouchableOpacity>
+        ) : (
+          typeUser !== 0 && (
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('AttendacneUser');
+              }}
+              style={{flex: 0.2, alignItems: 'center'}}>
+              <MaterialIcon name="menu-book" size={32} />
+            </TouchableOpacity>
+          )
+        )}
       </View>
       <View style={{marginTop: 15}}>
         {console.log('78456', userInfo)}

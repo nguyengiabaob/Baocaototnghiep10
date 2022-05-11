@@ -29,11 +29,7 @@ const LoginNavigator: React.FC = () => {
       ) : isLoggedIn === true && !userName ? (
         <Screen name="UpdateUserInformation" component={AddStaffScreen} />
       ) : (
-        <Screen
-          name="LoginScreen"
-          component={LoginScreen}
-      
-        />
+        <Screen name="LoginScreen" component={LoginScreen} />
       )}
       <Screen name="RegisterScreen" component={Register} />
       <Screen name="ForgotPasswordSceen" component={ForgotPassword} />

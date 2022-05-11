@@ -23,7 +23,8 @@ const CustomBoxItem: React.FC <props> =  ({Avatarimg, title,isBadge, BadgeSucess
         IsnotButton === true ? (
         <View style={[style.container, Style]}>
             <View style={{paddingLeft:25, paddingTop:15, paddingBottom:15}}>
-                {Avatarimg}
+            <Avatar containerStyle={{width:reponsivewidth(45), height:reponsiveheight(45)}} avatarStyle={{width:reponsivewidth(45), height:reponsiveheight(45)}} rounded source={Avatarimg}
+                />
             </View>
             <View style={style.containerTitle}>
                 <Text style={style.title}>{title}</Text>

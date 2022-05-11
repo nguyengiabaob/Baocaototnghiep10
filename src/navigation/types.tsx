@@ -47,15 +47,15 @@ export type ManageEmployeePramaList ={
     MainScreen: undefined,
     EmployeeInformationParamList: undefined,
     AssignmentParamaList: undefined,
-    Wages:undefined,
-    AttendanceScreen: undefined,
+    WagesParamaList:undefined,
+    AttendanceParamaList: undefined
     CreateAccount : undefined,
 }
 export type EmployeeInformationParamList= {
     ListStaffScreen: undefined,
     UserInformation:{id: string},
-    AddstaffScreen:undefined,
-    AttendanceScreen: undefined
+    AddstaffScreen: { isAdd : boolean},
+    AttendanceParamaList: undefined
 }
 export type ChartParamList={
     ChartScreen: undefined
@@ -80,5 +80,18 @@ export type MaterialParamList={
 export type AssignmentParamaList = {
     Assignment: undefined
     ListGeneralTimeWork: undefined
+}
+export type AttendanceParamaList = {
+    AttendanceScreen: undefined
+    AttendanceSettingScreen: undefined
+    AttendanceDetailScreen: {item : any} 
+    AddAttedance : undefined
+    AttendacneUser: undefined
+}
+export type WagesParamaList ={
+    WagesScreen: undefined
+    WagesDetail: {id: string}
+    LisLogScreen: {Day: string, userId: string | undefined}
+    AttendanceDetailScreen: {id:any}
 }
 

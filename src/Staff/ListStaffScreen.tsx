@@ -158,9 +158,19 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
     if (datadel.length > 0) {
       datadel.forEach(item => {
         DelImage(item.Avatar);
-        data.deletedData('user', item);
+        let user= staffArray.find(x=>x.id == item);
+        if(user)
+        {
+          let {username,password, ...rest} = user;
+          let newData = {
+            ...rest,
+            isDelete: true,
+          } 
+          // data.deletedData('user', item);
+          data.newdeletedData(item,'user', newData)
+        }
       });
-      let dataarray = await DataService.Getdata_dtService<any>('Assignment');
+      // let dataarray = await DataService.Getdata_dtService<any>('Assignment');
       // data.getdata("Assignment").then(res=>{
       //     let dataarray: any[]= [];
       //     for ( let key in res)
@@ -173,13 +183,13 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
       //             })
       //         }
       //     }
-      datadel.forEach(item => {
-        dataarray.forEach(i => {
-          if (i.EmployeeID == item.id) {
-            data.deletedData('Assignment', i.id);
-          }
-        });
-      });
+      // datadel.forEach(item => {
+      //   dataarray.forEach(i => {
+      //     if (i.EmployeeID == item.id) {
+      //       data.deletedData('Assignment', i.id);
+      //     }
+      //   });
+      // });
 
       // })
       setdatadel([]);
@@ -230,7 +240,7 @@ const ListStaffScreen: React.FC<props> = ({navigation}: props) => {
     
        { typeUser == 0 &&
           <TouchableOpacity
-            onPress={() => navigation.navigate('AddstaffScreen')}
+            onPress={() => navigation.navigate('AddstaffScreen', {isAdd: true})}
             style={{
               display: 'flex',
               flexDirection: 'row',

@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
 import instance from './instance';
@@ -9,6 +10,10 @@ import database from '@react-native-firebase/database';
 import firebase from 'firebase';
 import { Userdata } from '../Model/User';
 import { ConfigMaterial } from '../Model/ConfigMaterialModel';
+import { timeWork } from '../Model/TimeWork';
+import DataService from './dataservice';
+import { Assigment } from '../Model/Assignment';
+import { Wages } from '../Model/Wages';
 // import axios, {AxiosResponse} from 'axios';
 class data{
 static getRealTimeData (name: string)  {
@@ -57,9 +62,18 @@ static async getdata2( name: string) :Promise<any>
 static async deletedData (nametable: string, id: string) : Promise<any>
  {
      return await
-     instance.delete(`/${nametable}/${id}.json`).then(() => console.log('Data deleted.'));
+     instance.delete(`/${nametable}/${id}.json`).then(() =>{return true});
  }
-
+static async newdeletedData (id : string, name: string, data: any)
+{
+    return await
+    instance.post(`/${name}/${id}.json`,{
+        ...data
+    }).then(response=>{
+        console.log(response.data);
+        return true;
+    }).catch((e)=>{console.log(e);});
+}
 
 
 // Service User
@@ -88,6 +102,16 @@ static async postAccount( data : Userdata)
        Avatar: data.Avatar,
        Name: data.Name,
        dateofbirth: data.dateofbirth,
+    }).then(response=>{
+        console.log(response.data);
+        return true;
+    }).catch((e)=>{console.log(e);});
+}
+static async postAccountnew( data : any)
+{
+    return await
+    instance.post('/user.json',{
+        ...data
     }).then(response=>{
         console.log(response.data);
         return true;
@@ -143,6 +167,19 @@ static async updateuser (nametable : string, phone: string , Email:string, Gende
         return true;
     }).catch((e)=>{console.log(e);});
 }
+static async Patchuser (data: any ,id : string): Promise<any>
+{
+    return await
+    instance.patch(`/user/${id}.json`,{
+        ...data
+    }).then(response=>{
+        console.log(response.data);
+        return true;
+    }).catch((e)=>{console.log(e);});
+}
+
+
+
 // Update Permission
 static async updatePermission (id: string, _type: number) {
     return await
@@ -247,6 +284,17 @@ static async updatedataproduct (nametable: string , id: string,  name:string , p
 
 
 // Service TimeWork
+static async PostTimeWork2 (data: timeWork )
+{
+   return await
+   instance.post('/TimeWork.json',{
+       ...data
+
+   }).then(response=>{
+       console.log(response.data);
+       return true;
+   }).catch((e)=>{console.log(e);});
+}
 static async PostTimeWork (nametable: string , NameTimeWork: string, day: string )
  {
     return await
@@ -269,7 +317,41 @@ static async PostTimeWork (nametable: string , NameTimeWork: string, day: string
         return true;
     }).catch((e)=>{console.log(e);});
  }
-
+ static async UpdateTimeWork2 (data : timeWork)
+ {
+    let {id ,...rest}= data;
+    return await
+    instance.put(`/TimeWork/${data.id}.json`,{
+        ...rest
+    }).then(response=>{
+        console.log(response.data);
+        return true;
+    }).catch((e)=>{console.log(e);});
+ }
+static async DeleteTimeWork (data : timeWork)
+{
+    try
+    {
+        let assignmentData = await DataService.Getdata_dtService<Assigment>(
+            'Assignment',
+          );
+        if (assignmentData.length > 0)
+        {
+            assignmentData.map(x=>{
+                if (x.Time === data.id)
+                {
+                    this.deletedData('Assignment',x.id)
+                }
+            })
+        }
+    }
+    catch (e)
+    {
+        return false;
+    }
+    return await this.deletedData('TimeWork', data.id);
+    
+}
 
 
 //Service Assignment
@@ -282,7 +364,7 @@ static async PostTimeWork (nametable: string , NameTimeWork: string, day: string
 
 
  // Service Wages
- static async PostWages (EmployeeID: string , BasicSalary: number, TotalSalary: number, Time:number , Day: string  )
+ static async PostWages (EmployeeID: string , BasicSalary: number, TotalSalary: number, Time:number , Day: string,Content: string  )
  {
     return await
     instance.post('/Wages.json',{
@@ -291,6 +373,17 @@ static async PostTimeWork (nametable: string , NameTimeWork: string, day: string
         Time: Time,
         BasicSalary: BasicSalary,
         TotalSalary: TotalSalary,
+        Content: Content,
+    }).then(response=>{
+        console.log(response.data);
+        return true;
+    }).catch((e)=>{console.log(e);});
+ }
+ static async putWages (id: string , data: any)
+ {
+    return await
+    instance.patch(`/Wages/${id}.json`,{
+        ...data
     }).then(response=>{
         console.log(response.data);
         return true;

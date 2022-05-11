@@ -24,15 +24,19 @@ import IconCheck from '../asset/svg/check.svg';
 import { CustomNotification } from '../Model/CustomNofication';
 import { useAppDispatch, useAppSelector } from '../redux/hook';
 import { requestLogout, selectAuth } from '../redux/reducer/authslice';
+import Warning from '../asset/svg/Warning.svg';
+import { RouteProp } from '@react-navigation/native';
 type props ={
     navigation: StackNavigationProp<EmployeeInformationParamList,'AddstaffScreen'>
+    route: RouteProp<EmployeeInformationParamList,'AddstaffScreen'>
 }
-export const AddStaffScreen :React.FC<props> = ({navigation}:props)=>{
+export const AddStaffScreen :React.FC<props> = ({navigation,route}:props)=>{
 const [Name, setName] = useState<string>('');
 const [ErrorName, setErrorName] = useState<string>('');
 const [errorphone, seterrorphone]= useState<string>('');
 const [erroremail, seterroremail]= useState<string>('');
-const [errorservice, seterrorservice]= useState<string>('');
+const {isAdd}= route.params;
+// const [errorservice, seterrorservice]= useState<string>('');
 const [male,setmale] = useState<boolean>(true);
 const [female,setfemale] = useState<boolean>(false);
 const [phone,setphone] = useState<string>('');
@@ -43,7 +47,8 @@ const [datepickervalue,setdatepickervalue] = useState<string>();
 const [pickImg, setPickImage] = useState<ImageData[]>([]);
 const [visible, setvisible] = useState<boolean>(false);
 const [service,setservice] = useState<string>('');
-const {id}=useAppSelector(selectAuth);
+const {userToken}=useAppSelector(selectAuth);
+const [Error,setError]= useState<boolean>(false);
 const dispatch = useAppDispatch();
   function onLogOut() {
     dispatch(requestLogout());
@@ -97,7 +102,7 @@ async function addDataStaff (){
     {
         gen = 'nữ';
     }
-    if(pickImg.length>0 )
+    if (pickImg.length > 0 )
     {
     const reference = storage().ref(pickImg[0].fileName);
     console.log(reference);
@@ -105,14 +110,53 @@ async function addDataStaff (){
     await reference.putFile(pathToFile);
     urlimg =  await reference.getDownloadURL();
     }
-    if(phone !== '' && Email !== '' && Name !=='' && service !== '' && erroremail=='' && errorphone=='' && errorservice=='' && ErrorName=='')
+    if(isAdd == true)
     {
-        data.UpdateDatauserNew(phone,Email, gen, urlimg, Name,new Date(showdatepickervalue).toDateString(),id).then(res=>{if (res === true)
+        if(phone !== ''  && Name !==''  && errorphone=='' && ErrorName=='' && userToken && datepickervalue && gen!= '' )
         {
-            console.log('true');
-            openModal();
-        }});
+            let newData = {
+                phone: phone,
+                Gender: gen,
+                Avatar: urlimg,
+                Name: Name,
+                dateofbirth: showdatepickervalue.toDateString(),
+            }
+            data.Patchuser(newData,userToken).then(res=>{if (res === true)
+            {
+                console.log('true');
+                openModal();
+            }});
+        }
+        else
+        {
+            setError(true);
+        }
     }
+    else
+    {
+        if(phone !== ''  && Name !=='' && Email!== ''  && errorphone=='' &&erroremail==''&& ErrorName=='' && datepickervalue && gen!= '' )
+        {
+            let newData = {
+                type: 1,
+                Email:Email,
+                phone: phone,
+                Gender: gen,
+                Avatar: urlimg,
+                Name: Name,
+                dateofbirth: showdatepickervalue.toDateString(),
+            }
+            data.postAccountnew(newData).then(res=>{if (res === true)
+            {
+                console.log('true');
+                openModal();
+            }});
+        }
+        else
+        {
+            setError(true);
+        }
+    }
+   
 };
     return (
         <SafeAreaView style={style.container}>
@@ -218,7 +262,7 @@ async function addDataStaff (){
             </View>
             <View style={style.fieldinfo}>
                <View style={{flexDirection: 'row', alignItems:'center', flex:0.35, marginLeft:6}} >
-                   {/* <Fethericon name="user" size={20} color="#94cdf5"/> */}
+                  
                    <Text style={{marginHorizontal:8}}>Email</Text>
                </View>
                <View style={{flex:0.7, marginTop:10}}>
@@ -280,11 +324,11 @@ async function addDataStaff (){
                </View>
             </View>
             </ScrollView>
-            <View style={{justifyContent:'center',alignItems:'center',marginTop:15}}>
+            <View style={{alignItems:'center',marginTop:5, height: reponsiveheight(110)}}>
             <TouchableOpacity onPress={()=>{addDataStaff()}} style={style.button}>
                 {/* <Fethericon name="log-out" size={20} color="#FFF"/> */}
                 <View style={{flex:1}}>
-                <Text style={{ color:'#FFF', marginHorizontal:8, alignSelf:'center'}}>Cập nhật</Text>
+                <Text style={{ color:'#FFF', marginHorizontal:8, alignSelf:'center'}}>{isAdd == true ? ' Thêm ': 'Cập nhật'}</Text>
                 </View>
                 </TouchableOpacity>
             </View>
@@ -303,6 +347,7 @@ async function addDataStaff (){
                         </Pressable>
                     </View>
             </Overlay> */}
+            <CustomNotification visible={Error} iconTitle={<Warning width={reponsivewidth(30)} height={reponsiveheight(30)}/>} title={'Thông báo'} Content={'Vui lòng nhập thông tin đầy đủ'} onCancel={()=>setError(false)}/>
             <CustomNotification visible={visible} iconTitle={<BellNofi width={reponsivewidth(30)} height={reponsiveheight(30)}/>} title="Thông báo" iconContent={ <IconCheck   width={reponsivewidth(150)} height={reponsiveheight(60)} /> } onCancel={()=>{cancelModal(); onLogOut() }} Content="Bạn đã cập nhật thành công !"/>
         </SafeAreaView>
     );
@@ -311,7 +356,7 @@ const style = StyleSheet.create({
     container:
     {
         flex:1,
-        alignItems:'center',
+      
     },
     fieldinfo:
         {
@@ -323,7 +368,7 @@ const style = StyleSheet.create({
             alignSelf:'center',
             justifyContent:'center',
             width: reponsivewidth(380),
-            height:reponsiveheight(85),
+            height:reponsiveheight(100),
 
         },
         button:
@@ -334,6 +379,7 @@ const style = StyleSheet.create({
             width:reponsivewidth(150),
             backgroundColor:'#226cb3',
             color:'#FFF',
+            borderRadius:10
         },
     
 })

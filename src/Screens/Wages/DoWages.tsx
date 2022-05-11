@@ -1,12 +1,17 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
+import { StackNavigationProp } from '@react-navigation/stack';
 import React, {useEffect, useState} from 'react';
 import {Text, View} from 'react-native';
 import {Tab, TabView} from 'react-native-elements';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { WagesParamaList } from '../../navigation/types';
 import {WagesHistory} from './HistoryWages';
 import {Wages} from './Wages';
-export const TimeKeeping: React.FC = () => {
+type props = {
+  navigation: StackNavigationProp<WagesParamaList,'WagesScreen'>
+}
+export const TimeKeeping: React.FC<props> = ({navigation}) => {
   const [index, setIndex] = useState(0);
   const [load, setload] = useState(true);
   useEffect(() => {
@@ -34,7 +39,7 @@ export const TimeKeeping: React.FC = () => {
           <Wages />
         </TabView.Item>
         <TabView.Item style={{width: '100%'}}>
-          <WagesHistory visible={load} />
+          <WagesHistory visible={load} navigation ={navigation} />
         </TabView.Item>
       </TabView>
     </SafeAreaView>

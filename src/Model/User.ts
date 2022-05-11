@@ -12,4 +12,5 @@ export interface Userdata
     Avatar: string,
     Gender: string,
     dateofbirth: string,
+    isDelete: boolean
 }
